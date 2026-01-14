@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.Linux_x86_64"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Linux x86-64 platform bindings."
+
+[build]
+sources = [
+    "Types.fs",
+    "Console.fs",
+    "WebView.fs",
+    "WebViewWrapper.fs"
+]
+
+[dependencies]
