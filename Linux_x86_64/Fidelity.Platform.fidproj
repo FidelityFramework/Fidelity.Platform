@@ -13,3 +13,4 @@ sources = [
 ]
 
 [dependencies]
+barewire = { path = "/home/hhh/repos/BAREWire/src" }

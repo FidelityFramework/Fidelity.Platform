@@ -8,6 +8,8 @@
 /// call Console.* uniformly.
 module Console
 
+open BAREWire.Core.Capability
+
 /// Standard file descriptors
 [<Literal>]
 let STDIN = 0
@@ -46,11 +48,21 @@ let readLineInto (buffer: nativeptr<byte>) (maxLength: int) : int =
     pos
 
 /// Read a line from stdin, returning it as a string.
-/// Allocates a stack buffer, reads into it, then creates a string.
+/// WARNING: Allocates on readln's stack - returned string is INVALID after return!
+/// Use readlnFrom with an arena for strings that must outlive this call.
 let readln () : string =
     let buffer = NativePtr.stackalloc<byte> 256
     let len = readLineInto buffer 256
     NativeStr.fromPointer buffer len
+
+/// Read a line from stdin using arena for string storage.
+/// The string data lives in the arena, surviving this function's return.
+/// This is the safe alternative to readln() for strings that must outlive the call.
+let readlnFrom (arena: byref<Arena<'lifetime>>) : string =
+    let buffer = Arena.alloc &arena 256
+    let bufferPtr = NativePtr.ofNativeInt<byte> buffer
+    let len = readLineInto bufferPtr 256
+    NativeStr.fromPointer bufferPtr len
 
 /// Write a string to stdout.
 let write (s: string) : unit =
