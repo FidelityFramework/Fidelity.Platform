@@ -13,4 +13,5 @@ sources = [
 ]
 
 [dependencies]
-barewire = { path = "/home/hhh/repos/BAREWire/src" }
+# BAREWire will be added when WebSocket bindings need it
+# For now, Console/WebView only need FNCS intrinsics

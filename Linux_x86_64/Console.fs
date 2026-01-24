@@ -8,7 +8,7 @@
 /// call Console.* uniformly.
 module Console
 
-open BAREWire.Core.Capability
+// NOTE: Arena<'lifetime> is an FNCS intrinsic - no BAREWire import needed
 
 /// Standard file descriptors
 [<Literal>]
@@ -48,9 +48,10 @@ let readLineInto (buffer: nativeptr<byte>) (maxLength: int) : int =
     pos
 
 /// Read a line from stdin, returning it as a string.
-/// WARNING: Allocates on readln's stack - returned string is INVALID after return!
-/// Use readlnFrom with an arena for strings that must outlive this call.
-let readln () : string =
+/// This function is marked `inline` for escape analysis - the stackalloc
+/// is lifted to the caller's frame, ensuring the returned string is valid
+/// through the caller's scope.
+let inline readln () : string =
     let buffer = NativePtr.stackalloc<byte> 256
     let len = readLineInto buffer 256
     NativeStr.fromPointer buffer len
