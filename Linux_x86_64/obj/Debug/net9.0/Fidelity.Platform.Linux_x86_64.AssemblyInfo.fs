@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("Fidelity.Platform.Linux_x86_64")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ec1c5263aaaf2f2347c49020afd555979cebd98")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12a64a861d40c6bdc5566543b62cf391091c93ec")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("Fidelity.Platform.Linux_x86_64")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("Fidelity.Platform.Linux_x86_64")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]
