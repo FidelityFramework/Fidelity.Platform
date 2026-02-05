@@ -24,13 +24,14 @@ let STDERR = 2
 /// Directly uses Sys.read intrinsic - PSG enrichment, Baker saturation,
 /// and Alex witnessing handle mutable state, control flow, and FFI conversion.
 /// Allocation strategy (stack vs arena) determined by escape analysis.
+/// NOTE: pos is nativeint (not int) - buffer positions map to MLIR index type
 let readln () : string =
     let buffer = NativePtr.stackalloc<byte> 256
-    let mutable pos = 0
+    let mutable pos = 0n  // nativeint - maps to MLIR index type
     let mutable isDone = false
     let charBuf = NativePtr.stackalloc<byte> 1
 
-    while not isDone && pos < 255 do
+    while not isDone && pos < 255n do  // Compare with nativeint literal
         let bytesRead = Sys.read STDIN charBuf
 
         if bytesRead <= 0 then
@@ -41,9 +42,9 @@ let readln () : string =
                 isDone <- true
             else
                 NativePtr.write (NativePtr.add buffer pos) b
-                pos <- pos + 1
+                pos <- pos + 1n  // Increment as nativeint
 
-    NativeStr.fromPointer buffer
+    NativeStr.fromPointer buffer pos
 
 
 
