@@ -8,6 +8,7 @@ description = "Linux x86-64 platform bindings."
 sources = [
     "Types.fs",
     "Format.fs",
+    "Parse.fs",
     "Console.fs",
     "WebView.fs",
     "WebViewWrapper.fs"
