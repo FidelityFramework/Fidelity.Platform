@@ -53,5 +53,6 @@ Fidelity.Platform/
 
 - `quotation_binding_pattern` memory
 - `hardware_binding_traceability` memory
+- `bindings_prelude_policy` memory
 - `gtk_webkit_integration` memory
 - `/home/hhh/repos/Composer/docs/Platform_Binding_Model.md`

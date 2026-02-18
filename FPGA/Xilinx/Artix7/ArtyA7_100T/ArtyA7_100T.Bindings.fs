@@ -1,4 +1,4 @@
-namespace Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T
+namespace Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Bindings
 
 open Fidelity.Platform.Contracts
 
