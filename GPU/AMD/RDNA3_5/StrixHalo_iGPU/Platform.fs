@@ -1,0 +1,23 @@
+namespace Fidelity.Platform.GPU.AMD.RDNA3_5.StrixHalo_iGPU
+
+open Fidelity.Platform.Contracts
+
+module Platform =
+    let descriptor: PlatformDescriptor = {
+        Id = "gpu-amd-rdna3_5-strix-halo"
+        DisplayName = "Strix Halo iGPU (RDNA 3.5)"
+        Substrate = SubstrateKind.GPU
+        Vendor = "AMD"
+        Family = "RDNA3.5"
+        Device = "Strix Halo iGPU"
+        Package = "Host"
+        SpeedGrade = "n/a"
+        Clocks = []
+        Groups = []
+        Uarts = []
+        DedicatedPins = []
+        Notes = [
+            "Scaffolding package for GPU substrate partitioning."
+            "Populate with queue, memory, and dialect/toolchain metadata as integration matures."
+        ]
+    }

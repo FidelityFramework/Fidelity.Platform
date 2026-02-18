@@ -46,6 +46,6 @@ let write s = ...  // Omit inline - let MLIR decide
 
 ## Reference
 
-See `inline_architecture_real_functions_mlir_norms` memory in FNCS and Firefly repos for full architectural rationale.
+See `docs/Architecture_Canonical.md` in Composer for broader canonical architecture context. Apply this same "real function" rule to hardware platform adapters in addition to OS adapters.
 
 **Golden Rule:** Platform libraries adapt F# idioms to targets. Real functions preserve flexibility.

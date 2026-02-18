@@ -2,7 +2,7 @@
 
 ## Context
 
-Fidelity.Platform uses F# quotations to express platform bindings that Alex witnesses into MLIR.
+Fidelity.Platform uses quotation-based bindings (implemented in `.fs` during bootstrap) that Alex witnesses into MLIR.
 
 ## Decision
 
@@ -48,4 +48,5 @@ llvm.func @gtk_window_new() -> !llvm.ptr attributes {sym_visibility = "private"}
 ## Related
 
 - `platform_role` memory
-- `/home/hhh/repos/Firefly/docs/Quotation_Based_Memory_Architecture.md`
+- `hardware_binding_traceability` memory
+- `/home/hhh/repos/Composer/docs/Platform_Binding_Model.md`

@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Digilent Arty A7-100T platform binding package (FPGA substrate)."
+
+[build]
+sources = [
+    "ArtyA7_100T.fs"
+]
+output = "fidelity-platform-fpga-arty-a7-100t"
+output_kind = "library"
+
+[dependencies]
+contracts = { path = "../../../../Contracts" }

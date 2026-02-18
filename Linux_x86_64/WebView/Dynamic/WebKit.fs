@@ -5,7 +5,7 @@ namespace Fidelity.Platform.WebView.Dynamic
 /// NOTE: Currently using linker-based dynamic linking (-lwebkit2gtk-4.1).
 /// The library is resolved at load time by the system's ld.so.
 ///
-/// FUTURE: Full dlopen/dlsym pattern requires mutable variable support in FNCS.
+/// FUTURE: Full dlopen/dlsym pattern requires mutable variable support in CCS.
 /// When that's available, we can try multiple library versions at runtime.
 module WebKit =
 

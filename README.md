@@ -4,49 +4,74 @@ Platform binding monorepo for the Fidelity framework.
 
 ## Structure
 
-Each platform has its own subdirectory with quotation-based bindings:
+The repository now uses a substrate-first layout to keep platform growth organized:
 
 ```
 Fidelity.Platform/
-├── Linux_x86_64/       # Linux on x86-64
-├── Linux_ARM64/        # Linux on ARM64 (future)
-├── Windows_x86_64/     # Windows on x86-64 (future)
-├── MacOS_x86_64/       # macOS on x86-64 (future)
-├── MacOS_ARM64/        # macOS on ARM64/Apple Silicon (future)
-├── BareMetal_ARM32/    # Bare-metal ARM Cortex-M (future)
-└── ...
+├── Contracts/                           # Shared substrate-neutral contracts
+├── CPU/
+│   └── Linux/
+│       └── X86_64/
+│           └── StrixHalo/
+├── MCU/
+│   ├── ST/
+│   │   └── STM32F7/
+│   │       └── MeadowF7/
+│   └── Renesas/
+│       └── RA6M5/
+│           └── EK_RA6M5/
+├── GPU/
+│   └── AMD/
+│       └── RDNA3_5/
+│           └── StrixHalo_iGPU/
+├── NPU/
+│   └── AMD/
+│       └── XDNA2/
+│           └── StrixHalo_NPU/
+├── FPGA/
+│   └── Xilinx/
+│       └── Artix7/
+│           └── ArtyA7_100T/
+├── CGRA/                                # Reserved substrate space
+├── Profiles/
+│   └── StrixHalo_ArtyLab/
+└── Linux_x86_64/                        # Existing package used by current samples
 ```
+
+For additional details, see `PLATFORM_STRUCTURE.md`.
 
 ## Usage in fidproj
 
-Reference the specific platform your project targets:
+Reference the specific platform package your project targets:
 
 ```toml
 [dependencies]
-alloy = { path = "/home/hhh/repos/Alloy/src" }
+platform = { path = "/home/hhh/repos/Fidelity.Platform/FPGA/Xilinx/Artix7/ArtyA7_100T" }
+```
+
+Or use the currently active Linux package used by existing sample projects:
+
+```toml
+[dependencies]
 platform = { path = "/home/hhh/repos/Fidelity.Platform/Linux_x86_64" }
 ```
 
 ## Architecture
 
-Platform bindings provide:
+Platform bindings provide data that ultimately informs backend lowering:
 
-1. **Type Layouts** - Size and alignment for primitive types (`int`, `nativeint`, `pointer`, etc.)
-2. **Syscall Conventions** - Calling convention, register assignments, syscall instruction
-3. **Syscall Numbers** - Platform-specific syscall numbers
-4. **Memory Regions** - Stack, heap, peripheral memory semantics
+1. Type/layout and substrate metadata
+2. Endpoint and channel definitions
+3. Device capability declarations
+4. Memory and clock topology
 
-These are expressed as **F# quotations** that flow through the compilation pipeline
-unchanged until Alex witnesses them and generates platform-specific MLIR.
+These are expressed in source and consumed through the normal project loading path.
 
 ## Design Principle
 
-Platform knowledge flows "from the top" - it comes from binding libraries, not from
-compiler inference. This enables:
+Platform knowledge flows from binding packages, not ad hoc compiler inference.
+A consistent package shape across CPU/MCU/GPU/NPU/FPGA/CGRA allows:
 
-- GPU platforms (CUDA, ROCm, AVX-512)
-- NPU platforms (tensor accelerators)
-- FPGA platforms (programmable logic)
-- Embedded platforms (ARM Cortex-M, RISC-V)
-
-All follow the same pattern: quotation-based bindings → PSG → Alex witnesses → MLIR.
+- Clean multi-substrate composition via profiles
+- Per-target evolution without contaminating unrelated substrates
+- Explicit dependency wiring from application manifests

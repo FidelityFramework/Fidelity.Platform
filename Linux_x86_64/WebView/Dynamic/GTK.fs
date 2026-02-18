@@ -5,7 +5,7 @@ namespace Fidelity.Platform.WebView.Dynamic
 /// NOTE: Currently using linker-based dynamic linking (-lgtk-3).
 /// This means libgtk-3.so is resolved at load time by the system's ld.so.
 ///
-/// FUTURE: Full dlopen/dlsym pattern requires mutable variable support in FNCS.
+/// FUTURE: Full dlopen/dlsym pattern requires mutable variable support in CCS.
 /// When that's available, we can switch to explicit runtime loading for more
 /// flexibility (check if GTK exists, try different versions, etc.).
 module GTK =

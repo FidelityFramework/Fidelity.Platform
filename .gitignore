@@ -65,6 +65,18 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Fidelity/Clef local compiler assets
+# Multi-target projects should use `targets/` (plural) at the project level.
+# Current tooling may still emit `target/` for leaf package builds.
+targets/
+target/
+deps/
+
+# Local AI/tooling state (never track)
+.serena/
+.claude/
+.gemini/
+
 # Tye
 .tye/
 

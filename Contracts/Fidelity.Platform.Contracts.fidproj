@@ -1,0 +1,12 @@
+[package]
+name = "Fidelity.Platform.Contracts"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Shared substrate-neutral contracts for Fidelity.Platform packages."
+
+[build]
+sources = [
+    "PlatformContracts.fs"
+]
+output = "fidelity-platform-contracts"
+output_kind = "library"

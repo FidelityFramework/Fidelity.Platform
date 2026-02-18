@@ -1,7 +1,7 @@
 namespace Fidelity.Platform
 
 /// GTK3 and WebKitGTK platform conduits for Linux.
-/// Uses FnPtr.fromSymbol for FFI calls per fsnative-spec/spec/ffi-boundary.md
+/// Uses FnPtr.fromSymbol for FFI calls per clef-lang-spec/spec/ffi-boundary.md
 ///
 /// Design:
 /// - Private FnPtr declarations bind to C symbols at link time

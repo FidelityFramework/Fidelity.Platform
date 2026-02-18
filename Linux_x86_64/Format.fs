@@ -1,6 +1,6 @@
 /// Format operations for Fidelity.Platform
-/// Numeric-to-string conversion using FNCS intrinsics.
-/// Same compilation pattern as Console.write — F# code flows through FNCS → PSG → Baker → Alex.
+/// Numeric-to-string conversion using compiler intrinsics.
+/// Same compilation pattern as Console.write - source flows through CCS -> PSG -> Baker -> Alex.
 /// NOTE: float is defined BEFORE int to avoid shadowing the built-in `int` conversion function.
 module Format
 

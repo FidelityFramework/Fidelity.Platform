@@ -2,7 +2,7 @@
 
 ## Context
 
-Fidelity.Platform provides low-level OS abstractions and platform-specific bindings for Fidelity applications.
+Fidelity.Platform provides low-level OS abstractions and platform-specific bindings for Fidelity applications and target hardware.
 
 ## Decision
 
@@ -25,7 +25,8 @@ Fidelity.Desktop / Fidelity.WebView / Fidelity.Signal
 3. **GTK bindings**: Window, widget, event loop via quotations
 4. **WebKitGTK bindings**: WebView widget integration
 5. **WebSocket server**: Full WebSocket protocol implementation
-6. **Threading primitives**: Thread spawn, join, mutex (future)
+6. **Hardware target bindings**: Target descriptors and endpoint mappings (FPGA/MCU/SoC)
+7. **Threading primitives**: Thread spawn, join, mutex (future)
 
 ## Structure
 
@@ -51,5 +52,6 @@ Fidelity.Platform/
 ## Related
 
 - `quotation_binding_pattern` memory
+- `hardware_binding_traceability` memory
 - `gtk_webkit_integration` memory
-- `/home/hhh/repos/Firefly/docs/Platform_Binding_Model.md`
+- `/home/hhh/repos/Composer/docs/Platform_Binding_Model.md`

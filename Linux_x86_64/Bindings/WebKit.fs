@@ -5,7 +5,7 @@ namespace Fidelity.Platform.Bindings
 /// NOTE: Currently using linker-based dynamic linking (-lwebkit2gtk-4.1).
 /// The library is resolved at load time by the system's ld.so.
 ///
-/// The "Bindings" namespace signals to FNCS that these are platform bindings.
+/// The "Bindings" namespace signals to CCS that these are platform bindings.
 /// Alex provides the actual implementations.
 module WebKit =
 

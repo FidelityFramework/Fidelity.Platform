@@ -83,4 +83,5 @@ let serve (port: int) (handler: Frame -> Frame option) =
 ## Related
 
 - `platform_role` memory
+- `hardware_binding_traceability` memory
 - `/home/hhh/repos/BAREWire/.serena/memories/wren_stack_integration.md`

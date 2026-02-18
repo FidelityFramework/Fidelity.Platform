@@ -1,14 +1,14 @@
 /// Console I/O operations for Fidelity.Platform
-/// These use FNCS intrinsics (Sys.read, NativePtr.*, NativeStr.fromPointer)
+/// These use compiler intrinsics (Sys.read, NativePtr.*, NativeStr.fromPointer)
 /// and flow through the normal compilation pipeline.
 /// Alex witnesses the PSG structure including while loops - no imperative construction.
 ///
 /// NOTE: Top-level module declaration provides "Console.readln" etc. directly matching
-/// the FNCS intrinsic names for write/writeln/error/errorln. This allows user code to
+/// the intrinsic names for write/writeln/error/errorln. This allows user code to
 /// call Console.* uniformly.
 module Console
 
-// NOTE: Arena<'lifetime> is an FNCS intrinsic - no BAREWire import needed
+// NOTE: Arena<'lifetime> is a compiler intrinsic - no BAREWire import needed
 
 /// Standard file descriptors
 [<Literal>]

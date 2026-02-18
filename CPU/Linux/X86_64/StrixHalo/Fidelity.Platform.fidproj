@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.CPU.Linux.X86_64.StrixHalo"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "CPU substrate binding metadata for Strix Halo on Linux x86-64."
+
+[build]
+sources = [
+    "Platform.fs"
+]
+output = "fidelity-platform-cpu-strixhalo"
+output_kind = "library"
+
+[dependencies]
+contracts = { path = "../../../../Contracts" }

@@ -1,0 +1,18 @@
+[package]
+name = "Fidelity.Platform.Profile.StrixHalo_ArtyLab"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Lab profile composing Strix Halo CPU/GPU/NPU with Arty A7 FPGA."
+
+[build]
+sources = [
+    "Profile.fs"
+]
+output = "fidelity-platform-profile-strixhalo-arty"
+output_kind = "library"
+
+[dependencies]
+cpu = { path = "../../CPU/Linux/X86_64/StrixHalo" }
+gpu = { path = "../../GPU/AMD/RDNA3_5/StrixHalo_iGPU" }
+npu = { path = "../../NPU/AMD/XDNA2/StrixHalo_NPU" }
+fpga = { path = "../../FPGA/Xilinx/Artix7/ArtyA7_100T" }

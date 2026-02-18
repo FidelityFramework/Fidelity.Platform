@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.MCU.Renesas.RA6M5.EK_RA6M5"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "MCU substrate binding metadata scaffold for Renesas EK-RA6M5."
+
+[build]
+sources = [
+    "Platform.fs"
+]
+output = "fidelity-platform-mcu-ra6m5-ek-ra6m5"
+output_kind = "library"
+
+[dependencies]
+contracts = { path = "../../../../Contracts" }

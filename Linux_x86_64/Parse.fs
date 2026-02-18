@@ -1,6 +1,6 @@
 /// Parse operations for Fidelity.Platform
-/// String-to-numeric conversion using FNCS intrinsics.
-/// Same compilation pattern as Format.int — F# code flows through FNCS → PSG → Baker → Alex.
+/// String-to-numeric conversion using compiler intrinsics.
+/// Same compilation pattern as Format.int - source flows through CCS -> PSG -> Baker -> Alex.
 /// NOTE: float is defined BEFORE int to avoid shadowing the built-in `int` conversion function.
 module Parse
 

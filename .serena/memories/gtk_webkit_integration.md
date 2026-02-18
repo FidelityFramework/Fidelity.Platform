@@ -59,4 +59,5 @@ GTK events flow through the main loop:
 ## Related
 
 - `quotation_binding_pattern` memory
-- `/home/hhh/repos/Firefly/docs/WebView_Desktop_Architecture.md`
+- `hardware_binding_traceability` memory
+- `/home/hhh/repos/Composer/docs/WebView_Desktop_Architecture.md`

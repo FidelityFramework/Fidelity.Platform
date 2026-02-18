@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.NPU.AMD.XDNA2.StrixHalo_NPU"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "NPU substrate binding metadata for Strix Halo XDNA2."
+
+[build]
+sources = [
+    "Platform.fs"
+]
+output = "fidelity-platform-npu-strixhalo"
+output_kind = "library"
+
+[dependencies]
+contracts = { path = "../../../../Contracts" }
