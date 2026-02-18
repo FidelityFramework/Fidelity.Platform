@@ -1,0 +1,26 @@
+/**********************************************************************************************************************
+* File Name    : readme.txt
+* Description  : Contains general information about Example Project and detailed instructions
+**********************************************************************************************************************/
+
+Project Overview:
+    This example project demonstrates basic functionalities of vee flash driver on Renesas RA MCUs based on Renesas FSP.
+    Based on User input, EP performs following operations :
+    1. Writing different data types to the different record IDs of vee flash.
+    2. Reading back the data from the different record IDs.
+    3. Format operation.
+    4. Get the status of Virtual EEPROM.
+    5. Refresh operation.   
+
+    On successful completion of each operation, success message will be displayed on the Jlink RTTViewer.
+    Error and info messages will be printed on JlinkRTTViewer.
+
+
+1) Segger RTT block address may be needed to download and observe EP operation using a hex file with RTT-Viewer.
+   RTT Block address for hex file committed in repository are as follows:
+   a. e2studio: 0x20001e08
+   b. Keil: Not Available 
+   c. IAR: Not Available
+ 
+2) If an EP is modified, compiled, and downloaded please find the block address (for the variable in RAM called _SEGGER_RTT) 
+   in .map file generated in the build configuration folder (Debug/Release).

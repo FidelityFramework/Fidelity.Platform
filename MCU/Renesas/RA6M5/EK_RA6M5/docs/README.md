@@ -12,7 +12,6 @@ Store authoritative source artifacts for this board in this folder.
 
 ## Folder Notes
 
-- Place immutable vendor files under `vendor/`.
-- Place board-level reference files under `board/`.
-- Place extracted pinout tables under `pinouts/`.
+- Keep source artifacts directly under `docs/` by default.
+- Optional subfolders are allowed, but not required.
 - Update `SOURCE_MANIFEST.md` when adding, replacing, or re-versioning artifacts.

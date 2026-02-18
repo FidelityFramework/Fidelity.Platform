@@ -1,0 +1,15 @@
+collapse/module.arm.mbed.littlefs.1593166156=false
+collapse/module.arm.mbedtls.725875028=false
+collapse/module.aws.coreHttpsLib.911886500=false
+collapse/module.aws.freertosplus.crypto.1246552139=false
+collapse/module.aws.pkcs11.mbedtls.1881757752=false
+collapse/module.aws.sockets_wrapper.wifi_silex.2111304715=false
+collapse/module.aws.transport_interface.mbedtls_pkcs11.147425319=false
+collapse/module.driver.psa_crypto.1154340646=false
+collapse/module.driver.rm_aws_pkcs11_pal_littlefs.50212407=false
+collapse/module.driver.rm_psa_crypto.354260963=false
+collapse/module.driver.sce9.plaintext.1039079964=false
+collapse/module.driver.uart_on_sci_uart.651667452=false
+collapse/module.driver.wifi_onchip_silex_using_sci_uart.1682419643=false
+collapse/module.middleware.rm_littlefs.314497083=false
+eclipse.preferences.version=1
