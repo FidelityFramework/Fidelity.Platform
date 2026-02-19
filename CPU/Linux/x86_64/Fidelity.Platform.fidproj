@@ -6,12 +6,12 @@ description = "Linux x86-64 platform bindings."
 
 [build]
 sources = [
-    "Types.fs",
-    "Format.fs",
-    "Parse.fs",
-    "Console.fs",
-    "WebView.fs",
-    "WebViewWrapper.fs"
+    "Types.clef",
+    "Format.clef",
+    "Parse.clef",
+    "Console.clef",
+    "WebView.clef",
+    "WebViewWrapper.clef"
 ]
 
 [dependencies]

@@ -1,26 +1,32 @@
 namespace Fidelity.Platform.Contracts
 
+// NOTE:
+// Composer currently imports these contracts through a restricted type-layout path.
+// String-backed aliases keep call sites stable while avoiding DU layout import failures.
+type SubstrateKind = string
 [<RequireQualifiedAccess>]
-type SubstrateKind =
-    | CPU
-    | MCU
-    | GPU
-    | NPU
-    | FPGA
-    | CGRA
+module SubstrateKind =
+    let CPU: SubstrateKind = "CPU"
+    let MCU: SubstrateKind = "MCU"
+    let GPU: SubstrateKind = "GPU"
+    let NPU: SubstrateKind = "NPU"
+    let FPGA: SubstrateKind = "FPGA"
+    let CGRA: SubstrateKind = "CGRA"
 
+type PinDirection = string
 [<RequireQualifiedAccess>]
-type PinDirection =
-    | Input
-    | Output
-    | InOut
+module PinDirection =
+    let Input: PinDirection = "Input"
+    let Output: PinDirection = "Output"
+    let InOut: PinDirection = "InOut"
 
+type ElectricalStandard = string
 [<RequireQualifiedAccess>]
-type ElectricalStandard =
-    | LVCMOS33
-    | LVCMOS18
-    | LVDS
-    | Unknown of string
+module ElectricalStandard =
+    let LVCMOS33: ElectricalStandard = "LVCMOS33"
+    let LVCMOS18: ElectricalStandard = "LVCMOS18"
+    let LVDS: ElectricalStandard = "LVDS"
+    let Unknown (value: string) : ElectricalStandard = value
 
 [<CLIMutable>]
 type PinEndpoint = {

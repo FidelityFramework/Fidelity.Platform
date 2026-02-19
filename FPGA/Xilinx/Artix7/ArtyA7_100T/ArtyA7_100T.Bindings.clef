@@ -44,7 +44,7 @@ module Pins =
     }
 
     let ledR0: PinEndpoint = {
-        LogicalName = "rgb[0].r"
+        LogicalName = "led0_r"
         PackagePin = "G6"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -52,7 +52,7 @@ module Pins =
     }
 
     let ledG0: PinEndpoint = {
-        LogicalName = "rgb[0].g"
+        LogicalName = "led0_g"
         PackagePin = "F6"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -60,7 +60,7 @@ module Pins =
     }
 
     let ledB0: PinEndpoint = {
-        LogicalName = "rgb[0].b"
+        LogicalName = "led0_b"
         PackagePin = "E1"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -68,7 +68,7 @@ module Pins =
     }
 
     let ledR1: PinEndpoint = {
-        LogicalName = "rgb[1].r"
+        LogicalName = "led1_r"
         PackagePin = "G3"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -76,7 +76,7 @@ module Pins =
     }
 
     let ledG1: PinEndpoint = {
-        LogicalName = "rgb[1].g"
+        LogicalName = "led1_g"
         PackagePin = "J4"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -84,7 +84,7 @@ module Pins =
     }
 
     let ledB1: PinEndpoint = {
-        LogicalName = "rgb[1].b"
+        LogicalName = "led1_b"
         PackagePin = "G4"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -92,7 +92,7 @@ module Pins =
     }
 
     let ledR2: PinEndpoint = {
-        LogicalName = "rgb[2].r"
+        LogicalName = "led2_r"
         PackagePin = "J3"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -100,7 +100,7 @@ module Pins =
     }
 
     let ledG2: PinEndpoint = {
-        LogicalName = "rgb[2].g"
+        LogicalName = "led2_g"
         PackagePin = "J2"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -108,7 +108,7 @@ module Pins =
     }
 
     let ledB2: PinEndpoint = {
-        LogicalName = "rgb[2].b"
+        LogicalName = "led2_b"
         PackagePin = "H4"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -116,7 +116,7 @@ module Pins =
     }
 
     let ledR3: PinEndpoint = {
-        LogicalName = "rgb[3].r"
+        LogicalName = "led3_r"
         PackagePin = "K1"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -124,7 +124,7 @@ module Pins =
     }
 
     let ledG3: PinEndpoint = {
-        LogicalName = "rgb[3].g"
+        LogicalName = "led3_g"
         PackagePin = "H6"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33
@@ -132,7 +132,7 @@ module Pins =
     }
 
     let ledB3: PinEndpoint = {
-        LogicalName = "rgb[3].b"
+        LogicalName = "led3_b"
         PackagePin = "K2"
         Direction = PinDirection.Output
         Standard = ElectricalStandard.LVCMOS33

@@ -6,7 +6,7 @@ description = "Shared substrate-neutral contracts for Fidelity.Platform packages
 
 [build]
 sources = [
-    "PlatformContracts.fs"
+    "PlatformContracts.clef"
 ]
 output = "fidelity-platform-contracts"
 output_kind = "library"

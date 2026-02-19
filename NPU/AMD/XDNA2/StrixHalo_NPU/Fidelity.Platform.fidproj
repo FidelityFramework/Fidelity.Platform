@@ -6,7 +6,7 @@ description = "NPU substrate binding metadata for Strix Halo XDNA2."
 
 [build]
 sources = [
-    "Platform.fs"
+    "Platform.clef"
 ]
 output = "fidelity-platform-npu-strixhalo"
 output_kind = "library"

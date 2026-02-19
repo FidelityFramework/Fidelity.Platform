@@ -6,7 +6,7 @@ description = "Lab profile composing Strix Halo CPU/GPU/NPU with Arty A7 FPGA."
 
 [build]
 sources = [
-    "Profile.fs"
+    "Profile.clef"
 ]
 output = "fidelity-platform-profile-strixhalo-arty"
 output_kind = "library"

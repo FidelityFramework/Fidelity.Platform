@@ -6,7 +6,7 @@ description = "MCU substrate binding metadata scaffold for Renesas EK-RA6M5."
 
 [build]
 sources = [
-    "Platform.fs"
+    "Platform.clef"
 ]
 output = "fidelity-platform-mcu-ra6m5-ek-ra6m5"
 output_kind = "library"
