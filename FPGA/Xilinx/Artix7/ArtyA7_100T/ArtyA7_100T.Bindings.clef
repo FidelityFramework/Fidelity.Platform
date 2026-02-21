@@ -221,13 +221,16 @@ module Pins =
         Description = Some "USB-UART RX to FPGA"
     }
 
-    // Dedicated reset button is wired to dedicated FPGA reset infrastructure in docs.
-    let resetButton: PinEndpoint = {
-        LogicalName = "reset_n"
-        PackagePin = "DEDICATED"
-        Direction = PinDirection.Input
-        Standard = ElectricalStandard.Unknown "Dedicated reset network"
-        Description = Some "Active-low board reset button (not exposed as user I/O pin in this package)"
+    // Arty A7 has no user-accessible dedicated reset button (RESET triggers PROGRAM_B).
+    // C2 (ck_rst) is on the ChipKit header but requires external wiring.
+    // Internal POR: the compiler generates a single-cycle power-on reset circuit.
+    let resetEndpoint: ResetEndpoint = {
+        Name = "rst"
+        Kind = ResetKind.Internal
+        PackagePin = "NONE"
+        Standard = ElectricalStandard.LVCMOS33
+        ActiveLevel = ActiveLevel.High
+        Description = Some "Internal power-on reset (no dedicated user reset pin on Arty A7)"
     }
 
     // ChipKit/Arduino digital GPIO bank from Digilent Arty-A7-100 master XDC.
@@ -359,54 +362,21 @@ module Platform =
         Package = "CSG324"
         SpeedGrade = "-1"
         Clocks = [ sysClk ]
+        Resets = [ resetEndpoint ]
         Groups = [ greenLeds; rgb0; rgb1; rgb2; rgb3; buttons; switches; chipKitDigitalGpio ]
         Uarts = [ Uart.usbUart ]
-        DedicatedPins = [ resetButton ]
+        DedicatedPins = []
         Notes = [
             "All user I/O in this package is LVCMOS33."
             "Buttons are modeled as active-high momentary inputs."
             "Switches are modeled as active-high latching inputs."
             "LED outputs are active-high."
             "UART mapping follows current HelloBlinky migration artifacts: uart_tx=D10, uart_rx=A9."
-            "Reset button is represented semantically; pin is marked dedicated because it is not modeled as user GPIO."
+            "Reset is internal POR (no user-accessible reset button on bare Arty A7)."
             "ChipKit digital GPIO endpoints are sourced from Digilent Arty-A7-100 Master XDC (ck_io*, ck_ioa, ck_rst)."
         ]
     }
 
-    let xdcConstraints: string list =
-        [
-            "set_property -dict { PACKAGE_PIN E3  IOSTANDARD LVCMOS33 } [get_ports { sys_clk }]"
-            "create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports { sys_clk }]"
-            "set_property -dict { PACKAGE_PIN H5  IOSTANDARD LVCMOS33 } [get_ports { led[0] }]"
-            "set_property -dict { PACKAGE_PIN J5  IOSTANDARD LVCMOS33 } [get_ports { led[1] }]"
-            "set_property -dict { PACKAGE_PIN T9  IOSTANDARD LVCMOS33 } [get_ports { led[2] }]"
-            "set_property -dict { PACKAGE_PIN T10 IOSTANDARD LVCMOS33 } [get_ports { led[3] }]"
-            "set_property -dict { PACKAGE_PIN G6  IOSTANDARD LVCMOS33 } [get_ports { led0_r }]"
-            "set_property -dict { PACKAGE_PIN F6  IOSTANDARD LVCMOS33 } [get_ports { led0_g }]"
-            "set_property -dict { PACKAGE_PIN E1  IOSTANDARD LVCMOS33 } [get_ports { led0_b }]"
-            "set_property -dict { PACKAGE_PIN G3  IOSTANDARD LVCMOS33 } [get_ports { led1_r }]"
-            "set_property -dict { PACKAGE_PIN J4  IOSTANDARD LVCMOS33 } [get_ports { led1_g }]"
-            "set_property -dict { PACKAGE_PIN G4  IOSTANDARD LVCMOS33 } [get_ports { led1_b }]"
-            "set_property -dict { PACKAGE_PIN J3  IOSTANDARD LVCMOS33 } [get_ports { led2_r }]"
-            "set_property -dict { PACKAGE_PIN J2  IOSTANDARD LVCMOS33 } [get_ports { led2_g }]"
-            "set_property -dict { PACKAGE_PIN H4  IOSTANDARD LVCMOS33 } [get_ports { led2_b }]"
-            "set_property -dict { PACKAGE_PIN K1  IOSTANDARD LVCMOS33 } [get_ports { led3_r }]"
-            "set_property -dict { PACKAGE_PIN H6  IOSTANDARD LVCMOS33 } [get_ports { led3_g }]"
-            "set_property -dict { PACKAGE_PIN K2  IOSTANDARD LVCMOS33 } [get_ports { led3_b }]"
-            "set_property -dict { PACKAGE_PIN D9  IOSTANDARD LVCMOS33 } [get_ports { btn[0] }]"
-            "set_property -dict { PACKAGE_PIN C9  IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]"
-            "set_property -dict { PACKAGE_PIN B9  IOSTANDARD LVCMOS33 } [get_ports { btn[2] }]"
-            "set_property -dict { PACKAGE_PIN B8  IOSTANDARD LVCMOS33 } [get_ports { btn[3] }]"
-            "set_property -dict { PACKAGE_PIN A8  IOSTANDARD LVCMOS33 } [get_ports { sw[0] }]"
-            "set_property -dict { PACKAGE_PIN C11 IOSTANDARD LVCMOS33 } [get_ports { sw[1] }]"
-            "set_property -dict { PACKAGE_PIN C10 IOSTANDARD LVCMOS33 } [get_ports { sw[2] }]"
-            "set_property -dict { PACKAGE_PIN A10 IOSTANDARD LVCMOS33 } [get_ports { sw[3] }]"
-            "set_property -dict { PACKAGE_PIN D10 IOSTANDARD LVCMOS33 } [get_ports { uart_tx }]"
-            "set_property -dict { PACKAGE_PIN A9  IOSTANDARD LVCMOS33 } [get_ports { uart_rx }]"
-        ]
-        @ (
-            Pins.chipKitDigitalGpioPins
-            |> List.map (fun pin ->
-                sprintf "set_property -dict { PACKAGE_PIN %-3s IOSTANDARD LVCMOS33 } [get_ports { %s }]" pin.PackagePin pin.LogicalName
-            )
-        )
+    // XDC constraints are generated by the compiler from PinEndpoint/ClockEndpoint
+    // definitions above. The PlatformPinResolution nanopass attaches pin mappings
+    // as coeffects, and the CIRCT backend emits the .xdc as a post-backend artifact.

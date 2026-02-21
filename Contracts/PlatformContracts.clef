@@ -28,6 +28,18 @@ module ElectricalStandard =
     let LVDS: ElectricalStandard = "LVDS"
     let Unknown (value: string) : ElectricalStandard = value
 
+type ActiveLevel = string
+[<RequireQualifiedAccess>]
+module ActiveLevel =
+    let High: ActiveLevel = "High"
+    let Low: ActiveLevel = "Low"
+
+type ResetKind = string
+[<RequireQualifiedAccess>]
+module ResetKind =
+    let External: ResetKind = "External"
+    let Internal: ResetKind = "Internal"
+
 [<CLIMutable>]
 type PinEndpoint = {
     LogicalName: string
@@ -43,6 +55,16 @@ type ClockEndpoint = {
     FrequencyHz: int64
     PackagePin: string
     Standard: ElectricalStandard
+    Description: string option
+}
+
+[<CLIMutable>]
+type ResetEndpoint = {
+    Name: string
+    Kind: ResetKind
+    PackagePin: string
+    Standard: ElectricalStandard
+    ActiveLevel: ActiveLevel
     Description: string option
 }
 
@@ -75,6 +97,7 @@ type PlatformDescriptor = {
     Package: string
     SpeedGrade: string
     Clocks: ClockEndpoint list
+    Resets: ResetEndpoint list
     Groups: EndpointGroup list
     Uarts: UartEndpoint list
     DedicatedPins: PinEndpoint list
