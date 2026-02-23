@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["SpeakEZ Technologies"]
 description = "Linux x86-64 platform bindings."
 
+[compilation]
+target = "cpu"
+
 [build]
 sources = [
     "Types.clef",
@@ -13,6 +16,12 @@ sources = [
     "WebView.clef",
     "WebViewWrapper.clef"
 ]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
 
 [dependencies]
 # BAREWire will be added when WebSocket bindings need it

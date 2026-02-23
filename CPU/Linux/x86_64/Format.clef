@@ -1,6 +1,6 @@
 /// Format operations for Fidelity.Platform
-/// Numeric-to-string conversion using compiler intrinsics.
-/// Same compilation pattern as Console.write - source flows through CCS -> PSG -> Baker -> Alex.
+/// Numeric-to-string conversion using byte arrays and String.fromBytes.
+/// Types are language-level: byte[], int, string. No pointer types.
 /// NOTE: float is defined BEFORE int to avoid shadowing the built-in `int` conversion function.
 module Format
 
@@ -8,8 +8,8 @@ module Format
 /// Uses right-to-left digit extraction with scaled integer arithmetic.
 /// Must be defined before Format.int so `int` conversion (float→int) resolves to built-in.
 let float (value: float) : string =
-    let buf = NativePtr.stackalloc<byte> 32
-    let mutable pos = 31n
+    let buf = Array.zeroCreate<byte> 32
+    let mutable pos = 31
     let mutable v = value
     let isNeg = v < 0.0
     if isNeg then
@@ -23,63 +23,63 @@ let float (value: float) : string =
     // Fractional digits (right-to-left)
     let d1 = fracDigits % 10
     let d0 = fracDigits / 10
-    NativePtr.write (NativePtr.add buf pos) (byte (d1 + 48))
-    pos <- pos - 1n
-    NativePtr.write (NativePtr.add buf pos) (byte (d0 + 48))
-    pos <- pos - 1n
+    Array.set buf pos (byte (d1 + 48))
+    pos <- pos - 1
+    Array.set buf pos (byte (d0 + 48))
+    pos <- pos - 1
 
     // Decimal point
-    NativePtr.write (NativePtr.add buf pos) 46uy
-    pos <- pos - 1n
+    Array.set buf pos 46uy
+    pos <- pos - 1
 
     // Integer part (right-to-left)
     let mutable iv = intPart
     let mutable isDone = false
     if iv = 0 then
-        NativePtr.write (NativePtr.add buf pos) 48uy
-        pos <- pos - 1n
+        Array.set buf pos 48uy
+        pos <- pos - 1
         isDone <- true
     while not isDone do
         let digit = iv % 10
-        NativePtr.write (NativePtr.add buf pos) (byte (digit + 48))
-        pos <- pos - 1n
+        Array.set buf pos (byte (digit + 48))
+        pos <- pos - 1
         iv <- iv / 10
         if iv = 0 then
             isDone <- true
 
     // Sign
     if isNeg then
-        NativePtr.write (NativePtr.add buf pos) 45uy
-        pos <- pos - 1n
+        Array.set buf pos 45uy
+        pos <- pos - 1
 
-    let startPos = pos + 1n
-    let len = 31n - pos
-    NativeStr.fromPointer (NativePtr.add buf startPos) len
+    let startPos = pos + 1
+    let len = 31 - pos
+    String.fromBytes (Array.sub buf startPos len)
 
 /// Convert integer to string representation
-/// Uses right-to-left digit extraction — same primitives as Console.readln.
+/// Uses right-to-left digit extraction with byte array buffer.
 let int (value: int) : string =
-    let buf = NativePtr.stackalloc<byte> 21
-    let mutable pos = 20n
+    let buf = Array.zeroCreate<byte> 21
+    let mutable pos = 20
     let mutable v = if value < 0 then 0 - value else value
     let mutable isDone = false
 
     if v = 0 then
-        NativePtr.write (NativePtr.add buf pos) 48uy
-        pos <- pos - 1n
+        Array.set buf pos 48uy
+        pos <- pos - 1
         isDone <- true
     while not isDone do
         let digit = v % 10
-        NativePtr.write (NativePtr.add buf pos) (byte (digit + 48))
-        pos <- pos - 1n
+        Array.set buf pos (byte (digit + 48))
+        pos <- pos - 1
         v <- v / 10
         if v = 0 then
             isDone <- true
 
     if value < 0 then
-        NativePtr.write (NativePtr.add buf pos) 45uy
-        pos <- pos - 1n
+        Array.set buf pos 45uy
+        pos <- pos - 1
 
-    let startPos = pos + 1n
-    let len = 20n - pos
-    NativeStr.fromPointer (NativePtr.add buf startPos) len
+    let startPos = pos + 1
+    let len = 20 - pos
+    String.fromBytes (Array.sub buf startPos len)

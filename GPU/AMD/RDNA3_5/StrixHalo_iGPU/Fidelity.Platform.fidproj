@@ -4,12 +4,20 @@ version = "0.1.0"
 authors = ["SpeakEZ Technologies"]
 description = "GPU substrate binding metadata for Strix Halo integrated RDNA 3.5."
 
+[compilation]
+target = "gpu"
+
 [build]
 sources = [
     "Platform.clef"
 ]
 output = "fidelity-platform-gpu-strixhalo"
 output_kind = "library"
+
+[platform]
+runtime_model = "rocm"
+arch = "rdna3_5"
+word_size = 64
 
 [dependencies]
 contracts = { path = "../../../../Contracts" }

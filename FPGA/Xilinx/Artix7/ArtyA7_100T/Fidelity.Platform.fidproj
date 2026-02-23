@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["SpeakEZ Technologies"]
 description = "Digilent Arty A7-100T platform binding package (FPGA substrate)."
 
+[compilation]
+target = "fpga"
+
 [build]
 sources = [
     "../../../../Contracts/PlatformContracts.clef",
@@ -12,3 +15,12 @@ sources = [
 ]
 output = "fidelity-platform-fpga-arty-a7-100t"
 output_kind = "library"
+
+[platform]
+runtime_model = "bare"
+substrate = "fpga"
+vendor = "xilinx"
+family = "artix7"
+device = "xc7a100t"
+clock_mhz = 100
+ns_per_weight_unit = 1.6
