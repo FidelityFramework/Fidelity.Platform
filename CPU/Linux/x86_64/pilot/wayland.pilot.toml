@@ -1,0 +1,55 @@
+[library]
+name = "wayland-client"
+headers = ["/usr/include/wayland-client-core.h"]
+include_paths = ["/usr/include"]
+transitive_headers = ["wayland-util.h"]
+macro_prefixes = ["WL_", "WAYLAND_"]
+xml_protocols = [
+    "/usr/share/wayland/wayland.xml",
+    "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml",
+    "/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml"
+]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings/Wayland"
+
+[options]
+opaque_handles = true
+
+[[namespace]]
+name = "Fidelity.Wayland.Core"
+description = "Display connection, proxy management, and event dispatch"
+library = "wayland-client"
+prefixes = ["wl_display", "wl_proxy", "wl_event_queue"]
+functions = ["wl_log_set_handler_client"]
+
+[[namespace]]
+name = "Fidelity.Wayland.Protocol"
+description = "Core Wayland protocol interfaces"
+library = "wayland-client"
+xml_interfaces = [
+    "wl_compositor", "wl_surface", "wl_buffer", "wl_registry",
+    "wl_callback", "wl_shm", "wl_shm_pool", "wl_region",
+    "wl_output", "wl_seat", "wl_pointer", "wl_keyboard", "wl_touch",
+    "wl_data_offer", "wl_data_source", "wl_data_device",
+    "wl_data_device_manager", "wl_subcompositor", "wl_subsurface"
+]
+
+[[namespace]]
+name = "Fidelity.Wayland.XdgShell"
+description = "XDG shell window management protocol"
+library = "wayland-client"
+xml_interfaces = [
+    "xdg_wm_base", "xdg_surface", "xdg_toplevel",
+    "xdg_popup", "xdg_positioner"
+]
+
+[[namespace]]
+name = "Fidelity.Wayland.DmaBuf"
+description = "Linux DMA-BUF buffer sharing protocol"
+library = "wayland-client"
+xml_interfaces = [
+    "zwp_linux_dmabuf_v1", "zwp_linux_buffer_params_v1",
+    "zwp_linux_dmabuf_feedback_v1"
+]

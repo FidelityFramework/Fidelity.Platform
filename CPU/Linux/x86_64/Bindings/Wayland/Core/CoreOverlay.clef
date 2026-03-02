@@ -1,0 +1,82 @@
+module Fidelity.Wayland.Core.Overlay
+
+open Fidelity.Wayland.Core
+
+type WaylandError = {
+    Code: int32
+    Description: string
+}
+
+let private captureError (display: nativeint) : WaylandError =
+    let code = wl_display_get_error display
+    { Code = code; Description = "wayland display error" }
+
+let connect (name: nativeptr<byte>) : nativeint voption =
+    let result = wl_display_connect name
+    if result <> 0n then ValueSome result
+    else ValueNone
+
+let connectToFd (fd: int32) : nativeint voption =
+    let result = wl_display_connect_to_fd fd
+    if result <> 0n then ValueSome result
+    else ValueNone
+
+let dispatch (display: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch display
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let dispatchQueue (display: nativeint) (queue: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch_queue display queue
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let dispatchPending (display: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch_pending display
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let dispatchQueuePending (display: nativeint) (queue: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch_queue_pending display queue
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let dispatchTimeout (display: nativeint) (timeout: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch_timeout display timeout
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let dispatchQueueTimeout (display: nativeint) (queue: nativeint) (timeout: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_dispatch_queue_timeout display queue timeout
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let roundtrip (display: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_roundtrip display
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let roundtripQueue (display: nativeint) (queue: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_roundtrip_queue display queue
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let flush (display: nativeint) : Result<int32, WaylandError> =
+    let result = wl_display_flush display
+    if result >= 0l then Ok result
+    else Error (captureError display)
+
+let prepareRead (display: nativeint) : Result<unit, WaylandError> =
+    let result = wl_display_prepare_read display
+    if result = 0l then Ok ()
+    else Error (captureError display)
+
+let prepareReadQueue (display: nativeint) (queue: nativeint) : Result<unit, WaylandError> =
+    let result = wl_display_prepare_read_queue display queue
+    if result = 0l then Ok ()
+    else Error (captureError display)
+
+let readEvents (display: nativeint) : Result<unit, WaylandError> =
+    let result = wl_display_read_events display
+    if result = 0l then Ok ()
+    else Error (captureError display)

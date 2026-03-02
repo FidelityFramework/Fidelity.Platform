@@ -1,0 +1,60 @@
+[library]
+name = "amdhip64"
+headers = ["/opt/rocm/include/hip/hip_runtime_api.h"]
+include_paths = ["/opt/rocm/include"]
+defines = ["__HIP_PLATFORM_AMD__"]
+transitive_headers = ["driver_types.h"]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings"
+
+[error_conventions]
+default = "enum_error_code"
+error_type = "hipError_t"
+success_value = "hipSuccess"
+error_string_fn = "hipGetErrorString"
+error_name_fn = "hipGetErrorName"
+
+[options]
+opaque_handles = true
+flags_enums = true
+
+[[namespace]]
+name = "Fidelity.ROCm.Device"
+description = "Device management and properties"
+library = "amdhip64"
+prefixes = ["hipDevice", "hipGetDevice"]
+functions = ["hipInit", "hipDriverGetVersion", "hipRuntimeGetVersion"]
+
+[[namespace]]
+name = "Fidelity.ROCm.Memory"
+description = "Memory allocation and transfer"
+library = "amdhip64"
+prefixes = ["hipMalloc", "hipFree", "hipMemcpy", "hipMemset"]
+functions = ["hipHostMalloc", "hipHostFree", "hipHostGetDevicePointer", "hipImportExternalMemory", "hipExternalMemoryGetMappedBuffer", "hipDestroyExternalMemory"]
+
+[[namespace]]
+name = "Fidelity.ROCm.Stream"
+description = "Async command streams"
+library = "amdhip64"
+prefixes = ["hipStream"]
+
+[[namespace]]
+name = "Fidelity.ROCm.Event"
+description = "Timing and synchronization events"
+library = "amdhip64"
+prefixes = ["hipEvent"]
+
+[[namespace]]
+name = "Fidelity.ROCm.Module"
+description = "Kernel module loading and launch"
+library = "amdhip64"
+prefixes = ["hipModule"]
+functions = ["hipLaunchKernel", "hipFuncGetAttributes"]
+
+[[namespace]]
+name = "Fidelity.ROCm.Error"
+description = "Error query functions"
+library = "amdhip64"
+functions = ["hipGetErrorString", "hipGetErrorName", "hipGetLastError", "hipPeekAtLastError"]

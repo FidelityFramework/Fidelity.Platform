@@ -1,0 +1,17 @@
+[library]
+name = "gbm"
+headers = ["/usr/include/gbm.h"]
+macro_prefixes = ["GBM_"]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings/GBM"
+
+[options]
+opaque_handles = true
+
+[[namespace]]
+name = "Fidelity.GBM"
+description = "GPU buffer management — device, buffer objects, and surfaces"
+library = "gbm"
+prefixes = ["gbm_"]

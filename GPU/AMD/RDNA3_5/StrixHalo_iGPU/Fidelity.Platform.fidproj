@@ -9,7 +9,26 @@ target = "gpu"
 
 [build]
 sources = [
-    "Platform.clef"
+    "Platform.clef",
+    # Generated HIP bindings (Farscape)
+    "Bindings/Types.clef",
+    "Bindings/HipError.clef",
+    "Bindings/Device/Types.clef",
+    "Bindings/Device/Device.clef",
+    "Bindings/Device/DeviceWrappers.clef",
+    "Bindings/Memory/Types.clef",
+    "Bindings/Memory/Memory.clef",
+    "Bindings/Memory/MemoryWrappers.clef",
+    "Bindings/Stream/Types.clef",
+    "Bindings/Stream/Stream.clef",
+    "Bindings/Stream/StreamWrappers.clef",
+    "Bindings/Event/Event.clef",
+    "Bindings/Event/EventWrappers.clef",
+    "Bindings/Module/Types.clef",
+    "Bindings/Module/Module.clef",
+    "Bindings/Module/ModuleWrappers.clef",
+    "Bindings/Error/Error.clef",
+    "Bindings/Error/ErrorWrappers.clef",
 ]
 output = "fidelity-platform-gpu-strixhalo"
 output_kind = "library"

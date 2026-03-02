@@ -1,0 +1,123 @@
+[library]
+name = "c"
+headers = [
+    "/usr/include/unistd.h",
+    "/usr/include/fcntl.h",
+    "/usr/include/sys/mman.h",
+    "/usr/include/sys/socket.h",
+    "/usr/include/sys/stat.h",
+    "/usr/include/sys/ioctl.h",
+    "/usr/include/poll.h",
+    "/usr/include/dlfcn.h",
+    "/usr/include/string.h",
+    "/usr/include/stdlib.h"
+]
+include_paths = ["/usr/include"]
+macro_prefixes = [
+    "O_", "F_", "FD_",
+    "PROT_", "MAP_", "MS_", "MADV_", "MREMAP_",
+    "AF_", "PF_", "SOCK_", "SOL_", "SO_", "SHUT_", "MSG_",
+    "POLL", "EPOLL",
+    "S_I", "S_IS",
+    "RTLD_",
+    "SEEK_",
+    "R_OK", "W_OK", "X_OK", "F_OK"
+]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings/Libc"
+
+[error_conventions]
+default = "errno"
+
+[options]
+opaque_handles = false
+
+[[namespace]]
+name = "Fidelity.Libc.IO"
+description = "File I/O and control operations"
+library = "c"
+functions = [
+    "read", "write", "open", "openat", "close", "lseek",
+    "pread", "pwrite", "pread64", "pwrite64",
+    "dup", "dup2", "dup3",
+    "pipe", "pipe2",
+    "fsync", "fdatasync", "ftruncate", "ftruncate64",
+    "ioctl", "fcntl", "sync"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.Memory"
+description = "Memory mapping, allocation, and buffer operations"
+library = "c"
+functions = [
+    "mmap", "mmap64", "munmap", "mprotect", "msync", "madvise",
+    "mlock", "munlock", "mlockall", "munlockall", "mremap", "mincore",
+    "shm_open", "shm_unlink",
+    "malloc", "calloc", "realloc", "free",
+    "memcpy", "memmove", "memset", "memcmp", "memchr"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.Socket"
+description = "Network socket I/O"
+library = "c"
+functions = [
+    "socket", "socketpair",
+    "bind", "listen", "accept", "accept4", "connect",
+    "send", "recv", "sendto", "recvfrom", "sendmsg", "recvmsg",
+    "setsockopt", "getsockopt",
+    "shutdown",
+    "getpeername", "getsockname",
+    "poll"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.Process"
+description = "Process lifecycle and environment"
+library = "c"
+functions = [
+    "fork", "execve", "_exit", "exit",
+    "getpid", "getppid", "getuid", "getgid",
+    "getcwd", "chdir", "fchdir",
+    "sleep", "usleep",
+    "abort",
+    "getenv", "setenv", "unsetenv",
+    "atexit"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.FileStat"
+description = "File metadata and permissions"
+library = "c"
+functions = [
+    "stat", "fstat", "lstat",
+    "chmod", "fchmod", "umask",
+    "access",
+    "unlink", "rmdir", "mkdir", "mkdirat",
+    "rename", "renameat",
+    "link", "linkat", "symlink", "symlinkat", "readlink", "readlinkat"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.String"
+description = "String and memory operations"
+library = "c"
+functions = [
+    "strlen", "strnlen",
+    "strcpy", "strncpy",
+    "strcmp", "strncmp",
+    "strcat", "strncat",
+    "strchr", "strrchr", "strstr",
+    "strtok_r",
+    "strerror"
+]
+
+[[namespace]]
+name = "Fidelity.Libc.DynamicLink"
+description = "Dynamic library loading"
+library = "c"
+functions = [
+    "dlopen", "dlclose", "dlsym", "dlerror", "dladdr"
+]

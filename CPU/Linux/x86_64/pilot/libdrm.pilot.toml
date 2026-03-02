@@ -1,0 +1,46 @@
+[library]
+name = "drm"
+headers = ["/usr/include/xf86drm.h", "/usr/include/xf86drmMode.h"]
+include_paths = ["/usr/include", "/usr/include/libdrm"]
+transitive_headers = ["drm.h"]
+macro_prefixes = ["DRM_", "DRM_MODE_"]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings/DRM"
+
+[options]
+opaque_handles = true
+
+[[namespace]]
+name = "Fidelity.DRM.Core"
+description = "Device access, capability queries, and PRIME buffer sharing"
+library = "drm"
+functions = [
+    "drmOpen", "drmClose", "drmIoctl",
+    "drmGetVersion", "drmFreeVersion",
+    "drmGetCap", "drmSetClientCap",
+    "drmPrimeHandleToFD", "drmPrimeFDToHandle",
+    "drmGetDevices2", "drmFreeDevices",
+    "drmGetRenderDeviceNameFromFd",
+    "drmSetMaster", "drmDropMaster",
+    "drmAuthMagic", "drmIsKMS"
+]
+
+[[namespace]]
+name = "Fidelity.DRM.Mode"
+description = "KMS: resources, connectors, CRTCs, encoders, planes, framebuffers, atomic commit"
+library = "drm"
+prefixes = ["drmMode"]
+functions = [
+    "drmModePageFlip",
+    "drmModeAddFB", "drmModeAddFB2",
+    "drmModeRmFB",
+    "drmModeCreateDumbBuffer",
+    "drmModeDestroyDumbBuffer",
+    "drmModeMapDumbBuffer",
+    "drmModeAtomicAlloc", "drmModeAtomicFree",
+    "drmModeAtomicAddProperty",
+    "drmModeAtomicCommit",
+    "drmModeSetCrtc", "drmModeSetPlane"
+]

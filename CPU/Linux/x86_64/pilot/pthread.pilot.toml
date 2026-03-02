@@ -1,0 +1,57 @@
+[library]
+name = "pthread"
+headers = ["/usr/include/pthread.h"]
+include_paths = ["/usr/include"]
+macro_prefixes = ["PTHREAD_"]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings/Pthread"
+
+[error_conventions]
+default = "errno"
+
+[options]
+opaque_handles = false
+
+[[namespace]]
+name = "Fidelity.Pthread.Thread"
+description = "Thread creation, joining, and lifecycle"
+library = "pthread"
+functions = [
+    "pthread_create", "pthread_join", "pthread_detach",
+    "pthread_exit", "pthread_self", "pthread_equal",
+    "pthread_cancel", "pthread_once"
+]
+
+[[namespace]]
+name = "Fidelity.Pthread.Mutex"
+description = "Mutex locking primitives"
+library = "pthread"
+functions = [
+    "pthread_mutex_init", "pthread_mutex_destroy",
+    "pthread_mutex_lock", "pthread_mutex_trylock",
+    "pthread_mutex_timedlock", "pthread_mutex_unlock"
+]
+
+[[namespace]]
+name = "Fidelity.Pthread.Cond"
+description = "Condition variable primitives"
+library = "pthread"
+functions = [
+    "pthread_cond_init", "pthread_cond_destroy",
+    "pthread_cond_wait", "pthread_cond_timedwait",
+    "pthread_cond_signal", "pthread_cond_broadcast"
+]
+
+[[namespace]]
+name = "Fidelity.Pthread.Attr"
+description = "Thread and mutex attribute management"
+library = "pthread"
+functions = [
+    "pthread_attr_init", "pthread_attr_destroy",
+    "pthread_attr_setdetachstate", "pthread_attr_getdetachstate",
+    "pthread_attr_setstacksize", "pthread_attr_getstacksize",
+    "pthread_mutexattr_init", "pthread_mutexattr_destroy",
+    "pthread_mutexattr_settype", "pthread_mutexattr_gettype"
+]
