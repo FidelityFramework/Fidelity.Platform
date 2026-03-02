@@ -1,60 +1,84 @@
 /// Format operations for Fidelity.Platform
 /// Numeric-to-string conversion using byte arrays and String.fromBytes.
 /// Types are language-level: byte[], int, string. No pointer types.
-/// NOTE: float is defined BEFORE int to avoid shadowing the built-in `int` conversion function.
 module Format
 
-/// Convert float to string representation (2 decimal places)
-/// Uses right-to-left digit extraction with scaled integer arithmetic.
-/// Must be defined before Format.int so `int` conversion (float→int) resolves to built-in.
+/// Convert float to string representation preserving full precision.
+/// Integer part extracted right-to-left; fractional digits extracted left-to-right.
+/// Trailing fractional zeros are stripped via lastNonZero tracking (no stripping loop).
+/// All mutables at function entry, all while loops at function level — flat structure.
 let float (value: float) : string =
-    let buf = Array.zeroCreate<byte> 32
-    let mutable pos = 31
+    let buf = Array.zeroCreate<byte> 64
+    let mutable pos = 0
     let mutable v = value
     let isNeg = v < 0.0
     if isNeg then
         v <- 0.0 - v
 
-    // Scale to 2 decimal places and convert to integer arithmetic
-    let scaled = int (v * 100.0)
-    let fracDigits = scaled % 100
-    let intPart = scaled / 100
-
-    // Fractional digits (right-to-left)
-    let d1 = fracDigits % 10
-    let d0 = fracDigits / 10
-    Array.set buf pos (byte (d1 + 48))
-    pos <- pos - 1
-    Array.set buf pos (byte (d0 + 48))
-    pos <- pos - 1
-
-    // Decimal point
-    Array.set buf pos 46uy
-    pos <- pos - 1
-
-    // Integer part (right-to-left)
-    let mutable iv = intPart
-    let mutable isDone = false
-    if iv = 0 then
-        Array.set buf pos 48uy
-        pos <- pos - 1
-        isDone <- true
-    while not isDone do
-        let digit = iv % 10
-        Array.set buf pos (byte (digit + 48))
-        pos <- pos - 1
-        iv <- iv / 10
-        if iv = 0 then
-            isDone <- true
+    // Separate integer and fractional parts
+    let intPart = int v
+    let frac = v - (float intPart)
 
     // Sign
     if isNeg then
         Array.set buf pos 45uy
-        pos <- pos - 1
+        pos <- pos + 1
 
-    let startPos = pos + 1
-    let len = 31 - pos
-    String.fromBytes (Array.sub buf startPos len)
+    // Integer part (right-to-left into temp buffer)
+    let intBuf = Array.zeroCreate<byte> 21
+    let mutable intPos = 20
+    let mutable iv = intPart
+    let mutable isDone = false
+    if iv = 0 then
+        Array.set intBuf intPos 48uy
+        intPos <- intPos - 1
+        isDone <- true
+    while not isDone do
+        let digit = iv % 10
+        Array.set intBuf intPos (byte (digit + 48))
+        intPos <- intPos - 1
+        iv <- iv / 10
+        if iv = 0 then
+            isDone <- true
+
+    // Copy integer digits to output buffer
+    let mutable ci = intPos + 1
+    while ci <= 20 do
+        Array.set buf pos (Array.get intBuf ci)
+        pos <- pos + 1
+        ci <- ci + 1
+
+    // Fractional part: extract up to 15 digits, track last non-zero position
+    let fracBuf = Array.zeroCreate<byte> 15
+    let mutable fracLen = 0
+    let mutable lastNonZero = -1
+    let mutable f = frac
+    let mutable fracDone = frac <= 0.0
+    while not fracDone do
+        f <- f * 10.0
+        let raw = int f
+        let d = if raw > 9 then 9 else raw
+        Array.set fracBuf fracLen (byte (d + 48))
+        if d > 0 then
+            lastNonZero <- fracLen
+        fracLen <- fracLen + 1
+        f <- f - (float d)
+        if fracLen >= 15 then
+            fracDone <- true
+
+    // Write decimal point if we have fractional digits
+    if lastNonZero >= 0 then
+        Array.set buf pos 46uy
+        pos <- pos + 1
+
+    // Copy fractional digits up to last non-zero (loop doesn't execute when lastNonZero = -1)
+    let mutable fi = 0
+    while fi <= lastNonZero do
+        Array.set buf pos (Array.get fracBuf fi)
+        pos <- pos + 1
+        fi <- fi + 1
+
+    String.fromBytes (Array.sub buf 0 pos)
 
 /// Convert integer to string representation
 /// Uses right-to-left digit extraction with byte array buffer.
