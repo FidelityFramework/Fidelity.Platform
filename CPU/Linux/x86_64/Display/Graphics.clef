@@ -1,0 +1,49 @@
+/// Platform.Display.Graphics — DRM render node + GBM buffer allocation
+///
+/// Opens a DRM render node, creates GBM device and buffer objects,
+/// and exports DMA-BUF file descriptors for zero-copy presentation.
+///
+/// Absorbs HelloWayland's Graphics.clef.
+module Platform.Display.Graphics
+
+open Console
+open Fidelity.GBM.Api
+open Fidelity.Libc.IO
+
+// ═══════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════
+
+let private renderNodePath () : string = "/dev/dri/renderD128"
+let private gbmBoUseRenderingLinear () : uint32 = uint32 0x14
+let private formatArgb8888 () : uint32 = uint32 0x34325241
+
+// ═══════════════════════════════════════════════════════════
+// GRAPHICS SETUP
+// ═══════════════════════════════════════════════════════════
+
+/// Open DRM render node and create GBM device.
+/// Returns GBM device handle on success, 0n on failure.
+let createDevice () : nativeint =
+    let drmFd = Fidelity.Libc.IO.openat -100 (Some (renderNodePath ()).Pointer) 2
+    if drmFd < 0 then
+        Console.writeln "Platform.Display: Failed to open DRM render node"
+        0n
+    else
+    match gbm_create_device drmFd with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create GBM device"
+        0n
+    | Some dev -> dev
+
+/// Allocate a GBM buffer object and export its DMA-BUF fd.
+/// Returns (bufferObject, dmaBufFd) on success, (0n, -1) on failure.
+let allocateBuffer (device: nativeint) (width: int) (height: int) : nativeint * int =
+    match gbm_bo_create (Some device) (uint32 width) (uint32 height)
+                        (formatArgb8888 ()) (gbmBoUseRenderingLinear ()) with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create GBM buffer"
+        (0n, -1)
+    | Some bo ->
+        let fd = gbm_bo_get_fd (Some bo)
+        (bo, fd)

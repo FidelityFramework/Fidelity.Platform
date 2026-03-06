@@ -1,0 +1,33 @@
+[package]
+name = "Fidelity.Pthread"
+version = "0.1.0"
+description = "Generated bindings for pthread."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Pthread/Types.clef",
+    "Bindings/Pthread/Errno.clef",
+    "Bindings/Pthread/Thread/Types.clef",
+    "Bindings/Pthread/Thread/Thread.clef",
+    "Bindings/Pthread/Thread/ThreadApi.clef",
+    "Bindings/Pthread/Mutex/Mutex.clef",
+    "Bindings/Pthread/Mutex/MutexApi.clef",
+    "Bindings/Pthread/Cond/Types.clef",
+    "Bindings/Pthread/Cond/Cond.clef",
+    "Bindings/Pthread/Cond/CondApi.clef",
+    "Bindings/Pthread/Attr/Attr.clef",
+    "Bindings/Pthread/Attr/AttrApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }

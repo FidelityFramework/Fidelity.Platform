@@ -8,124 +8,124 @@ open Fidelity.Libc.Process.Types
     /// 
     /// C signature: unsigned int sleep(unsigned int __seconds)
     [<FidelityExtern("c", "sleep")>]
-    let sleep (seconds: uint32) : uint32 =
-        Unchecked.defaultof<uint32>
+    let sleep (seconds: uint) : uint =
+        NativeDefault.zeroed ()
 
     /// Sleep USECONDS microseconds, or until a signal arrives that is not blocked or ignored. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int usleep(__useconds_t __useconds)
     [<FidelityExtern("c", "usleep")>]
-    let usleep (useconds: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let usleep (useconds: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Change the process's working directory to PATH.
     /// 
     /// C signature: int chdir(const char * __path)
     [<FidelityExtern("c", "chdir")>]
-    let chdir (path: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let chdir (path: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Change the process's working directory to the one FD is open on.
     /// 
     /// C signature: int fchdir(int __fd)
     [<FidelityExtern("c", "fchdir")>]
-    let fchdir (fd: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let fchdir (fd: int) : int =
+        NativeDefault.zeroed ()
 
     /// Get the pathname of the current working directory, and put it in SIZE bytes of BUF.  Returns NULL if the directory couldn't be determined or SIZE was too small. If successful, returns BUF.  In GNU, if BUF is NULL, an array is allocated with `malloc'; the array is SIZE bytes long, unless SIZE == 0, in which case it is as big as necessary.
     /// 
     /// C signature: char * getcwd(char * __buf, size_t __size)
     [<FidelityExtern("c", "getcwd")>]
-    let getcwd (buf: nativeptr<byte>) (size: unativeint) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let getcwd (buf: option<nativeptr<byte>>) (size: unativeint) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Replace the current process, executing PATH with arguments ARGV and environment ENVP.  ARGV and ENVP are terminated by NULL pointers.
     /// 
     /// C signature: int execve(const char * __path, char *const * __argv, char *const * __envp)
     [<FidelityExtern("c", "execve")>]
-    let execve (path: nativeptr<byte>) (argv: nativeptr<byte>) (envp: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let execve (path: option<nativeptr<byte>>) (argv: option<nativeptr<byte>>) (envp: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Terminate program execution with the low-order 8 bits of STATUS.
     /// 
     /// C signature: void _exit(int __status)
     [<FidelityExtern("c", "_exit")>]
-    let _exit (status: int32) : unit =
-        Unchecked.defaultof<unit>
+    let _exit (status: int) : unit =
+        NativeDefault.zeroed ()
 
     /// Get the process ID of the calling process.
     /// 
     /// C signature: __pid_t getpid()
     [<FidelityExtern("c", "getpid")>]
     let getpid () : int32 =
-        Unchecked.defaultof<int32>
+        NativeDefault.zeroed ()
 
     /// Get the process ID of the calling process's parent.
     /// 
     /// C signature: __pid_t getppid()
     [<FidelityExtern("c", "getppid")>]
     let getppid () : int32 =
-        Unchecked.defaultof<int32>
+        NativeDefault.zeroed ()
 
     /// Get the real user ID of the calling process.
     /// 
     /// C signature: __uid_t getuid()
     [<FidelityExtern("c", "getuid")>]
     let getuid () : uint32 =
-        Unchecked.defaultof<uint32>
+        NativeDefault.zeroed ()
 
     /// Get the real group ID of the calling process.
     /// 
     /// C signature: __gid_t getgid()
     [<FidelityExtern("c", "getgid")>]
     let getgid () : uint32 =
-        Unchecked.defaultof<uint32>
+        NativeDefault.zeroed ()
 
     /// Clone the calling process, creating an exact copy. Return -1 for errors, 0 to the new process, and the process ID of the new process to the old process.
     /// 
     /// C signature: __pid_t fork()
     [<FidelityExtern("c", "fork")>]
     let fork () : int32 =
-        Unchecked.defaultof<int32>
+        NativeDefault.zeroed ()
 
     /// Abort execution and generate a core-dump.
     /// 
     /// C signature: void abort()
     [<FidelityExtern("c", "abort")>]
     let abort () : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// Register a function to be called when `exit' is called.
     /// 
     /// C signature: int atexit(void (*)(void) __func)
     [<FidelityExtern("c", "atexit")>]
-    let atexit (func: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let atexit (func: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// Call all functions registered with `atexit' and `on_exit', in the reverse of the order in which they were registered, perform stdio cleanup, and terminate program execution with STATUS.
     /// 
     /// C signature: void exit(int __status)
     [<FidelityExtern("c", "exit")>]
-    let exit (status: int32) : unit =
-        Unchecked.defaultof<unit>
+    let exit (status: int) : unit =
+        NativeDefault.zeroed ()
 
     /// Return the value of envariable NAME, or NULL if it doesn't exist.
     /// 
     /// C signature: char * getenv(const char * __name)
     [<FidelityExtern("c", "getenv")>]
-    let getenv (name: nativeptr<byte>) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let getenv (name: option<nativeptr<byte>>) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Set NAME to VALUE in the environment. If REPLACE is nonzero, overwrite an existing value.
     /// 
     /// C signature: int setenv(const char * __name, const char * __value, int __replace)
     [<FidelityExtern("c", "setenv")>]
-    let setenv (name: nativeptr<byte>) (value: nativeptr<byte>) (replace: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let setenv (name: option<nativeptr<byte>>) (value: option<nativeptr<byte>>) (replace: int) : int =
+        NativeDefault.zeroed ()
 
     /// Remove the variable NAME from the environment.
     /// 
     /// C signature: int unsetenv(const char * __name)
     [<FidelityExtern("c", "unsetenv")>]
-    let unsetenv (name: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let unsetenv (name: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()

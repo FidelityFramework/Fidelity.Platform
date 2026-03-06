@@ -1,0 +1,41 @@
+[package]
+name = "Fidelity.Libc"
+version = "0.1.0"
+description = "Generated bindings for c."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Libc/Types.clef",
+    "Bindings/Libc/Errno.clef",
+    "Bindings/Libc/IO/IO.clef",
+    "Bindings/Libc/IO/IOApi.clef",
+    "Bindings/Libc/Memory/Types.clef",
+    "Bindings/Libc/Memory/Memory.clef",
+    "Bindings/Libc/Memory/MemoryApi.clef",
+    "Bindings/Libc/Socket/Types.clef",
+    "Bindings/Libc/Socket/Socket.clef",
+    "Bindings/Libc/Socket/SocketApi.clef",
+    "Bindings/Libc/Process/Types.clef",
+    "Bindings/Libc/Process/Process.clef",
+    "Bindings/Libc/Process/ProcessApi.clef",
+    "Bindings/Libc/FileStat/Types.clef",
+    "Bindings/Libc/FileStat/FileStat.clef",
+    "Bindings/Libc/FileStat/FileStatApi.clef",
+    "Bindings/Libc/String/String.clef",
+    "Bindings/Libc/String/StringApi.clef",
+    "Bindings/Libc/DynamicLink/DynamicLink.clef",
+    "Bindings/Libc/DynamicLink/DynamicLinkApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }

@@ -5,107 +5,107 @@ module Fidelity.Libc.IO
 open Fidelity.Libc.Types
     /// C signature: __off_t lseek(int __fd, __off_t __offset, int __whence)
     [<FidelityExtern("c", "lseek")>]
-    let lseek (fd: int32) (offset: int64) (whence: int32) : int64 =
-        Unchecked.defaultof<int64>
+    let lseek (fd: int) (offset: int64) (whence: int) : int64 =
+        NativeDefault.zeroed ()
 
     /// Close the file descriptor FD. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int close(int __fd)
     [<FidelityExtern("c", "close")>]
-    let close (fd: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let close (fd: int) : int =
+        NativeDefault.zeroed ()
 
     /// Read NBYTES into BUF from FD.  Return the number read, -1 for errors or 0 for EOF. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t read(int __fd, void * __buf, size_t __nbytes)
     [<FidelityExtern("c", "read")>]
-    let read (fd: int32) (buf: nativeint) (nbytes: unativeint) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let read (fd: int) (buf: option<nativeint>) (nbytes: unativeint) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Write N bytes of BUF to FD.  Return the number written, or -1. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t write(int __fd, const void * __buf, size_t __n)
     [<FidelityExtern("c", "write")>]
-    let write (fd: int32) (buf: nativeint) (n: unativeint) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let write (fd: int) (buf: option<nativeint>) (n: unativeint) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Read NBYTES into BUF from FD at the given position OFFSET without changing the file pointer.  Return the number read, -1 for errors or 0 for EOF. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t pread(int __fd, void * __buf, size_t __nbytes, __off_t __offset)
     [<FidelityExtern("c", "pread")>]
-    let pread (fd: int32) (buf: nativeint) (nbytes: unativeint) (offset: int64) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let pread (fd: int) (buf: option<nativeint>) (nbytes: unativeint) (offset: int64) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Write N bytes of BUF to FD at the given position OFFSET without changing the file pointer.  Return the number written, or -1. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t pwrite(int __fd, const void * __buf, size_t __n, __off_t __offset)
     [<FidelityExtern("c", "pwrite")>]
-    let pwrite (fd: int32) (buf: nativeint) (n: unativeint) (offset: int64) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let pwrite (fd: int) (buf: option<nativeint>) (n: unativeint) (offset: int64) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Create a one-way communication channel (pipe). If successful, two file descriptors are stored in PIPEDES; bytes written on PIPEDES[1] can be read from PIPEDES[0]. Returns 0 if successful, -1 if not.
     /// 
     /// C signature: int pipe(int * __pipedes)
     [<FidelityExtern("c", "pipe")>]
-    let pipe (pipedes: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pipe (pipedes: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Duplicate FD, returning a new file descriptor on the same file.
     /// 
     /// C signature: int dup(int __fd)
     [<FidelityExtern("c", "dup")>]
-    let dup (fd: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let dup (fd: int) : int =
+        NativeDefault.zeroed ()
 
     /// Duplicate FD to FD2, closing FD2 and making it open on the same file.
     /// 
     /// C signature: int dup2(int __fd, int __fd2)
     [<FidelityExtern("c", "dup2")>]
-    let dup2 (fd: int32) (fd2: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let dup2 (fd: int) (fd2: int) : int =
+        NativeDefault.zeroed ()
 
     /// Make all changes done to FD actually appear on disk. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int fsync(int __fd)
     [<FidelityExtern("c", "fsync")>]
-    let fsync (fd: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let fsync (fd: int) : int =
+        NativeDefault.zeroed ()
 
     /// Make all changes done to all files actually appear on disk.
     /// 
     /// C signature: void sync()
     [<FidelityExtern("c", "sync")>]
     let sync () : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: int ftruncate(int __fd, __off_t __length)
     [<FidelityExtern("c", "ftruncate")>]
-    let ftruncate (fd: int32) (length: int64) : int32 =
-        Unchecked.defaultof<int32>
+    let ftruncate (fd: int) (length: int64) : int =
+        NativeDefault.zeroed ()
 
     /// Synchronize at least the data part of a file with the underlying media.
     /// 
     /// C signature: int fdatasync(int __fildes)
     [<FidelityExtern("c", "fdatasync")>]
-    let fdatasync (fildes: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let fdatasync (fildes: int) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int fcntl(int __fd, int __cmd)
     [<FidelityExtern("c", "fcntl")>]
-    let fcntl (fd: int32) (cmd: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let fcntl (fd: int) (cmd: int) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int open(const char * __file, int __oflag)
     [<FidelityExtern("c", "open")>]
-    let open (file: nativeptr<byte>) (oflag: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let open (file: option<nativeptr<byte>>) (oflag: int) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int openat(int __fd, const char * __file, int __oflag)
     [<FidelityExtern("c", "openat")>]
-    let openat (fd: int32) (file: nativeptr<byte>) (oflag: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let openat (fd: int) (file: option<nativeptr<byte>>) (oflag: int) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int ioctl(int __fd, unsigned long __request)
     [<FidelityExtern("c", "ioctl")>]
-    let ioctl (fd: int32) (request: uint64) : int32 =
-        Unchecked.defaultof<int32>
+    let ioctl (fd: int) (request: uint64) : int =
+        NativeDefault.zeroed ()

@@ -8,249 +8,249 @@ open Fidelity.ROCm.Stream.Types
     /// 
     /// C signature: hipError_t hipStreamCreate(hipStream_t * stream)
     [<FidelityExtern("amdhip64", "hipStreamCreate")>]
-    let hipStreamCreate (stream: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamCreate (stream: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Creates an asynchronous stream with flag. Pointer to new stream Parameters to control stream creation #hipSuccess, #hipErrorInvalidValue Creates a new asynchronous stream with its associated current device. returns an opaque handle that can be used to reference the newly created stream in subsequent hipStream* commands. The stream is allocated on the heap and will remain allocated even if the handle goes out-of-scope. To release the memory used by the stream, application must call hipStreamDestroy. The parameter controls behavior of the stream. The valid values are #hipStreamDefault and #hipStreamNonBlocking. hipStreamCreate, hipStreamCreateWithPriority, hipStreamSynchronize, hipStreamWaitEvent, hipStreamDestroy.
     /// 
     /// C signature: hipError_t hipStreamCreateWithFlags(hipStream_t * stream, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamCreateWithFlags")>]
-    let hipStreamCreateWithFlags (stream: nativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamCreateWithFlags (stream: option<nativeint>) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Creates an asynchronous stream with the specified priority. Pointer to new stream Parameters to control stream creation Priority of the stream. Lower numbers represent higher priorities. #hipSuccess, #hipErrorInvalidValue Creates a new asynchronous stream with the specified priority, with its associated current device. returns an opaque handle that can be used to reference the newly created stream in subsequent hipStream* commands. The stream is allocated on the heap and will remain allocated even if the handle goes out-of-scope. To release the memory used by the stream, application must call hipStreamDestroy. The parameter controls behavior of the stream. The valid values are #hipStreamDefault and #hipStreamNonBlocking. hipStreamCreate, hipStreamSynchronize, hipStreamWaitEvent, hipStreamDestroy
     /// 
     /// C signature: hipError_t hipStreamCreateWithPriority(hipStream_t * stream, unsigned int flags, int priority)
     [<FidelityExtern("amdhip64", "hipStreamCreateWithPriority")>]
-    let hipStreamCreateWithPriority (stream: nativeint) (flags: uint32) (priority: int32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamCreateWithPriority (stream: option<nativeint>) (flags: uint) (priority: int) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Destroys the specified stream. Stream identifier #hipSuccess #hipErrorInvalidHandle Destroys the specified stream. If commands are still executing on the specified stream, some may complete execution before the queue is deleted. The queue may be destroyed while some commands are still inflight, or may wait for all commands queued to the stream before destroying it. hipStreamCreate, hipStreamCreateWithFlags, hipStreamCreateWithPriority, hipStreamQuery, hipStreamWaitEvent, hipStreamSynchronize
     /// 
     /// C signature: hipError_t hipStreamDestroy(hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipStreamDestroy")>]
     let hipStreamDestroy (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Returns #hipSuccess if all of the operations in the specified have completed, or #hipErrorNotReady if not. Stream to query #hipSuccess, #hipErrorNotReady, #hipErrorInvalidHandle This is thread-safe and returns a snapshot of the current state of the queue.  However, if other host threads are sending work to the stream, the status may change immediately after the function is called.  It is typically used for debug. hipStreamCreate, hipStreamCreateWithFlags, hipStreamCreateWithPriority, hipStreamWaitEvent, hipStreamSynchronize, hipStreamDestroy
     /// 
     /// C signature: hipError_t hipStreamQuery(hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipStreamQuery")>]
     let hipStreamQuery (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Waits for all commands in the stream to complete. Stream identifier. #hipSuccess, #hipErrorInvalidHandle This command is host-synchronous : the host will block until all operations on the specified stream with its associated device are completed. On multiple device systems, the is associated with its device, no need to call hipSetDevice before this API. This command follows standard null-stream semantics. Specifying the null stream will cause the command to wait for other streams on the same device to complete all pending operations. This command honors the #hipDeviceScheduleBlockingSync flag, which controls whether the wait is active or blocking. hipStreamCreate, hipStreamCreateWithFlags, hipStreamCreateWithPriority, hipStreamWaitEvent, hipStreamDestroy
     /// 
     /// C signature: hipError_t hipStreamSynchronize(hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipStreamSynchronize")>]
     let hipStreamSynchronize (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Makes the specified compute stream wait for the specified event Stream to make wait Event to wait on Parameters to control the operation #hipSuccess, #hipErrorInvalidHandle, #hipErrorInvalidValue, #hipErrorStreamCaptureIsolation This function inserts a wait operation into the specified stream. All future work submitted to will wait until reports completion before beginning execution. Flags include: hipEventWaitDefault: Default event creation flag. hipEventWaitExternal: Wait is captured in the graph as an external event node when performing stream capture This function only waits for commands in the current stream to complete.  Notably, this function does not implicitly wait for commands in the default stream to complete, even if the specified stream is created with hipStreamNonBlocking = 0. hipStreamCreate, hipStreamCreateWithFlags, hipStreamCreateWithPriority, hipStreamSynchronize, hipStreamDestroy
     /// 
     /// C signature: hipError_t hipStreamWaitEvent(hipStream_t stream, hipEvent_t event, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamWaitEvent")>]
-    let hipStreamWaitEvent (stream: hipStream_t) (event: hipEvent_t) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWaitEvent (stream: hipStream_t) (event: hipEvent_t) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Returns flags associated with this stream. Stream to be queried Pointer to an unsigned integer in which the stream's flags are returned #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidHandle. hipStreamCreateWithFlags
     /// 
     /// C signature: hipError_t hipStreamGetFlags(hipStream_t stream, unsigned int * flags)
     [<FidelityExtern("amdhip64", "hipStreamGetFlags")>]
-    let hipStreamGetFlags (stream: hipStream_t) (flags: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetFlags (stream: hipStream_t) (flags: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Queries the Id of a stream. Stream to be queried Pointer to an unsigned long long in which the stream's id is returned #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidHandle. hipStreamCreateWithFlags, hipStreamGetFlags, hipStreamCreateWithPriority, hipStreamGetPriority
     /// 
     /// C signature: hipError_t hipStreamGetId(hipStream_t stream, unsigned long long * streamId)
     [<FidelityExtern("amdhip64", "hipStreamGetId")>]
-    let hipStreamGetId (stream: hipStream_t) (streamId: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetId (stream: hipStream_t) (streamId: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Queries the priority of a stream. Stream to be queried Pointer to an unsigned integer in which the stream's priority is returned #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidHandle. hipStreamCreateWithPriority
     /// 
     /// C signature: hipError_t hipStreamGetPriority(hipStream_t stream, int * priority)
     [<FidelityExtern("amdhip64", "hipStreamGetPriority")>]
-    let hipStreamGetPriority (stream: hipStream_t) (priority: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetPriority (stream: hipStream_t) (priority: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Gets the device associated with the stream. Stream to be queried Device associated with the stream #hipSuccess, #hipErrorInvalidValue, #hipErrorContextIsDestroyed, #hipErrorInvalidHandle, #hipErrorNotInitialized, #hipErrorDeinitialized, #hipErrorInvalidContext hipStreamCreate, hipStreamDestroy, hipDeviceGetStreamPriorityRange
     /// 
     /// C signature: hipError_t hipStreamGetDevice(hipStream_t stream, hipDevice_t * device)
     [<FidelityExtern("amdhip64", "hipStreamGetDevice")>]
-    let hipStreamGetDevice (stream: hipStream_t) (device: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetDevice (stream: hipStream_t) (device: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Adds a callback to be called on the host after all currently enqueued items in the stream have completed.  For each hipStreamAddCallback call, a callback will be executed exactly once. The callback will block later work in the stream until it is finished. - Stream to add callback to - The function to call once preceding stream operations are complete - User specified data to be passed to the callback function - Reserved for future use, must be 0 #hipSuccess, #hipErrorInvalidHandle, #hipErrorNotSupported hipStreamCreate, hipStreamCreateWithFlags, hipStreamQuery, hipStreamSynchronize, hipStreamWaitEvent, hipStreamDestroy, hipStreamCreateWithPriority
     /// 
     /// C signature: hipError_t hipStreamAddCallback(hipStream_t stream, hipStreamCallback_t callback, void * userData, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamAddCallback")>]
-    let hipStreamAddCallback (stream: hipStream_t) (callback: nativeint) (userData: nativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamAddCallback (stream: hipStream_t) (callback: nativeint) (userData: option<nativeint>) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Sets stream attribute. Updated attribute is applied to work submitted to the stream. - Stream to set attributes to - Attribute ID for the attribute to set - Attribute value for the attribute to set #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidResourceHandle
     /// 
     /// C signature: hipError_t hipStreamSetAttribute(hipStream_t stream, hipLaunchAttributeID attr, const hipLaunchAttributeValue * value)
     [<FidelityExtern("amdhip64", "hipStreamSetAttribute")>]
-    let hipStreamSetAttribute (stream: hipStream_t) (attr: hipLaunchAttributeID) (value: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamSetAttribute (stream: hipStream_t) (attr: hipLaunchAttributeID) (value: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// queries stream attribute. - Stream to geet attributes from - Attribute ID for the attribute to query - Attribute value output #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidResourceHandle
     /// 
     /// C signature: hipError_t hipStreamGetAttribute(hipStream_t stream, hipLaunchAttributeID attr, hipLaunchAttributeValue * value_out)
     [<FidelityExtern("amdhip64", "hipStreamGetAttribute")>]
-    let hipStreamGetAttribute (stream: hipStream_t) (attr: hipLaunchAttributeID) (value_out: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetAttribute (stream: hipStream_t) (attr: hipLaunchAttributeID) (value_out: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Copies attributes from source stream to destination stream. - Destination stream - Source stream #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipStreamCopyAttributes(hipStream_t dst, hipStream_t src)
     [<FidelityExtern("amdhip64", "hipStreamCopyAttributes")>]
     let hipStreamCopyAttributes (dst: hipStream_t) (src: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Enqueues a wait command to the stream.[BETA] - Stream identifier - Pointer to memory object allocated using #hipMallocSignalMemory flag - Value to be used in compare operation - Defines the compare operation, supported values are #hipStreamWaitValueGte #hipStreamWaitValueEq, #hipStreamWaitValueAnd and #hipStreamWaitValueNor - Mask to be applied on value at memory before it is compared with value, default value is set to enable every bit #hipSuccess, #hipErrorInvalidValue Enqueues a wait command to the stream, all operations enqueued  on this stream after this, will not execute until the defined wait condition is true. #hipStreamWaitValueGte: waits until *ptr &mask >= value #hipStreamWaitValueEq : waits until *ptr &mask == value #hipStreamWaitValueAnd: waits until ((*ptr &mask ) & value) != 0 #hipStreamWaitValueNor: waits until ~((*ptr &mask ) | (value &mask )) != 0 when using #hipStreamWaitValueNor, mask is applied on both 'value' and '*ptr'. Support for #hipStreamWaitValue32 can be queried using 'hipDeviceGetAttribute()' and 'hipDeviceAttributeCanUseStreamWaitValue' flag. This API is marked as Beta. While this feature is complete, it can change and might have outstanding issues. hipExtMallocWithFlags, hipFree, hipStreamWaitValue64, hipStreamWriteValue64, hipStreamWriteValue32, hipDeviceGetAttribute
     /// 
     /// C signature: hipError_t hipStreamWaitValue32(hipStream_t stream, void * ptr, uint32_t value, unsigned int flags, uint32_t mask)
     [<FidelityExtern("amdhip64", "hipStreamWaitValue32")>]
-    let hipStreamWaitValue32 (stream: hipStream_t) (ptr: nativeint) (value: uint32) (flags: uint32) (mask: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWaitValue32 (stream: hipStream_t) (ptr: option<nativeint>) (value: uint32) (flags: uint) (mask: uint32) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Enqueues a wait command to the stream.[BETA] - Stream identifier - Pointer to memory object allocated using 'hipMallocSignalMemory' flag - Value to be used in compare operation - Defines the compare operation, supported values are #hipStreamWaitValueGte #hipStreamWaitValueEq, #hipStreamWaitValueAnd and #hipStreamWaitValueNor. - Mask to be applied on value at memory before it is compared with value default value is set to enable every bit #hipSuccess, #hipErrorInvalidValue Enqueues a wait command to the stream, all operations enqueued  on this stream after this, will not execute until the defined wait condition is true. #hipStreamWaitValueGte: waits until *ptr &mask >= value #hipStreamWaitValueEq : waits until *ptr &mask == value #hipStreamWaitValueAnd: waits until ((*ptr &mask ) & value) != 0 #hipStreamWaitValueNor: waits until ~((*ptr &mask ) | (value &mask )) != 0 when using #hipStreamWaitValueNor, mask is applied on both 'value' and '*ptr'. Support for hipStreamWaitValue64 can be queried using 'hipDeviceGetAttribute()' and 'hipDeviceAttributeCanUseStreamWaitValue' flag. This API is marked as Beta. While this feature is complete, it can change and might have outstanding issues. hipExtMallocWithFlags, hipFree, hipStreamWaitValue32, hipStreamWriteValue64, hipStreamWriteValue32, hipDeviceGetAttribute
     /// 
     /// C signature: hipError_t hipStreamWaitValue64(hipStream_t stream, void * ptr, uint64_t value, unsigned int flags, uint64_t mask)
     [<FidelityExtern("amdhip64", "hipStreamWaitValue64")>]
-    let hipStreamWaitValue64 (stream: hipStream_t) (ptr: nativeint) (value: uint64) (flags: uint32) (mask: uint64) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWaitValue64 (stream: hipStream_t) (ptr: option<nativeint>) (value: uint64) (flags: uint) (mask: uint64) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Enqueues a write command to the stream.[BETA] - Stream identifier - Pointer to a GPU accessible memory object - Value to be written - reserved, ignored for now, will be used in future releases #hipSuccess, #hipErrorInvalidValue Enqueues a write command to the stream, write operation is performed after all earlier commands on this stream have completed the execution. This API is marked as Beta. While this feature is complete, it can change and might have outstanding issues. hipExtMallocWithFlags, hipFree, hipStreamWriteValue32, hipStreamWaitValue32, hipStreamWaitValue64
     /// 
     /// C signature: hipError_t hipStreamWriteValue32(hipStream_t stream, void * ptr, uint32_t value, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamWriteValue32")>]
-    let hipStreamWriteValue32 (stream: hipStream_t) (ptr: nativeint) (value: uint32) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWriteValue32 (stream: hipStream_t) (ptr: option<nativeint>) (value: uint32) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Enqueues a write command to the stream.[BETA] - Stream identifier - Pointer to a GPU accessible memory object - Value to be written - reserved, ignored for now, will be used in future releases #hipSuccess, #hipErrorInvalidValue Enqueues a write command to the stream, write operation is performed after all earlier commands on this stream have completed the execution. This API is marked as Beta. While this feature is complete, it can change and might have outstanding issues. hipExtMallocWithFlags, hipFree, hipStreamWriteValue32, hipStreamWaitValue32, hipStreamWaitValue64
     /// 
     /// C signature: hipError_t hipStreamWriteValue64(hipStream_t stream, void * ptr, uint64_t value, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamWriteValue64")>]
-    let hipStreamWriteValue64 (stream: hipStream_t) (ptr: nativeint) (value: uint64) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWriteValue64 (stream: hipStream_t) (ptr: option<nativeint>) (value: uint64) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Enqueues an array of stream memory operations in the stream.[BETA] - Stream identifier - The number of operations in the array. Must be less than 256 - The types and parameters of the individual operations. - Reserved for future expansion; must be 0. #hipSuccess, #hipErrorInvalidValue Batch operations to synchronize the stream via memory operations. This API is marked as beta, meaning, while this is feature complete, it is still open to changes and may have outstanding issues. hipStreamWriteValue32, hipStreamWaitValue32, hipStreamWaitValue64. hipStreamWriteValue64
     /// 
     /// C signature: hipError_t hipStreamBatchMemOp(hipStream_t stream, unsigned int count, hipStreamBatchMemOpParams * paramArray, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamBatchMemOp")>]
-    let hipStreamBatchMemOp (stream: hipStream_t) (count: uint32) (paramArray: nativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamBatchMemOp (stream: hipStream_t) (count: uint) (paramArray: option<nativeint>) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Attach memory to a stream asynchronously in HIP. - stream in which to enqueue the attach operation - pointer to memory (must be a pointer to managed memory or to a valid host-accessible region of system-allocated memory) - length of memory (defaults to zero) - must be one of hipMemAttachGlobal, hipMemAttachHost or hipMemAttachSingle (defaults to hipMemAttachSingle) #hipSuccess, #hipErrorInvalidValue This API is under development. Currently it is a no-operation (NOP) function on AMD GPUs and returns #hipSuccess.
     /// 
     /// C signature: hipError_t hipStreamAttachMemAsync(hipStream_t stream, void * dev_ptr, size_t length, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamAttachMemAsync")>]
-    let hipStreamAttachMemAsync (stream: hipStream_t) (dev_ptr: nativeint) (length: unativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamAttachMemAsync (stream: hipStream_t) (dev_ptr: option<nativeint>) (length: unativeint) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Begins graph capture on a stream. - Stream to initiate capture. - Controls the interaction of this capture sequence with other API calls that are not safe. #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipStreamBeginCapture(hipStream_t stream, hipStreamCaptureMode mode)
     [<FidelityExtern("amdhip64", "hipStreamBeginCapture")>]
     let hipStreamBeginCapture (stream: hipStream_t) (mode: hipStreamCaptureMode) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Begins graph capture on a stream to an existing graph. - Stream to initiate capture. - Graph to capture into. - Dependencies of the first node captured in the stream. Can be NULL if numDependencies is 0. - Optional array of data associated with each dependency. - Number of dependencies. - Controls the interaction of this capture sequence with other API calls that are not safe. #hipSuccess, #hipErrorInvalidValue param "const hipGraphEdgeData* dependencyData" is currently not supported and has to be passed as nullptr. This API is marked as beta, meaning, while this is feature complete, it is still open to changes and may have outstanding issues.
     /// 
     /// C signature: hipError_t hipStreamBeginCaptureToGraph(hipStream_t stream, hipGraph_t graph, const hipGraphNode_t * dependencies, const hipGraphEdgeData * dependencyData, size_t numDependencies, hipStreamCaptureMode mode)
     [<FidelityExtern("amdhip64", "hipStreamBeginCaptureToGraph")>]
-    let hipStreamBeginCaptureToGraph (stream: hipStream_t) (graph: hipGraph_t) (dependencies: nativeint) (dependencyData: nativeint) (numDependencies: unativeint) (mode: hipStreamCaptureMode) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamBeginCaptureToGraph (stream: hipStream_t) (graph: hipGraph_t) (dependencies: option<nativeint>) (dependencyData: option<nativeint>) (numDependencies: unativeint) (mode: hipStreamCaptureMode) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Ends capture on a stream, returning the captured graph. - Stream to end capture. - Captured graph. #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipStreamEndCapture(hipStream_t stream, hipGraph_t * pGraph)
     [<FidelityExtern("amdhip64", "hipStreamEndCapture")>]
-    let hipStreamEndCapture (stream: hipStream_t) (pGraph: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamEndCapture (stream: hipStream_t) (pGraph: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Get capture status of a stream. - Stream of which to get capture status from. - Returns current capture status. - Unique capture ID. #hipSuccess, #hipErrorStreamCaptureImplicit
     /// 
     /// C signature: hipError_t hipStreamGetCaptureInfo(hipStream_t stream, hipStreamCaptureStatus * pCaptureStatus, unsigned long long * pId)
     [<FidelityExtern("amdhip64", "hipStreamGetCaptureInfo")>]
-    let hipStreamGetCaptureInfo (stream: hipStream_t) (pCaptureStatus: nativeint) (pId: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetCaptureInfo (stream: hipStream_t) (pCaptureStatus: option<nativeint>) (pId: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Get stream's capture state - Stream of which to get capture status from. - Returns current capture status. - Unique capture ID. - Returns the graph being captured into. - Pointer to an array of nodes representing the graphs dependencies. - Returns size of the array returned in dependencies_out. #hipSuccess, #hipErrorInvalidValue, #hipErrorStreamCaptureImplicit
     /// 
     /// C signature: hipError_t hipStreamGetCaptureInfo_v2(hipStream_t stream, hipStreamCaptureStatus * captureStatus_out, unsigned long long * id_out, hipGraph_t * graph_out, const hipGraphNode_t ** dependencies_out, size_t * numDependencies_out)
     [<FidelityExtern("amdhip64", "hipStreamGetCaptureInfo_v2")>]
-    let hipStreamGetCaptureInfo_v2 (stream: hipStream_t) (captureStatus_out: nativeint) (id_out: nativeint) (graph_out: nativeint) (dependencies_out: nativeint) (numDependencies_out: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetCaptureInfo_v2 (stream: hipStream_t) (captureStatus_out: option<nativeint>) (id_out: option<nativeint>) (graph_out: option<nativeint>) (dependencies_out: option<nativeint>) (numDependencies_out: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Get stream's capture state - Stream of which to get capture status from. - Returns current capture status. #hipSuccess, #hipErrorInvalidValue, #hipErrorStreamCaptureImplicit
     /// 
     /// C signature: hipError_t hipStreamIsCapturing(hipStream_t stream, hipStreamCaptureStatus * pCaptureStatus)
     [<FidelityExtern("amdhip64", "hipStreamIsCapturing")>]
-    let hipStreamIsCapturing (stream: hipStream_t) (pCaptureStatus: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamIsCapturing (stream: hipStream_t) (pCaptureStatus: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Update the set of dependencies in a capturing stream Stream that is being captured. Pointer to an array of nodes to add/replace. Size of the dependencies array. Flag to update dependency set. Should be one of the values in enum #hipStreamUpdateCaptureDependenciesFlags. #hipSuccess, #hipErrorInvalidValue, #hipErrorIllegalState
     /// 
     /// C signature: hipError_t hipStreamUpdateCaptureDependencies(hipStream_t stream, hipGraphNode_t * dependencies, size_t numDependencies, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamUpdateCaptureDependencies")>]
-    let hipStreamUpdateCaptureDependencies (stream: hipStream_t) (dependencies: nativeint) (numDependencies: unativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamUpdateCaptureDependencies (stream: hipStream_t) (dependencies: option<nativeint>) (numDependencies: unativeint) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamQuery_spt(hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipStreamQuery_spt")>]
     let hipStreamQuery_spt (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamSynchronize_spt(hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipStreamSynchronize_spt")>]
     let hipStreamSynchronize_spt (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamGetPriority_spt(hipStream_t stream, int * priority)
     [<FidelityExtern("amdhip64", "hipStreamGetPriority_spt")>]
-    let hipStreamGetPriority_spt (stream: hipStream_t) (priority: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetPriority_spt (stream: hipStream_t) (priority: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamWaitEvent_spt(hipStream_t stream, hipEvent_t event, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamWaitEvent_spt")>]
-    let hipStreamWaitEvent_spt (stream: hipStream_t) (event: hipEvent_t) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamWaitEvent_spt (stream: hipStream_t) (event: hipEvent_t) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamGetFlags_spt(hipStream_t stream, unsigned int * flags)
     [<FidelityExtern("amdhip64", "hipStreamGetFlags_spt")>]
-    let hipStreamGetFlags_spt (stream: hipStream_t) (flags: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetFlags_spt (stream: hipStream_t) (flags: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamAddCallback_spt(hipStream_t stream, hipStreamCallback_t callback, void * userData, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipStreamAddCallback_spt")>]
-    let hipStreamAddCallback_spt (stream: hipStream_t) (callback: nativeint) (userData: nativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamAddCallback_spt (stream: hipStream_t) (callback: nativeint) (userData: option<nativeint>) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamBeginCapture_spt(hipStream_t stream, hipStreamCaptureMode mode)
     [<FidelityExtern("amdhip64", "hipStreamBeginCapture_spt")>]
     let hipStreamBeginCapture_spt (stream: hipStream_t) (mode: hipStreamCaptureMode) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamEndCapture_spt(hipStream_t stream, hipGraph_t * pGraph)
     [<FidelityExtern("amdhip64", "hipStreamEndCapture_spt")>]
-    let hipStreamEndCapture_spt (stream: hipStream_t) (pGraph: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamEndCapture_spt (stream: hipStream_t) (pGraph: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamIsCapturing_spt(hipStream_t stream, hipStreamCaptureStatus * pCaptureStatus)
     [<FidelityExtern("amdhip64", "hipStreamIsCapturing_spt")>]
-    let hipStreamIsCapturing_spt (stream: hipStream_t) (pCaptureStatus: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamIsCapturing_spt (stream: hipStream_t) (pCaptureStatus: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamGetCaptureInfo_spt(hipStream_t stream, hipStreamCaptureStatus * pCaptureStatus, unsigned long long * pId)
     [<FidelityExtern("amdhip64", "hipStreamGetCaptureInfo_spt")>]
-    let hipStreamGetCaptureInfo_spt (stream: hipStream_t) (pCaptureStatus: nativeint) (pId: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetCaptureInfo_spt (stream: hipStream_t) (pCaptureStatus: option<nativeint>) (pId: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipStreamGetCaptureInfo_v2_spt(hipStream_t stream, hipStreamCaptureStatus * captureStatus_out, unsigned long long * id_out, hipGraph_t * graph_out, const hipGraphNode_t ** dependencies_out, size_t * numDependencies_out)
     [<FidelityExtern("amdhip64", "hipStreamGetCaptureInfo_v2_spt")>]
-    let hipStreamGetCaptureInfo_v2_spt (stream: hipStream_t) (captureStatus_out: nativeint) (id_out: nativeint) (graph_out: nativeint) (dependencies_out: nativeint) (numDependencies_out: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipStreamGetCaptureInfo_v2_spt (stream: hipStream_t) (captureStatus_out: option<nativeint>) (id_out: option<nativeint>) (graph_out: option<nativeint>) (dependencies_out: option<nativeint>) (numDependencies_out: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()

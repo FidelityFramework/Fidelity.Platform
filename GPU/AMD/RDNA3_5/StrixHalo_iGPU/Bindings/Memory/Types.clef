@@ -94,17 +94,17 @@ type hipMemcpyAttributes = {
     srcAccessOrder: hipMemcpySrcAccessOrder
     srcLocHint: hipMemLocation
     dstLocHint: hipMemLocation
-    flags: uint32
+    flags: uint
 }
 
 type hipMemcpy3DPeerParms = {
     srcArray: hipArray_t
     srcPos: hipPos
     srcPtr: hipPitchedPtr
-    srcDevice: int32
+    srcDevice: int
     dstArray: hipArray_t
     dstPos: hipPos
     dstPtr: hipPitchedPtr
-    dstDevice: int32
+    dstDevice: int
     extent: hipExtent
 }

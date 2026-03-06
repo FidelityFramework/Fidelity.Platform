@@ -1,0 +1,24 @@
+[package]
+name = "Fidelity.GBM"
+version = "0.1.0"
+description = "Generated bindings for gbm."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/GBM/Types.clef",
+    "Bindings/GBM/GBM/GBM.clef",
+    "Bindings/GBM/GBM/GBMApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }

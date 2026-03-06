@@ -1,0 +1,24 @@
+[package]
+name = "Fidelity.ROCm.Bridge"
+version = "0.1.0"
+description = "Layer 3 bridge for amdhip64 — protocol dispatch and callback wrappers."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "StrixHalo_iGPU/ROCmBridge/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.fidproj" }
+Fidelity.ROCm = { path = "Fidelity.ROCm.fidproj" }
+Fidelity.Libc = { path = "../../../CPU/Linux/x86_64/Fidelity.Libc.fidproj" }

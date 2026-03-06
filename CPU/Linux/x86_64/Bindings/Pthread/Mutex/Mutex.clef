@@ -7,38 +7,38 @@ open Fidelity.Pthread.Types
     /// 
     /// C signature: int pthread_mutex_init(pthread_mutex_t * __mutex, const pthread_mutexattr_t * __mutexattr)
     [<FidelityExtern("pthread", "pthread_mutex_init")>]
-    let pthread_mutex_init (mutex: nativeint) (mutexattr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_init (mutex: option<nativeint>) (mutexattr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Destroy a mutex.
     /// 
     /// C signature: int pthread_mutex_destroy(pthread_mutex_t * __mutex)
     [<FidelityExtern("pthread", "pthread_mutex_destroy")>]
-    let pthread_mutex_destroy (mutex: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_destroy (mutex: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Try locking a mutex.
     /// 
     /// C signature: int pthread_mutex_trylock(pthread_mutex_t * __mutex)
     [<FidelityExtern("pthread", "pthread_mutex_trylock")>]
-    let pthread_mutex_trylock (mutex: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_trylock (mutex: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Lock a mutex.
     /// 
     /// C signature: int pthread_mutex_lock(pthread_mutex_t * __mutex)
     [<FidelityExtern("pthread", "pthread_mutex_lock")>]
-    let pthread_mutex_lock (mutex: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_lock (mutex: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int pthread_mutex_timedlock(pthread_mutex_t *restrict __mutex, const struct timespec *restrict __abstime)
     [<FidelityExtern("pthread", "pthread_mutex_timedlock")>]
-    let pthread_mutex_timedlock (mutex: nativeint) (abstime: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_timedlock (mutex: option<nativeint>) (abstime: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Unlock a mutex.
     /// 
     /// C signature: int pthread_mutex_unlock(pthread_mutex_t * __mutex)
     [<FidelityExtern("pthread", "pthread_mutex_unlock")>]
-    let pthread_mutex_unlock (mutex: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutex_unlock (mutex: option<nativeint>) : int =
+        NativeDefault.zeroed ()

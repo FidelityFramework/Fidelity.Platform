@@ -14,6 +14,13 @@ xml_protocols = [
 mode = "fidelity"
 directory = "../Bindings/Wayland"
 
+[protocol]
+marshal_function = "wl_proxy_marshal_array_flags"
+marshal_module = "Fidelity.Wayland.Core"
+version_function = "wl_proxy_get_version"
+interface_resolution = "dlsym"
+destroy_flag = 1
+
 [options]
 opaque_handles = true
 
@@ -29,7 +36,7 @@ name = "Fidelity.Wayland.Protocol"
 description = "Core Wayland protocol interfaces"
 library = "wayland-client"
 xml_interfaces = [
-    "wl_compositor", "wl_surface", "wl_buffer", "wl_registry",
+    "wl_display", "wl_compositor", "wl_surface", "wl_buffer", "wl_registry",
     "wl_callback", "wl_shm", "wl_shm_pool", "wl_region",
     "wl_output", "wl_seat", "wl_pointer", "wl_keyboard", "wl_touch",
     "wl_data_offer", "wl_data_source", "wl_data_device",

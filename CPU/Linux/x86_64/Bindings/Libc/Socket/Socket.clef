@@ -8,114 +8,114 @@ open Fidelity.Libc.Socket.Types
     /// 
     /// C signature: int socket(int __domain, int __type, int __protocol)
     [<FidelityExtern("c", "socket")>]
-    let socket (domain: int32) (``type``: int32) (protocol: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let socket (domain: int) (``type``: int) (protocol: int) : int =
+        NativeDefault.zeroed ()
 
     /// Create two new sockets, of type TYPE in domain DOMAIN and using protocol PROTOCOL, which are connected to each other, and put file descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero, one will be chosen automatically.  Returns 0 on success, -1 for errors.
     /// 
     /// C signature: int socketpair(int __domain, int __type, int __protocol, int * __fds)
     [<FidelityExtern("c", "socketpair")>]
-    let socketpair (domain: int32) (``type``: int32) (protocol: int32) (fds: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let socketpair (domain: int) (``type``: int) (protocol: int) (fds: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Give the socket FD the local address ADDR (which is LEN bytes long).
     /// 
     /// C signature: int bind(int __fd, const struct sockaddr * __addr, socklen_t __len)
     [<FidelityExtern("c", "bind")>]
-    let bind (fd: int32) (addr: nativeint) (len: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let bind (fd: int) (addr: option<nativeint>) (len: uint) : int =
+        NativeDefault.zeroed ()
 
     /// Put the local address of FD into *ADDR and its length in *LEN.
     /// 
     /// C signature: int getsockname(int __fd, struct sockaddr *restrict __addr, socklen_t *restrict __len)
     [<FidelityExtern("c", "getsockname")>]
-    let getsockname (fd: int32) (addr: nativeint) (len: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let getsockname (fd: int) (addr: option<nativeint>) (len: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Open a connection on socket FD to peer at ADDR (which LEN bytes long). For connectionless socket types, just set the default address to send to and the only address from which to accept transmissions. Return 0 on success, -1 for errors. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int connect(int __fd, const struct sockaddr * __addr, socklen_t __len)
     [<FidelityExtern("c", "connect")>]
-    let connect (fd: int32) (addr: nativeint) (len: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let connect (fd: int) (addr: option<nativeint>) (len: uint) : int =
+        NativeDefault.zeroed ()
 
     /// Put the address of the peer connected to socket FD into *ADDR (which is *LEN bytes long), and its actual length into *LEN.
     /// 
     /// C signature: int getpeername(int __fd, struct sockaddr *restrict __addr, socklen_t *restrict __len)
     [<FidelityExtern("c", "getpeername")>]
-    let getpeername (fd: int32) (addr: nativeint) (len: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let getpeername (fd: int) (addr: option<nativeint>) (len: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Send N bytes of BUF to socket FD.  Returns the number sent or -1. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t send(int __fd, const void * __buf, size_t __n, int __flags)
     [<FidelityExtern("c", "send")>]
-    let send (fd: int32) (buf: nativeint) (n: unativeint) (flags: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let send (fd: int) (buf: option<nativeint>) (n: unativeint) (flags: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Read N bytes into BUF from socket FD. Returns the number read or -1 for errors. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t recv(int __fd, void * __buf, size_t __n, int __flags)
     [<FidelityExtern("c", "recv")>]
-    let recv (fd: int32) (buf: nativeint) (n: unativeint) (flags: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let recv (fd: int) (buf: option<nativeint>) (n: unativeint) (flags: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Send N bytes of BUF on socket FD to peer at address ADDR (which is ADDR_LEN bytes long).  Returns the number sent, or -1 for errors. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t sendto(int __fd, const void * __buf, size_t __n, int __flags, const struct sockaddr * __addr, socklen_t __addr_len)
     [<FidelityExtern("c", "sendto")>]
-    let sendto (fd: int32) (buf: nativeint) (n: unativeint) (flags: int32) (addr: nativeint) (addr_len: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let sendto (fd: int) (buf: option<nativeint>) (n: unativeint) (flags: int) (addr: option<nativeint>) (addr_len: uint) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Read N bytes into BUF through socket FD. If ADDR is not NULL, fill in *ADDR_LEN bytes of it with the address of the sender, and store the actual size of the address in *ADDR_LEN. Returns the number of bytes read or -1 for errors. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: ssize_t recvfrom(int __fd, void *restrict __buf, size_t __n, int __flags, struct sockaddr *restrict __addr, socklen_t *restrict __addr_len)
     [<FidelityExtern("c", "recvfrom")>]
-    let recvfrom (fd: int32) (buf: nativeint) (n: unativeint) (flags: int32) (addr: nativeint) (addr_len: nativeint) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let recvfrom (fd: int) (buf: option<nativeint>) (n: unativeint) (flags: int) (addr: option<nativeint>) (addr_len: option<nativeint>) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: ssize_t sendmsg(int __fd, const struct msghdr * __message, int __flags)
     [<FidelityExtern("c", "sendmsg")>]
-    let sendmsg (fd: int32) (message: nativeint) (flags: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let sendmsg (fd: int) (message: option<nativeint>) (flags: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: ssize_t recvmsg(int __fd, struct msghdr * __message, int __flags)
     [<FidelityExtern("c", "recvmsg")>]
-    let recvmsg (fd: int32) (message: nativeint) (flags: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let recvmsg (fd: int) (message: option<nativeint>) (flags: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: int getsockopt(int __fd, int __level, int __optname, void *restrict __optval, socklen_t *restrict __optlen)
     [<FidelityExtern("c", "getsockopt")>]
-    let getsockopt (fd: int32) (level: int32) (optname: int32) (optval: nativeint) (optlen: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let getsockopt (fd: int) (level: int) (optname: int) (optval: option<nativeint>) (optlen: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int setsockopt(int __fd, int __level, int __optname, const void * __optval, socklen_t __optlen)
     [<FidelityExtern("c", "setsockopt")>]
-    let setsockopt (fd: int32) (level: int32) (optname: int32) (optval: nativeint) (optlen: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let setsockopt (fd: int) (level: int) (optname: int) (optval: option<nativeint>) (optlen: uint) : int =
+        NativeDefault.zeroed ()
 
     /// Prepare to accept connections on socket FD. N connection requests will be queued before further requests are refused. Returns 0 on success, -1 for errors.
     /// 
     /// C signature: int listen(int __fd, int __n)
     [<FidelityExtern("c", "listen")>]
-    let listen (fd: int32) (n: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let listen (fd: int) (n: int) : int =
+        NativeDefault.zeroed ()
 
     /// Await a connection on socket FD. When a connection arrives, open a new socket to communicate with it, set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting peer and *ADDR_LEN to the address's actual length, and return the new socket's descriptor, or -1 for errors. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int accept(int __fd, struct sockaddr *restrict __addr, socklen_t *restrict __addr_len)
     [<FidelityExtern("c", "accept")>]
-    let accept (fd: int32) (addr: nativeint) (addr_len: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let accept (fd: int) (addr: option<nativeint>) (addr_len: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Shut down all or part of the connection open on socket FD. HOW determines what to shut down: SHUT_RD   = No more receptions; SHUT_WR   = No more transmissions; SHUT_RDWR = No more receptions or transmissions. Returns 0 on success, -1 for errors.
     /// 
     /// C signature: int shutdown(int __fd, int __how)
     [<FidelityExtern("c", "shutdown")>]
-    let shutdown (fd: int32) (how: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let shutdown (fd: int) (how: int) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int poll(struct pollfd * __fds, nfds_t __nfds, int __timeout)
     [<FidelityExtern("c", "poll")>]
-    let poll (fds: nativeint) (nfds: uint64) (timeout: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let poll (fds: option<nativeint>) (nfds: uint64) (timeout: int) : int =
+        NativeDefault.zeroed ()

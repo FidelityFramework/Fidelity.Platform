@@ -7,68 +7,68 @@ open Fidelity.Pthread.Types
     /// 
     /// C signature: int pthread_attr_init(pthread_attr_t * __attr)
     [<FidelityExtern("pthread", "pthread_attr_init")>]
-    let pthread_attr_init (attr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_init (attr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Destroy thread attribute *ATTR.
     /// 
     /// C signature: int pthread_attr_destroy(pthread_attr_t * __attr)
     [<FidelityExtern("pthread", "pthread_attr_destroy")>]
-    let pthread_attr_destroy (attr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_destroy (attr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Get detach state attribute.
     /// 
     /// C signature: int pthread_attr_getdetachstate(const pthread_attr_t * __attr, int * __detachstate)
     [<FidelityExtern("pthread", "pthread_attr_getdetachstate")>]
-    let pthread_attr_getdetachstate (attr: nativeint) (detachstate: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_getdetachstate (attr: option<nativeint>) (detachstate: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Set detach state attribute.
     /// 
     /// C signature: int pthread_attr_setdetachstate(pthread_attr_t * __attr, int __detachstate)
     [<FidelityExtern("pthread", "pthread_attr_setdetachstate")>]
-    let pthread_attr_setdetachstate (attr: nativeint) (detachstate: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_setdetachstate (attr: option<nativeint>) (detachstate: int) : int =
+        NativeDefault.zeroed ()
 
     /// Return the currently used minimal stack size.
     /// 
     /// C signature: int pthread_attr_getstacksize(const pthread_attr_t *restrict __attr, size_t *restrict __stacksize)
     [<FidelityExtern("pthread", "pthread_attr_getstacksize")>]
-    let pthread_attr_getstacksize (attr: nativeint) (stacksize: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_getstacksize (attr: option<nativeint>) (stacksize: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Add information about the minimum stack size needed for the thread to be started.  This size must never be less than PTHREAD_STACK_MIN and must also not exceed the system limits.
     /// 
     /// C signature: int pthread_attr_setstacksize(pthread_attr_t * __attr, size_t __stacksize)
     [<FidelityExtern("pthread", "pthread_attr_setstacksize")>]
-    let pthread_attr_setstacksize (attr: nativeint) (stacksize: unativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_attr_setstacksize (attr: option<nativeint>) (stacksize: unativeint) : int =
+        NativeDefault.zeroed ()
 
     /// Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP).
     /// 
     /// C signature: int pthread_mutexattr_init(pthread_mutexattr_t * __attr)
     [<FidelityExtern("pthread", "pthread_mutexattr_init")>]
-    let pthread_mutexattr_init (attr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutexattr_init (attr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Destroy mutex attribute object ATTR.
     /// 
     /// C signature: int pthread_mutexattr_destroy(pthread_mutexattr_t * __attr)
     [<FidelityExtern("pthread", "pthread_mutexattr_destroy")>]
-    let pthread_mutexattr_destroy (attr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutexattr_destroy (attr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Return in *KIND the mutex kind attribute in *ATTR.
     /// 
     /// C signature: int pthread_mutexattr_gettype(const pthread_mutexattr_t *restrict __attr, int *restrict __kind)
     [<FidelityExtern("pthread", "pthread_mutexattr_gettype")>]
-    let pthread_mutexattr_gettype (attr: nativeint) (kind: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutexattr_gettype (attr: option<nativeint>) (kind: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL, PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT).
     /// 
     /// C signature: int pthread_mutexattr_settype(pthread_mutexattr_t * __attr, int __kind)
     [<FidelityExtern("pthread", "pthread_mutexattr_settype")>]
-    let pthread_mutexattr_settype (attr: nativeint) (kind: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_mutexattr_settype (attr: option<nativeint>) (kind: int) : int =
+        NativeDefault.zeroed ()

@@ -751,48 +751,27 @@ type hipMemRangeFlags =
     | hipMemRangeFlagDmaBufMappingTypePcie = 1L
     | hipMemRangeFlagsMax = 2147483647L
 
-type random_data = {
-    fptr: nativeint
-    rptr: nativeint
-    state: nativeint
-    rand_type: int32
-    rand_deg: int32
-    rand_sep: int32
-    end_ptr: nativeint
-}
-
-type drand48_data = {
-    __x: uint16
-    __old_x: uint16
-    __c: uint16
-    __init: uint16
-    __a: uint64
-}
-
 type hipUUID_t = {
     bytes: byte
 }
 
 /// Pointer attributes
 type hipPointerAttribute_t = {
-    type: hipMemoryType
-    device: int32
+    ``type``: hipMemoryType
+    device: int
     devicePointer: nativeint
     hostPointer: nativeint
-    isManaged: int32
-    allocationFlags: uint32
+    isManaged: int
+    allocationFlags: uint
 }
 
 /// HIP channel format descriptor
 type hipChannelFormatDesc = {
-    x: int32
-    y: int32
-    z: int32
-    w: int32
+    x: int
+    y: int
+    z: int
+    w: int
     f: hipChannelFormatKind
-}
-
-type hipArray = {
 }
 
 /// HIP array descriptor
@@ -800,7 +779,7 @@ type HIP_ARRAY_DESCRIPTOR = {
     Width: unativeint
     Height: unativeint
     Format: hipArray_Format
-    NumChannels: uint32
+    NumChannels: uint
 }
 
 /// HIP 3D array descriptor
@@ -809,37 +788,37 @@ type HIP_ARRAY3D_DESCRIPTOR = {
     Height: unativeint
     Depth: unativeint
     Format: hipArray_Format
-    NumChannels: uint32
-    Flags: uint32
+    NumChannels: uint
+    Flags: uint
 }
 
 /// HIP mipmapped array
 type hipMipmappedArray = {
     data: nativeint
     desc: hipChannelFormatDesc
-    type: uint32
-    width: uint32
-    height: uint32
-    depth: uint32
-    min_mipmap_level: uint32
-    max_mipmap_level: uint32
-    flags: uint32
+    ``type``: uint
+    width: uint
+    height: uint
+    depth: uint
+    min_mipmap_level: uint
+    max_mipmap_level: uint
+    flags: uint
     format: hipArray_Format
-    num_channels: uint32
+    num_channels: uint
 }
 
 /// HIP texture descriptor
 type HIP_TEXTURE_DESC_st = {
     addressMode: HIPaddress_mode_enum
     filterMode: HIPfilter_mode_enum
-    flags: uint32
-    maxAnisotropy: uint32
+    flags: uint
+    maxAnisotropy: uint
     mipmapFilterMode: HIPfilter_mode_enum
     mipmapLevelBias: single
     minMipmapLevelClamp: single
     maxMipmapLevelClamp: single
     borderColor: single
-    reserved: int32
+    reserved: int
 }
 
 /// HIP resource descriptor
@@ -852,7 +831,7 @@ type hipResourceDesc = {
 type HIP_RESOURCE_DESC_st = {
     resType: HIPresourcetype_enum
     res: union
-    flags: uint32
+    flags: uint
 }
 
 /// HIP resource view descriptor
@@ -861,10 +840,10 @@ type hipResourceViewDesc = {
     width: unativeint
     height: unativeint
     depth: unativeint
-    firstMipmapLevel: uint32
-    lastMipmapLevel: uint32
-    firstLayer: uint32
-    lastLayer: uint32
+    firstMipmapLevel: uint
+    lastMipmapLevel: uint
+    firstLayer: uint
+    lastLayer: uint
 }
 
 /// Resource view descriptor
@@ -873,11 +852,11 @@ type HIP_RESOURCE_VIEW_DESC_st = {
     width: unativeint
     height: unativeint
     depth: unativeint
-    firstMipmapLevel: uint32
-    lastMipmapLevel: uint32
-    firstLayer: uint32
-    lastLayer: uint32
-    reserved: uint32
+    firstMipmapLevel: uint
+    lastMipmapLevel: uint
+    firstLayer: uint
+    lastLayer: uint
+    reserved: uint
 }
 
 /// HIP position
@@ -916,8 +895,8 @@ type HIP_MEMCPY3D = {
 
 /// Specifies a memory location. To specify a gpu, set type = and set id = the gpu's device ID
 type hipMemLocation = {
-    type: hipMemLocationType
-    id: int32
+    ``type``: hipMemLocationType
+    id: int
 }
 
 /// Struct representing offset into a hipArray_t in elements.
@@ -929,7 +908,7 @@ type hipOffset3D = {
 
 /// Struct representing an operand for copy with hipMemcpy3DBatchAsync.
 type hipMemcpy3DOperand = {
-    type: hipMemcpy3DOperandType
+    ``type``: hipMemcpy3DOperandType
     op: union
 }
 
@@ -939,7 +918,7 @@ type hipMemcpy3DBatchOp = {
     dst: hipMemcpy3DOperand
     extent: hipExtent
     srcAccessOrder: hipMemcpySrcAccessOrder
-    flags: uint32
+    flags: uint
 }
 
 /// hip texture descriptor
@@ -947,10 +926,10 @@ type hipTextureDesc = {
     addressMode: hipTextureAddressMode
     filterMode: hipTextureFilterMode
     readMode: hipTextureReadMode
-    sRGB: int32
+    sRGB: int
     borderColor: single
-    normalizedCoords: int32
-    maxAnisotropy: uint32
+    normalizedCoords: int
+    maxAnisotropy: uint
     mipmapFilterMode: hipTextureFilterMode
     mipmapLevelBias: single
     minMipmapLevelClamp: single
@@ -962,12 +941,6 @@ type surfaceReference = {
     surfaceObject: hipSurfaceObject_t
 }
 
-type ihipCtx_t = {
-}
-
-type ihipStream_t = {
-}
-
 type hipIpcMemHandle_st = {
     reserved: byte
 }
@@ -976,38 +949,17 @@ type hipIpcEventHandle_st = {
     reserved: byte
 }
 
-type ihipModule_t = {
-}
-
-type ihipModuleSymbol_t = {
-}
-
-type ihipLinkState_t = {
-}
-
-type ihipLibrary_t = {
-}
-
-type ihipKernel_t = {
-}
-
-type ihipMemPoolHandle_t = {
-}
-
 type hipFuncAttributes = {
-    binaryVersion: int32
-    cacheModeCA: int32
+    binaryVersion: int
+    cacheModeCA: int
     constSizeBytes: unativeint
     localSizeBytes: unativeint
-    maxDynamicSharedSizeBytes: int32
-    maxThreadsPerBlock: int32
-    numRegs: int32
-    preferredShmemCarveout: int32
-    ptxVersion: int32
+    maxDynamicSharedSizeBytes: int
+    maxThreadsPerBlock: int
+    numRegs: int
+    preferredShmemCarveout: int
+    ptxVersion: int
     sharedSizeBytes: unativeint
-}
-
-type ihipEvent_t = {
 }
 
 /// Union representing batch memory operation parameters for HIP streams. hipStreamBatchMemOpParams is used to specify the parameters for batch memory operations in a HIP stream. This union supports various operations including waiting for a specific value, writing a value, and different flags for wait conditions. The union includes fields for different types of operations defined in the enum hipStreamBatchMemOpType: - hipStreamMemOpWaitValue32:  Wait for a 32-bit value. - hipStreamMemOpWriteValue32: Write a 32-bit value. - hipStreamMemOpWaitValue64:  Wait for a 64-bit value. - hipStreamMemOpWriteValue64: Write a 64-bit value. Each operation type includes an address, the value to wait for or write, flags, and an optional alias that is not relevant on AMD GPUs. Flags can be used to specify different wait conditions such as equality, bitwise AND, greater than or equal, and bitwise NOR. Example usage:
@@ -1023,33 +975,33 @@ type hipStreamBatchMemOpParams_union = {
 type hipStreamMemOpWaitValueParams_t = {
     operation: hipStreamBatchMemOpType
     address: nativeint
-    flags: uint32
+    flags: uint
     alias: nativeint
 }
 
 type hipStreamMemOpWriteValueParams_t = {
     operation: hipStreamBatchMemOpType
     address: nativeint
-    flags: uint32
+    flags: uint
     alias: nativeint
 }
 
 type hipStreamMemOpFlushRemoteWritesParams_t = {
     operation: hipStreamBatchMemOpType
-    flags: uint32
+    flags: uint
 }
 
 type hipStreamMemOpMemoryBarrierParams_t = {
     operation: hipStreamBatchMemOpType
-    flags: uint32
+    flags: uint
 }
 
 /// Structure representing node parameters for batch memory operations in HIP graphs. hipBatchMemOpNodeParams is used to specify the parameters for batch memory operations in HIP graphs. This struct includes the context to use for the operations, the number of operations, and an array of hipStreamBatchMemOpParams that describe the operations. The structure includes the following fields: - ctx: The HIP context to use for the operations. - count: The number of operations in the paramArray. - paramArray: A pointer to an array of hipStreamBatchMemOpParams. - flags: Flags to control the node. Example usage:
 type hipBatchMemOpNodeParams = {
     ctx: hipCtx_t
-    count: uint32
+    count: uint
     paramArray: nativeint
-    flags: uint32
+    flags: uint
 }
 
 /// Memory access descriptor structure is used to specify memory access permissions for a virtual memory region in Virtual Memory Management API. This structure changes read, and write permissions for specific memory regions.
@@ -1085,74 +1037,59 @@ type hipLaunchParams_t = {
 
 /// struct hipFunctionLaunchParams_t
 type hipFunctionLaunchParams_t = {
-    function: hipFunction_t
-    gridDimX: uint32
-    gridDimY: uint32
-    gridDimZ: uint32
-    blockDimX: uint32
-    blockDimY: uint32
-    blockDimZ: uint32
-    sharedMemBytes: uint32
+    ``function``: hipFunction_t
+    gridDimX: uint
+    gridDimY: uint
+    gridDimZ: uint
+    blockDimX: uint
+    blockDimY: uint
+    blockDimZ: uint
+    sharedMemBytes: uint
     hStream: hipStream_t
     kernelParams: nativeint
 }
 
 type hipExternalMemoryHandleDesc_st = {
-    type: hipExternalMemoryHandleType_enum
+    ``type``: hipExternalMemoryHandleType_enum
     handle: union
     size: uint64
-    flags: uint32
-    reserved: uint32
+    flags: uint
+    reserved: uint
 }
 
 type hipExternalMemoryBufferDesc_st = {
     offset: uint64
     size: uint64
-    flags: uint32
-    reserved: uint32
+    flags: uint
+    reserved: uint
 }
 
 type hipExternalMemoryMipmappedArrayDesc_st = {
     offset: uint64
     formatDesc: hipChannelFormatDesc
     extent: hipExtent
-    flags: uint32
-    numLevels: uint32
+    flags: uint
+    numLevels: uint
 }
 
 type hipExternalSemaphoreHandleDesc_st = {
-    type: hipExternalSemaphoreHandleType_enum
+    ``type``: hipExternalSemaphoreHandleType_enum
     handle: union
-    flags: uint32
-    reserved: uint32
+    flags: uint
+    reserved: uint
 }
 
 type hipExternalSemaphoreSignalParams_st = {
     params: struct
-    flags: uint32
-    reserved: uint32
+    flags: uint
+    reserved: uint
 }
 
 /// External semaphore wait parameters, compatible with driver type
 type hipExternalSemaphoreWaitParams_st = {
     params: struct
-    flags: uint32
-    reserved: uint32
-}
-
-type _hipGraphicsResource = {
-}
-
-type ihipGraph = {
-}
-
-type hipGraphNode = {
-}
-
-type hipGraphExec = {
-}
-
-type hipUserObject = {
+    flags: uint
+    reserved: uint
 }
 
 type hipHostNodeParams = {
@@ -1166,15 +1103,15 @@ type hipKernelNodeParams = {
     func: nativeint
     gridDim: dim3
     kernelParams: nativeint
-    sharedMemBytes: uint32
+    sharedMemBytes: uint
 }
 
 type hipMemsetParams = {
     dst: nativeint
-    elementSize: uint32
+    elementSize: uint
     height: unativeint
     pitch: unativeint
-    value: uint32
+    value: uint
     width: unativeint
 }
 
@@ -1211,7 +1148,7 @@ type hipGraphInstantiateParams = {
 
 /// Memory allocation properties
 type hipMemAllocationProp = {
-    type: hipMemAllocationType
+    ``type``: hipMemAllocationType
     location: hipMemLocation
     win32HandleMetaData: nativeint
     allocFlags: struct
@@ -1221,17 +1158,14 @@ type hipMemAllocationProp = {
 type hipExternalSemaphoreSignalNodeParams = {
     extSemArray: nativeint
     paramsArray: nativeint
-    numExtSems: uint32
+    numExtSems: uint
 }
 
 /// External semaphore wait node parameters
 type hipExternalSemaphoreWaitNodeParams = {
     extSemArray: nativeint
     paramsArray: nativeint
-    numExtSems: uint32
-}
-
-type ihipMemGenericAllocationHandle = {
+    numExtSems: uint
 }
 
 /// Map info for arrays
@@ -1244,15 +1178,15 @@ type hipArrayMapInfo = {
     memHandleType: hipMemHandleType
     memHandle: union
     offset: uint64
-    deviceBitMask: uint32
-    flags: uint32
-    reserved: uint32
+    deviceBitMask: uint
+    flags: uint
+    reserved: uint
 }
 
 /// Memcpy node params
 type hipMemcpyNodeParams = {
-    flags: int32
-    reserved: int32
+    flags: int
+    reserved: int
     copyParams: hipMemcpy3DParms
 }
 
@@ -1278,8 +1212,8 @@ type hipMemFreeNodeParams = {
 
 /// Params for different graph nodes
 type hipGraphNodeParams = {
-    type: hipGraphNodeType
-    reserved0: int32
+    ``type``: hipGraphNodeType
+    reserved0: int
     reserved2: int64
 }
 
@@ -1296,21 +1230,21 @@ type hipLaunchConfig_st = {
     dynamicSmemBytes: unativeint
     stream: hipStream_t
     attrs: nativeint
-    numAttrs: uint32
+    numAttrs: uint
 }
 
 /// HIP driver extensible launch configuration
 type HIP_LAUNCH_CONFIG_st = {
-    gridDimX: uint32
-    gridDimY: uint32
-    gridDimZ: uint32
-    blockDimX: uint32
-    blockDimY: uint32
-    blockDimZ: uint32
-    sharedMemBytes: uint32
+    gridDimX: uint
+    gridDimY: uint
+    gridDimZ: uint
+    blockDimX: uint
+    blockDimY: uint
+    blockDimZ: uint
+    sharedMemBytes: uint
     hStream: hipStream_t
     attrs: nativeint
-    numAttrs: uint32
+    numAttrs: uint
 }
 
 // Macro constants

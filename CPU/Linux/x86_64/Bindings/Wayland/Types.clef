@@ -189,7 +189,7 @@ type wl_shell_surface_transient =
 
 /// different method to set the surface fullscreen
 type wl_shell_surface_fullscreen_method =
-    | default = 0L
+    | ``default`` = 0L
     | scale = 1L
     | driver = 2L
     | fill = 3L
@@ -261,9 +261,9 @@ type wl_output_subpixel =
 /// transformation applied to buffer contents
 type wl_output_transform =
     | normal = 0L
-    | 90 = 1L
-    | 180 = 2L
-    | 270 = 3L
+    | _90 = 1L
+    | _180 = 2L
+    | _270 = 3L
     | flipped = 4L
     | flipped_90 = 5L
     | flipped_180 = 6L
@@ -395,261 +395,11 @@ type zwp_linux_buffer_params_v1_flags =
 type zwp_linux_dmabuf_feedback_v1_tranche_flags =
     | scanout = 1L
 
-/// fatal error event
-type WlDisplayErrorHandler = delegate of data: nativeint * wl_display: nativeint * object_id: nativeint * code: uint32 * message: nativeptr<byte> -> unit
-
-/// acknowledge object ID deletion
-type WlDisplayDeleteIdHandler = delegate of data: nativeint * wl_display: nativeint * id: uint32 -> unit
-
-/// announce global object
-type WlRegistryGlobalHandler = delegate of data: nativeint * wl_registry: nativeint * name: uint32 * interface: nativeptr<byte> * version: uint32 -> unit
-
-/// announce removal of global object
-type WlRegistryGlobalRemoveHandler = delegate of data: nativeint * wl_registry: nativeint * name: uint32 -> unit
-
-/// done event
-type WlCallbackDoneHandler = delegate of data: nativeint * wl_callback: nativeint * callback_data: uint32 -> unit
-
-/// pixel format description
-type WlShmFormatHandler = delegate of data: nativeint * wl_shm: nativeint * format: uint32 -> unit
-
-/// compositor releases buffer
-type WlBufferReleaseHandler = delegate of data: nativeint * wl_buffer: nativeint -> unit
-
-/// advertise offered mime type
-type WlDataOfferOfferHandler = delegate of data: nativeint * wl_data_offer: nativeint * mime_type: nativeptr<byte> -> unit
-
-/// notify the source-side available actions
-type WlDataOfferSourceActionsHandler = delegate of data: nativeint * wl_data_offer: nativeint * source_actions: uint32 -> unit
-
-/// notify the selected action
-type WlDataOfferActionHandler = delegate of data: nativeint * wl_data_offer: nativeint * dnd_action: uint32 -> unit
-
-/// a target accepts an offered mime type
-type WlDataSourceTargetHandler = delegate of data: nativeint * wl_data_source: nativeint * mime_type: nativeptr<byte> -> unit
-
-/// send the data
-type WlDataSourceSendHandler = delegate of data: nativeint * wl_data_source: nativeint * mime_type: nativeptr<byte> * fd: int32 -> unit
-
-/// selection was cancelled
-type WlDataSourceCancelledHandler = delegate of data: nativeint * wl_data_source: nativeint -> unit
-
-/// the drag-and-drop operation physically finished
-type WlDataSourceDndDropPerformedHandler = delegate of data: nativeint * wl_data_source: nativeint -> unit
-
-/// the drag-and-drop operation concluded
-type WlDataSourceDndFinishedHandler = delegate of data: nativeint * wl_data_source: nativeint -> unit
-
-/// notify the selected action
-type WlDataSourceActionHandler = delegate of data: nativeint * wl_data_source: nativeint * dnd_action: uint32 -> unit
-
-/// introduce a new wl_data_offer
-type WlDataDeviceDataOfferHandler = delegate of data: nativeint * wl_data_device: nativeint * id: nativeint -> unit
-
-/// initiate drag-and-drop session
-type WlDataDeviceEnterHandler = delegate of data: nativeint * wl_data_device: nativeint * serial: uint32 * surface: nativeint * x: int32 * y: int32 * id: nativeint -> unit
-
-/// end drag-and-drop session
-type WlDataDeviceLeaveHandler = delegate of data: nativeint * wl_data_device: nativeint -> unit
-
-/// drag-and-drop session motion
-type WlDataDeviceMotionHandler = delegate of data: nativeint * wl_data_device: nativeint * time: uint32 * x: int32 * y: int32 -> unit
-
-/// end drag-and-drop session successfully
-type WlDataDeviceDropHandler = delegate of data: nativeint * wl_data_device: nativeint -> unit
-
-/// advertise new selection
-type WlDataDeviceSelectionHandler = delegate of data: nativeint * wl_data_device: nativeint * id: nativeint -> unit
-
-/// ping client
-type WlShellSurfacePingHandler = delegate of data: nativeint * wl_shell_surface: nativeint * serial: uint32 -> unit
-
-/// suggest resize
-type WlShellSurfaceConfigureHandler = delegate of data: nativeint * wl_shell_surface: nativeint * edges: uint32 * width: int32 * height: int32 -> unit
-
-/// popup interaction is done
-type WlShellSurfacePopupDoneHandler = delegate of data: nativeint * wl_shell_surface: nativeint -> unit
-
-/// surface enters an output
-type WlSurfaceEnterHandler = delegate of data: nativeint * wl_surface: nativeint * output: nativeint -> unit
-
-/// surface leaves an output
-type WlSurfaceLeaveHandler = delegate of data: nativeint * wl_surface: nativeint * output: nativeint -> unit
-
-/// preferred buffer scale for the surface
-type WlSurfacePreferredBufferScaleHandler = delegate of data: nativeint * wl_surface: nativeint * factor: int32 -> unit
-
-/// preferred buffer transform for the surface
-type WlSurfacePreferredBufferTransformHandler = delegate of data: nativeint * wl_surface: nativeint * transform: uint32 -> unit
-
-/// seat capabilities changed
-type WlSeatCapabilitiesHandler = delegate of data: nativeint * wl_seat: nativeint * capabilities: uint32 -> unit
-
-/// unique identifier for this seat
-type WlSeatNameHandler = delegate of data: nativeint * wl_seat: nativeint * name: nativeptr<byte> -> unit
-
-/// enter event
-type WlPointerEnterHandler = delegate of data: nativeint * wl_pointer: nativeint * serial: uint32 * surface: nativeint * surface_x: int32 * surface_y: int32 -> unit
-
-/// leave event
-type WlPointerLeaveHandler = delegate of data: nativeint * wl_pointer: nativeint * serial: uint32 * surface: nativeint -> unit
-
-/// pointer motion event
-type WlPointerMotionHandler = delegate of data: nativeint * wl_pointer: nativeint * time: uint32 * surface_x: int32 * surface_y: int32 -> unit
-
-/// pointer button event
-type WlPointerButtonHandler = delegate of data: nativeint * wl_pointer: nativeint * serial: uint32 * time: uint32 * button: uint32 * state: uint32 -> unit
-
-/// axis event
-type WlPointerAxisHandler = delegate of data: nativeint * wl_pointer: nativeint * time: uint32 * axis: uint32 * value: int32 -> unit
-
-/// end of a pointer event sequence
-type WlPointerFrameHandler = delegate of data: nativeint * wl_pointer: nativeint -> unit
-
-/// axis source event
-type WlPointerAxisSourceHandler = delegate of data: nativeint * wl_pointer: nativeint * axis_source: uint32 -> unit
-
-/// axis stop event
-type WlPointerAxisStopHandler = delegate of data: nativeint * wl_pointer: nativeint * time: uint32 * axis: uint32 -> unit
-
-/// axis click event
-type WlPointerAxisDiscreteHandler = delegate of data: nativeint * wl_pointer: nativeint * axis: uint32 * discrete: int32 -> unit
-
-/// axis high-resolution scroll event
-type WlPointerAxisValue120Handler = delegate of data: nativeint * wl_pointer: nativeint * axis: uint32 * value120: int32 -> unit
-
-/// axis relative physical direction event
-type WlPointerAxisRelativeDirectionHandler = delegate of data: nativeint * wl_pointer: nativeint * axis: uint32 * direction: uint32 -> unit
-
-/// keyboard mapping
-type WlKeyboardKeymapHandler = delegate of data: nativeint * wl_keyboard: nativeint * format: uint32 * fd: int32 * size: uint32 -> unit
-
-/// enter event
-type WlKeyboardEnterHandler = delegate of data: nativeint * wl_keyboard: nativeint * serial: uint32 * surface: nativeint * keys: nativeint -> unit
-
-/// leave event
-type WlKeyboardLeaveHandler = delegate of data: nativeint * wl_keyboard: nativeint * serial: uint32 * surface: nativeint -> unit
-
-/// key event
-type WlKeyboardKeyHandler = delegate of data: nativeint * wl_keyboard: nativeint * serial: uint32 * time: uint32 * key: uint32 * state: uint32 -> unit
-
-/// modifier and group state
-type WlKeyboardModifiersHandler = delegate of data: nativeint * wl_keyboard: nativeint * serial: uint32 * mods_depressed: uint32 * mods_latched: uint32 * mods_locked: uint32 * group: uint32 -> unit
-
-/// repeat rate and delay
-type WlKeyboardRepeatInfoHandler = delegate of data: nativeint * wl_keyboard: nativeint * rate: int32 * delay: int32 -> unit
-
-/// touch down event and beginning of a touch sequence
-type WlTouchDownHandler = delegate of data: nativeint * wl_touch: nativeint * serial: uint32 * time: uint32 * surface: nativeint * id: int32 * x: int32 * y: int32 -> unit
-
-/// end of a touch event sequence
-type WlTouchUpHandler = delegate of data: nativeint * wl_touch: nativeint * serial: uint32 * time: uint32 * id: int32 -> unit
-
-/// update of touch point coordinates
-type WlTouchMotionHandler = delegate of data: nativeint * wl_touch: nativeint * time: uint32 * id: int32 * x: int32 * y: int32 -> unit
-
-/// end of touch frame event
-type WlTouchFrameHandler = delegate of data: nativeint * wl_touch: nativeint -> unit
-
-/// touch session cancelled
-type WlTouchCancelHandler = delegate of data: nativeint * wl_touch: nativeint -> unit
-
-/// update shape of touch point
-type WlTouchShapeHandler = delegate of data: nativeint * wl_touch: nativeint * id: int32 * major: int32 * minor: int32 -> unit
-
-/// update orientation of touch point
-type WlTouchOrientationHandler = delegate of data: nativeint * wl_touch: nativeint * id: int32 * orientation: int32 -> unit
-
-/// properties of the output
-type WlOutputGeometryHandler = delegate of data: nativeint * wl_output: nativeint * x: int32 * y: int32 * physical_width: int32 * physical_height: int32 * subpixel: int32 * make: nativeptr<byte> * model: nativeptr<byte> * transform: int32 -> unit
-
-/// advertise available modes for the output
-type WlOutputModeHandler = delegate of data: nativeint * wl_output: nativeint * flags: uint32 * width: int32 * height: int32 * refresh: int32 -> unit
-
-/// sent all information about output
-type WlOutputDoneHandler = delegate of data: nativeint * wl_output: nativeint -> unit
-
-/// output scaling properties
-type WlOutputScaleHandler = delegate of data: nativeint * wl_output: nativeint * factor: int32 -> unit
-
-/// name of this output
-type WlOutputNameHandler = delegate of data: nativeint * wl_output: nativeint * name: nativeptr<byte> -> unit
-
-/// human-readable description of this output
-type WlOutputDescriptionHandler = delegate of data: nativeint * wl_output: nativeint * description: nativeptr<byte> -> unit
-
-/// check if the client is alive
-type XdgWmBasePingHandler = delegate of data: nativeint * xdg_wm_base: nativeint * serial: uint32 -> unit
-
-/// suggest a surface change
-type XdgSurfaceConfigureHandler = delegate of data: nativeint * xdg_surface: nativeint * serial: uint32 -> unit
-
-/// suggest a surface change
-type XdgToplevelConfigureHandler = delegate of data: nativeint * xdg_toplevel: nativeint * width: int32 * height: int32 * states: nativeint -> unit
-
-/// surface wants to be closed
-type XdgToplevelCloseHandler = delegate of data: nativeint * xdg_toplevel: nativeint -> unit
-
-/// recommended window geometry bounds
-type XdgToplevelConfigureBoundsHandler = delegate of data: nativeint * xdg_toplevel: nativeint * width: int32 * height: int32 -> unit
-
-/// compositor capabilities
-type XdgToplevelWmCapabilitiesHandler = delegate of data: nativeint * xdg_toplevel: nativeint * capabilities: nativeint -> unit
-
-/// configure the popup surface
-type XdgPopupConfigureHandler = delegate of data: nativeint * xdg_popup: nativeint * x: int32 * y: int32 * width: int32 * height: int32 -> unit
-
-/// popup interaction is done
-type XdgPopupPopupDoneHandler = delegate of data: nativeint * xdg_popup: nativeint -> unit
-
-/// signal the completion of a repositioned request
-type XdgPopupRepositionedHandler = delegate of data: nativeint * xdg_popup: nativeint * token: uint32 -> unit
-
-/// supported buffer format
-type ZwpLinuxDmabufV1FormatHandler = delegate of data: nativeint * zwp_linux_dmabuf_v1: nativeint * format: uint32 -> unit
-
-/// supported buffer format modifier
-type ZwpLinuxDmabufV1ModifierHandler = delegate of data: nativeint * zwp_linux_dmabuf_v1: nativeint * format: uint32 * modifier_hi: uint32 * modifier_lo: uint32 -> unit
-
-/// buffer creation succeeded
-type ZwpLinuxBufferParamsV1CreatedHandler = delegate of data: nativeint * zwp_linux_buffer_params_v1: nativeint * buffer: nativeint -> unit
-
-/// buffer creation failed
-type ZwpLinuxBufferParamsV1FailedHandler = delegate of data: nativeint * zwp_linux_buffer_params_v1: nativeint -> unit
-
-/// all feedback has been sent
-type ZwpLinuxDmabufFeedbackV1DoneHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint -> unit
-
-/// format and modifier table
-type ZwpLinuxDmabufFeedbackV1FormatTableHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint * fd: int32 * size: uint32 -> unit
-
-/// preferred main device
-type ZwpLinuxDmabufFeedbackV1MainDeviceHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint * device: nativeint -> unit
-
-/// a preference tranche has been sent
-type ZwpLinuxDmabufFeedbackV1TrancheDoneHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint -> unit
-
-/// target device
-type ZwpLinuxDmabufFeedbackV1TrancheTargetDeviceHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint * device: nativeint -> unit
-
-/// supported buffer format modifier
-type ZwpLinuxDmabufFeedbackV1TrancheFormatsHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint * indices: nativeint -> unit
-
-/// tranche flags
-type ZwpLinuxDmabufFeedbackV1TrancheFlagsHandler = delegate of data: nativeint * zwp_linux_dmabuf_feedback_v1: nativeint * flags: uint32 -> unit
-
-/// A protocol object. A `wl_object` is an opaque struct identifying the protocol object underlying a `wl_proxy` or `wl_resource`. Functions accessing a `wl_object` are not normally used by client code. Clients should normally use the higher level interface generated by the scanner to interact with compositor objects.
-type wl_object = {
-}
-
 /// Protocol message signature A wl_message describes the signature of an actual protocol message, such as a request or event, that adheres to the Wayland protocol wire format. The protocol implementation uses a wl_message within its demarshal machinery for decoding messages between a compositor and its clients. In a sense, a wl_message is to a protocol message like a class is to an object. The `name` of a wl_message is the name of the corresponding protocol message. The `signature` is an ordered list of symbols representing the data types of message arguments and, optionally, a protocol version and indicators for nullability. A leading integer in the `signature` indicates the _since_ version of the protocol message. A `?` preceding a data type symbol indicates that the following argument type is nullable. While it is a protocol violation to send messages with non-nullable arguments set to `NULL`, event handlers in clients might still get called with non-nullable object arguments set to `NULL`. This can happen when the client destroyed the object being used as argument on its side and an event referencing that object was sent before the server knew about its destruction. As this race cannot be prevented, clients should - as a general rule - program their event handlers such that they can handle object arguments declared non-nullable being `NULL` gracefully. When no arguments accompany a message, `signature` is an empty string. Symbols: * `i`: int * `u`: uint * `f`: fixed * `s`: string * `o`: object * `n`: new_id * `a`: array * `h`: fd * `?`: following argument (`o` or `s`) is nullable While demarshaling primitive arguments is straightforward, when demarshaling messages containing `object` or `new_id` arguments, the protocol implementation often must determine the type of the object. The `types` of a wl_message is an array of wl_interface references that correspond to `o` and `n` arguments in `signature`, with `NULL` placeholders for arguments with non-object types. Consider the protocol event wl_display `delete_id` that has a single `uint` argument. The wl_message is: Here, the message `name` is `"delete_id"`, the `signature` is `"u"`, and the argument `types` is `[NULL]`, indicating that the `uint` argument has no corresponding wl_interface since it is a primitive argument. In contrast, consider a `wl_foo` interface supporting protocol request `bar` that has existed since version 2, and has two arguments: a `uint` and an object of type `wl_baz_interface` that may be `NULL`. Such a `wl_message` might be: Here, the message `name` is `"bar"`, and the `signature` is `"2u?o"`. Notice how the `2` indicates the protocol version, the `u` indicates the first argument type is `uint`, and the `?o` indicates that the second argument is an object that may be `NULL`. Lastly, the argument `types` array indicates that no wl_interface corresponds to the first argument, while the type `wl_baz_interface` corresponds to the second argument. wl_argument wl_interface Wire Format
 type wl_message = {
     name: nativeptr<byte>
     signature: nativeptr<byte>
     types: nativeint
-}
-
-type wl_interface = {
 }
 
 /// Doubly-linked list On its own, an instance of `struct wl_list` represents the sentinel head of a doubly-linked list, and must be initialized using wl_list_init(). When empty, the list head's `next` and `prev` members point to the list head itself, otherwise `next` references the first element in the list, and `prev` refers to the last element in the list. Use the `struct wl_list` type to represent both the list head and the links between elements within the list. Use wl_list_empty() to determine if the list is empty in O(1). All elements in the list must be of the same type. The element type must have a `struct wl_list` member, often named `link` by convention. Prior to insertion, there is no need to initialize an element's `link` - invoking wl_list_init() on an individual list element's `struct wl_list` member is unnecessary if the very next operation is wl_list_insert(). However, a common idiom is to initialize an element's `link` prior to removal - ensure safety by invoking wl_list_init() before wl_list_remove(). Consider a list reference `struct wl_list foo_list`, an element type as `struct element`, and an element's link member as `struct wl_list link`. The following code initializes a list and adds three elements to it. The list now looks like [e2, e3, e1] . The `wl_list` API provides some iterator macros. For example, to iterate a list in ascending order: See the documentation of each iterator for details. http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/include/linux/list.h
@@ -669,7 +419,7 @@ type wl_array = {
 type wl_argument = {
     i: int32
     u: uint32
-    f: int32
+    f: int
     s: nativeptr<byte>
     o: nativeint
     n: uint32
@@ -677,184 +427,173 @@ type wl_argument = {
     h: int32
 }
 
-type timespec = {
-}
-
-/// Represents a protocol object on the client side. A wl_proxy acts as a client side proxy to an object existing in the compositor. The proxy is responsible for converting requests made by the clients with into Wayland's wire format. Events coming from the compositor are also handled by the proxy, which will in turn call the handler set with With the exception of function functions accessing a wl_proxy are not normally used by client code. Clients should normally use the higher level interface generated by the scanner to interact with compositor objects.
-type wl_proxy = {
-}
-
-/// A queue for object events. Event queues allows the events on a display to be handled in a thread-safe manner. See for details.
-type wl_event_queue = {
-}
-
 /// Event listener for wl_display
 type wl_display_listener = {
-    error: WlDisplayErrorHandler
-    delete_id: WlDisplayDeleteIdHandler
+    error: nativeint
+    delete_id: nativeint
 }
 
 /// Event listener for wl_registry
 type wl_registry_listener = {
-    global: WlRegistryGlobalHandler
-    global_remove: WlRegistryGlobalRemoveHandler
+    ``global``: nativeint
+    global_remove: nativeint
 }
 
 /// Event listener for wl_callback
 type wl_callback_listener = {
-    done: WlCallbackDoneHandler
+    ``done``: nativeint
 }
 
 /// Event listener for wl_shm
 type wl_shm_listener = {
-    format: WlShmFormatHandler
+    format: nativeint
 }
 
 /// Event listener for wl_buffer
 type wl_buffer_listener = {
-    release: WlBufferReleaseHandler
+    release: nativeint
 }
 
 /// Event listener for wl_data_offer
 type wl_data_offer_listener = {
-    offer: WlDataOfferOfferHandler
-    source_actions: WlDataOfferSourceActionsHandler
-    action: WlDataOfferActionHandler
+    offer: nativeint
+    source_actions: nativeint
+    action: nativeint
 }
 
 /// Event listener for wl_data_source
 type wl_data_source_listener = {
-    target: WlDataSourceTargetHandler
-    send: WlDataSourceSendHandler
-    cancelled: WlDataSourceCancelledHandler
-    dnd_drop_performed: WlDataSourceDndDropPerformedHandler
-    dnd_finished: WlDataSourceDndFinishedHandler
-    action: WlDataSourceActionHandler
+    target: nativeint
+    send: nativeint
+    cancelled: nativeint
+    dnd_drop_performed: nativeint
+    dnd_finished: nativeint
+    action: nativeint
 }
 
 /// Event listener for wl_data_device
 type wl_data_device_listener = {
-    data_offer: WlDataDeviceDataOfferHandler
-    enter: WlDataDeviceEnterHandler
-    leave: WlDataDeviceLeaveHandler
-    motion: WlDataDeviceMotionHandler
-    drop: WlDataDeviceDropHandler
-    selection: WlDataDeviceSelectionHandler
+    data_offer: nativeint
+    enter: nativeint
+    leave: nativeint
+    motion: nativeint
+    drop: nativeint
+    selection: nativeint
 }
 
 /// Event listener for wl_shell_surface
 type wl_shell_surface_listener = {
-    ping: WlShellSurfacePingHandler
-    configure: WlShellSurfaceConfigureHandler
-    popup_done: WlShellSurfacePopupDoneHandler
+    ping: nativeint
+    configure: nativeint
+    popup_done: nativeint
 }
 
 /// Event listener for wl_surface
 type wl_surface_listener = {
-    enter: WlSurfaceEnterHandler
-    leave: WlSurfaceLeaveHandler
-    preferred_buffer_scale: WlSurfacePreferredBufferScaleHandler
-    preferred_buffer_transform: WlSurfacePreferredBufferTransformHandler
+    enter: nativeint
+    leave: nativeint
+    preferred_buffer_scale: nativeint
+    preferred_buffer_transform: nativeint
 }
 
 /// Event listener for wl_seat
 type wl_seat_listener = {
-    capabilities: WlSeatCapabilitiesHandler
-    name: WlSeatNameHandler
+    capabilities: nativeint
+    name: nativeint
 }
 
 /// Event listener for wl_pointer
 type wl_pointer_listener = {
-    enter: WlPointerEnterHandler
-    leave: WlPointerLeaveHandler
-    motion: WlPointerMotionHandler
-    button: WlPointerButtonHandler
-    axis: WlPointerAxisHandler
-    frame: WlPointerFrameHandler
-    axis_source: WlPointerAxisSourceHandler
-    axis_stop: WlPointerAxisStopHandler
-    axis_discrete: WlPointerAxisDiscreteHandler
-    axis_value120: WlPointerAxisValue120Handler
-    axis_relative_direction: WlPointerAxisRelativeDirectionHandler
+    enter: nativeint
+    leave: nativeint
+    motion: nativeint
+    button: nativeint
+    axis: nativeint
+    frame: nativeint
+    axis_source: nativeint
+    axis_stop: nativeint
+    axis_discrete: nativeint
+    axis_value120: nativeint
+    axis_relative_direction: nativeint
 }
 
 /// Event listener for wl_keyboard
 type wl_keyboard_listener = {
-    keymap: WlKeyboardKeymapHandler
-    enter: WlKeyboardEnterHandler
-    leave: WlKeyboardLeaveHandler
-    key: WlKeyboardKeyHandler
-    modifiers: WlKeyboardModifiersHandler
-    repeat_info: WlKeyboardRepeatInfoHandler
+    keymap: nativeint
+    enter: nativeint
+    leave: nativeint
+    key: nativeint
+    modifiers: nativeint
+    repeat_info: nativeint
 }
 
 /// Event listener for wl_touch
 type wl_touch_listener = {
-    down: WlTouchDownHandler
-    up: WlTouchUpHandler
-    motion: WlTouchMotionHandler
-    frame: WlTouchFrameHandler
-    cancel: WlTouchCancelHandler
-    shape: WlTouchShapeHandler
-    orientation: WlTouchOrientationHandler
+    down: nativeint
+    up: nativeint
+    motion: nativeint
+    frame: nativeint
+    cancel: nativeint
+    shape: nativeint
+    orientation: nativeint
 }
 
 /// Event listener for wl_output
 type wl_output_listener = {
-    geometry: WlOutputGeometryHandler
-    mode: WlOutputModeHandler
-    done: WlOutputDoneHandler
-    scale: WlOutputScaleHandler
-    name: WlOutputNameHandler
-    description: WlOutputDescriptionHandler
+    geometry: nativeint
+    mode: nativeint
+    ``done``: nativeint
+    scale: nativeint
+    name: nativeint
+    description: nativeint
 }
 
 /// Event listener for xdg_wm_base
 type xdg_wm_base_listener = {
-    ping: XdgWmBasePingHandler
+    ping: nativeint
 }
 
 /// Event listener for xdg_surface
 type xdg_surface_listener = {
-    configure: XdgSurfaceConfigureHandler
+    configure: nativeint
 }
 
 /// Event listener for xdg_toplevel
 type xdg_toplevel_listener = {
-    configure: XdgToplevelConfigureHandler
-    close: XdgToplevelCloseHandler
-    configure_bounds: XdgToplevelConfigureBoundsHandler
-    wm_capabilities: XdgToplevelWmCapabilitiesHandler
+    configure: nativeint
+    close: nativeint
+    configure_bounds: nativeint
+    wm_capabilities: nativeint
 }
 
 /// Event listener for xdg_popup
 type xdg_popup_listener = {
-    configure: XdgPopupConfigureHandler
-    popup_done: XdgPopupPopupDoneHandler
-    repositioned: XdgPopupRepositionedHandler
+    configure: nativeint
+    popup_done: nativeint
+    repositioned: nativeint
 }
 
 /// Event listener for zwp_linux_dmabuf_v1
 type zwp_linux_dmabuf_v1_listener = {
-    format: ZwpLinuxDmabufV1FormatHandler
-    modifier: ZwpLinuxDmabufV1ModifierHandler
+    format: nativeint
+    modifier: nativeint
 }
 
 /// Event listener for zwp_linux_buffer_params_v1
 type zwp_linux_buffer_params_v1_listener = {
-    created: ZwpLinuxBufferParamsV1CreatedHandler
-    failed: ZwpLinuxBufferParamsV1FailedHandler
+    created: nativeint
+    failed: nativeint
 }
 
 /// Event listener for zwp_linux_dmabuf_feedback_v1
 type zwp_linux_dmabuf_feedback_v1_listener = {
-    done: ZwpLinuxDmabufFeedbackV1DoneHandler
-    format_table: ZwpLinuxDmabufFeedbackV1FormatTableHandler
-    main_device: ZwpLinuxDmabufFeedbackV1MainDeviceHandler
-    tranche_done: ZwpLinuxDmabufFeedbackV1TrancheDoneHandler
-    tranche_target_device: ZwpLinuxDmabufFeedbackV1TrancheTargetDeviceHandler
-    tranche_formats: ZwpLinuxDmabufFeedbackV1TrancheFormatsHandler
-    tranche_flags: ZwpLinuxDmabufFeedbackV1TrancheFlagsHandler
+    ``done``: nativeint
+    format_table: nativeint
+    main_device: nativeint
+    tranche_done: nativeint
+    tranche_target_device: nativeint
+    tranche_formats: nativeint
+    tranche_flags: nativeint
 }
 
 // Macro constants

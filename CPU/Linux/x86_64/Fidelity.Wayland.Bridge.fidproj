@@ -1,0 +1,27 @@
+[package]
+name = "Fidelity.Wayland.Bridge"
+version = "0.1.0"
+description = "Layer 3 bridge for wayland-client — protocol dispatch and callback wrappers."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/WaylandBridge/ProtocolDispatch.clef",
+    "Bindings/WaylandBridge/XdgShellDispatch.clef",
+    "Bindings/WaylandBridge/DmaBufDispatch.clef",
+    "Bindings/WaylandBridge/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }
+Fidelity.Wayland = { path = "Fidelity.Wayland.fidproj" }
+Fidelity.Libc = { path = "Fidelity.Libc.fidproj" }

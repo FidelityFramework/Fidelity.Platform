@@ -1,0 +1,64 @@
+/// Platform.Display.Callbacks — Protocol callback implementations
+///
+/// These functions are compiled to native symbols, resolved at runtime
+/// via dlsym(RTLD_DEFAULT, "Platform.Display.Callbacks.*") by the
+/// listener builder functions in Fidelity.Wayland.Bridge.
+///
+/// Absorbs HelloWayland's Callbacks.clef — the application no longer
+/// needs to define or know about protocol callbacks.
+module Platform.Display.Callbacks
+
+open Fidelity.Wayland.Bridge.XdgShell
+
+// ═══════════════════════════════════════════════════════════
+// REGISTRY CALLBACKS
+// ═══════════════════════════════════════════════════════════
+
+/// Called for each global object in the Wayland registry.
+/// TODO: string comparison on iface to bind compositor, xdg_wm_base, dmabuf
+let registryGlobal (data: nativeint) (registry: nativeint) (name: uint32)
+                    (iface: nativeptr<byte>) (version: uint32) : unit =
+    ()
+
+/// Called when a global object is removed from the registry.
+let registryGlobalRemove (data: nativeint) (registry: nativeint)
+                          (name: uint32) : unit =
+    ()
+
+// ═══════════════════════════════════════════════════════════
+// XDG SHELL CALLBACKS
+// ═══════════════════════════════════════════════════════════
+
+/// Respond to xdg_wm_base ping with pong (keep-alive).
+let wmBasePing (data: nativeint) (wmBase: nativeint) (serial: uint32) : unit =
+    xdg_wm_base_pong wmBase serial
+
+/// Acknowledge xdg_surface configure event.
+let surfaceConfigure (data: nativeint) (xdgSurface: nativeint)
+                      (serial: uint32) : unit =
+    xdg_surface_ack_configure xdgSurface serial
+
+// ═══════════════════════════════════════════════════════════
+// TOPLEVEL CALLBACKS
+// ═══════════════════════════════════════════════════════════
+
+/// Handle toplevel configure (resize/state change).
+let toplevelConfigure (data: nativeint) (toplevel: nativeint)
+                       (width: int32) (height: int32)
+                       (states: nativeint) : unit =
+    ()
+
+/// Handle toplevel close request.
+/// TODO: signal close to event loop via data pointer
+let toplevelClose (data: nativeint) (toplevel: nativeint) : unit =
+    ()
+
+/// Handle toplevel configure bounds.
+let toplevelConfigureBounds (data: nativeint) (toplevel: nativeint)
+                             (width: int32) (height: int32) : unit =
+    ()
+
+/// Handle toplevel window manager capabilities.
+let toplevelWmCapabilities (data: nativeint) (toplevel: nativeint)
+                            (capabilities: nativeint) : unit =
+    ()

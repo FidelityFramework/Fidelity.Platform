@@ -33,21 +33,56 @@ module hipModule_t =
 
 
 
+/// hipJitOption
+type hipJitOption =
+    | hipJitOptionMaxRegisters = 0L
+    | hipJitOptionThreadsPerBlock = 1L
+    | hipJitOptionWallTime = 2L
+    | hipJitOptionInfoLogBuffer = 3L
+    | hipJitOptionInfoLogBufferSizeBytes = 4L
+    | hipJitOptionErrorLogBuffer = 5L
+    | hipJitOptionErrorLogBufferSizeBytes = 6L
+    | hipJitOptionOptimizationLevel = 7L
+    | hipJitOptionTargetFromContext = 8L
+    | hipJitOptionTarget = 9L
+    | hipJitOptionFallbackStrategy = 10L
+    | hipJitOptionGenerateDebugInfo = 11L
+    | hipJitOptionLogVerbose = 12L
+    | hipJitOptionGenerateLineInfo = 13L
+    | hipJitOptionCacheMode = 14L
+    | hipJitOptionSm3xOpt = 15L
+    | hipJitOptionFastCompile = 16L
+    | hipJitOptionGlobalSymbolNames = 17L
+    | hipJitOptionGlobalSymbolAddresses = 18L
+    | hipJitOptionGlobalSymbolCount = 19L
+    | hipJitOptionLto = 20L
+    | hipJitOptionFtz = 21L
+    | hipJitOptionPrecDiv = 22L
+    | hipJitOptionPrecSqrt = 23L
+    | hipJitOptionFma = 24L
+    | hipJitOptionPositionIndependentCode = 25L
+    | hipJitOptionMinCTAPerSM = 26L
+    | hipJitOptionMaxThreadsPerBlock = 27L
+    | hipJitOptionOverrideDirectiveValues = 28L
+    | hipJitOptionNumOptions = 29L
+    | hipJitOptionIRtoISAOptExt = 10000L
+    | hipJitOptionIRtoISAOptCountExt = 10001L
+
 /// hip texture reference
 type textureReference = {
-    normalized: int32
+    normalized: int
     readMode: hipTextureReadMode
     filterMode: hipTextureFilterMode
     addressMode: hipTextureAddressMode
     channelDesc: hipChannelFormatDesc
-    sRGB: int32
-    maxAnisotropy: uint32
+    sRGB: int
+    maxAnisotropy: uint
     mipmapFilterMode: hipTextureFilterMode
     mipmapLevelBias: single
     minMipmapLevelClamp: single
     maxMipmapLevelClamp: single
     textureObject: hipTextureObject_t
-    numChannels: int32
+    numChannels: int
     format: hipArray_Format
 }
 

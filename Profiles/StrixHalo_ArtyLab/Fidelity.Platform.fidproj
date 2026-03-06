@@ -11,8 +11,10 @@ sources = [
 output = "fidelity-platform-profile-strixhalo-arty"
 output_kind = "library"
 
+[compilation]
+target = "cpu"
+
 [dependencies]
-cpu = { path = "../../CPU/Linux/X86_64/StrixHalo" }
-gpu = { path = "../../GPU/AMD/RDNA3_5/StrixHalo_iGPU" }
-npu = { path = "../../NPU/AMD/XDNA2/StrixHalo_NPU" }
-fpga = { path = "../../FPGA/Xilinx/Artix7/ArtyA7_100T" }
+gpu = { path = "../../GPU/AMD/RDNA3_5/StrixHalo_iGPU/Fidelity.Platform.fidproj" }
+npu = { path = "../../NPU/AMD/XDNA2/StrixHalo_NPU/Fidelity.Platform.fidproj" }
+fpga = { path = "../../FPGA/Xilinx/Artix7/ArtyA7_100T/Fidelity.Platform.fidproj" }

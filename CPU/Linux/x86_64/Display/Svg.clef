@@ -1,0 +1,60 @@
+/// Platform.Display.Svg — SVG rasterization via resvg
+///
+/// Parses SVG files and rasterizes them into pixel buffers.
+///
+/// Absorbs HelloWayland's Rendering.clef.
+/// Uses L1 bindings directly (fully qualified) to avoid L2 sub-module
+/// resolution issues with errno/error describe functions.
+module Platform.Display.Svg
+
+open Console
+
+// ═══════════════════════════════════════════════════════════
+// SVG RASTERIZATION
+// ═══════════════════════════════════════════════════════════
+
+/// Rasterize an SVG file into a pixel buffer.
+/// Returns pixel buffer handle on success, 0n on failure.
+/// Caller is responsible for freeing the buffer via freePixmap.
+let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
+    let bufferSize = width * height * 4
+
+    match Fidelity.Image.Resvg.resvg_options_create () with
+    | None ->
+        Console.writeln "Platform.Display: resvg_options_create failed"
+        0n
+    | Some opts ->
+        Fidelity.Image.Resvg.resvg_options_load_system_fonts (Some opts)
+
+        match Fidelity.Libc.Memory.malloc (unativeint 8) with
+        | None ->
+            Console.writeln "Platform.Display: tree storage malloc failed"
+            Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
+            0n
+        | Some treePtrStorage ->
+
+        let parseResult = int (Fidelity.Image.Resvg.resvg_parse_tree_from_file (Some svgPath.Pointer) (Some opts) (Some treePtrStorage))
+        if parseResult <> 0 then
+            Console.writeln "Platform.Display: SVG parse failed"
+            Fidelity.Libc.Memory.free (Some treePtrStorage)
+            Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
+            0n
+        else
+
+        match Fidelity.Libc.Memory.malloc (unativeint bufferSize) with
+        | None ->
+            Console.writeln "Platform.Display: pixmap malloc failed"
+            Fidelity.Libc.Memory.free (Some treePtrStorage)
+            Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
+            0n
+        | Some pix ->
+            let _ = Fidelity.Libc.Memory.memset (Some pix) 0 (unativeint bufferSize)
+            // TODO: resvg_render with identity transform
+            // For now, return the allocated pixmap buffer
+            Fidelity.Libc.Memory.free (Some treePtrStorage)
+            Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
+            pix
+
+/// Free a pixel buffer returned by rasterize.
+let freePixmap (pixmap: nativeint) : unit =
+    Fidelity.Libc.Memory.free (Some pixmap)

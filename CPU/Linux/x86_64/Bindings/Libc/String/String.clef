@@ -7,81 +7,81 @@ open Fidelity.Libc.Types
     /// 
     /// C signature: char * strcpy(char *restrict __dest, const char *restrict __src)
     [<FidelityExtern("c", "strcpy")>]
-    let strcpy (dest: nativeptr<byte>) (src: nativeptr<byte>) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strcpy (dest: option<nativeptr<byte>>) (src: option<nativeptr<byte>>) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Copy no more than N characters of SRC to DEST.
     /// 
     /// C signature: char * strncpy(char *restrict __dest, const char *restrict __src, size_t __n)
     [<FidelityExtern("c", "strncpy")>]
-    let strncpy (dest: nativeptr<byte>) (src: nativeptr<byte>) (n: unativeint) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strncpy (dest: option<nativeptr<byte>>) (src: option<nativeptr<byte>>) (n: unativeint) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Append SRC onto DEST.
     /// 
     /// C signature: char * strcat(char *restrict __dest, const char *restrict __src)
     [<FidelityExtern("c", "strcat")>]
-    let strcat (dest: nativeptr<byte>) (src: nativeptr<byte>) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strcat (dest: option<nativeptr<byte>>) (src: option<nativeptr<byte>>) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Append no more than N characters from SRC onto DEST.
     /// 
     /// C signature: char * strncat(char *restrict __dest, const char *restrict __src, size_t __n)
     [<FidelityExtern("c", "strncat")>]
-    let strncat (dest: nativeptr<byte>) (src: nativeptr<byte>) (n: unativeint) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strncat (dest: option<nativeptr<byte>>) (src: option<nativeptr<byte>>) (n: unativeint) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Compare S1 and S2.
     /// 
     /// C signature: int strcmp(const char * __s1, const char * __s2)
     [<FidelityExtern("c", "strcmp")>]
-    let strcmp (s1: nativeptr<byte>) (s2: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let strcmp (s1: option<nativeptr<byte>>) (s2: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Compare N characters of S1 and S2.
     /// 
     /// C signature: int strncmp(const char * __s1, const char * __s2, size_t __n)
     [<FidelityExtern("c", "strncmp")>]
-    let strncmp (s1: nativeptr<byte>) (s2: nativeptr<byte>) (n: unativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let strncmp (s1: option<nativeptr<byte>>) (s2: option<nativeptr<byte>>) (n: unativeint) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: char * strchr(const char * __s, int __c)
     [<FidelityExtern("c", "strchr")>]
-    let strchr (s: nativeptr<byte>) (c: int32) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strchr (s: option<nativeptr<byte>>) (c: int) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// C signature: char * strrchr(const char * __s, int __c)
     [<FidelityExtern("c", "strrchr")>]
-    let strrchr (s: nativeptr<byte>) (c: int32) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strrchr (s: option<nativeptr<byte>>) (c: int) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// C signature: char * strstr(const char * __haystack, const char * __needle)
     [<FidelityExtern("c", "strstr")>]
-    let strstr (haystack: nativeptr<byte>) (needle: nativeptr<byte>) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strstr (haystack: option<nativeptr<byte>>) (needle: option<nativeptr<byte>>) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// C signature: char * strtok_r(char *restrict __s, const char *restrict __delim, char **restrict __save_ptr)
     [<FidelityExtern("c", "strtok_r")>]
-    let strtok_r (s: nativeptr<byte>) (delim: nativeptr<byte>) (save_ptr: nativeptr<byte>) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strtok_r (s: option<nativeptr<byte>>) (delim: option<nativeptr<byte>>) (save_ptr: option<nativeptr<byte>>) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Return the length of S.
     /// 
     /// C signature: unsigned long strlen(const char * __s)
     [<FidelityExtern("c", "strlen")>]
-    let strlen (s: nativeptr<byte>) : uint64 =
-        Unchecked.defaultof<uint64>
+    let strlen (s: option<nativeptr<byte>>) : uint64 =
+        NativeDefault.zeroed ()
 
     /// Find the length of STRING, but scan at most MAXLEN characters. If no ' \ 0' terminator is found in that many characters, return MAXLEN.
     /// 
     /// C signature: size_t strnlen(const char * __string, size_t __maxlen)
     [<FidelityExtern("c", "strnlen")>]
-    let strnlen (string: nativeptr<byte>) (maxlen: unativeint) : unativeint =
-        Unchecked.defaultof<unativeint>
+    let strnlen (string: option<nativeptr<byte>>) (maxlen: unativeint) : unativeint =
+        NativeDefault.zeroed ()
 
     /// Return a string describing the meaning of the `errno' code in ERRNUM.
     /// 
     /// C signature: char * strerror(int __errnum)
     [<FidelityExtern("c", "strerror")>]
-    let strerror (errnum: int32) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let strerror (errnum: int) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()

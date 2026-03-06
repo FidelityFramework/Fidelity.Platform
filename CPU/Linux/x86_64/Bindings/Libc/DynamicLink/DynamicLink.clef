@@ -7,26 +7,26 @@ open Fidelity.Libc.Types
     /// 
     /// C signature: void * dlopen(const char * __file, int __mode)
     [<FidelityExtern("c", "dlopen")>]
-    let dlopen (file: nativeptr<byte>) (mode: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let dlopen (file: option<nativeptr<byte>>) (mode: int) : option<nativeint> =
+        NativeDefault.zeroed ()
 
     /// Unmap and close a shared object opened by `dlopen'. The handle cannot be used again after calling `dlclose'.
     /// 
     /// C signature: int dlclose(void * __handle)
     [<FidelityExtern("c", "dlclose")>]
-    let dlclose (handle: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let dlclose (handle: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Find the run-time address in the shared object HANDLE refers to of the symbol called NAME.
     /// 
     /// C signature: void * dlsym(void *restrict __handle, const char *restrict __name)
     [<FidelityExtern("c", "dlsym")>]
-    let dlsym (handle: nativeint) (name: nativeptr<byte>) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let dlsym (handle: option<nativeint>) (name: option<nativeptr<byte>>) : option<nativeint> =
+        NativeDefault.zeroed ()
 
     /// When any of the above functions fails, call this function to return a string describing the error.  Each call resets the error string so that a following call returns null.
     /// 
     /// C signature: char * dlerror()
     [<FidelityExtern("c", "dlerror")>]
-    let dlerror () : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let dlerror () : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()

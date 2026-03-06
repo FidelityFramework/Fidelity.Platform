@@ -1,0 +1,51 @@
+/// Platform.Display.Connection — Wayland display lifecycle
+///
+/// Connects to Wayland display, discovers registry globals,
+/// and manages the event dispatch loop.
+///
+/// All C types (nativeint, dlsym, listener structs) are internal.
+/// Consuming code sees only opaque handles.
+module Platform.Display.Connection
+
+open Console
+open Fidelity.Wayland.Core
+open Fidelity.Wayland.Core.Api
+open Fidelity.Wayland.Bridge.Protocol
+open Fidelity.Wayland.Bridge.Callbacks
+
+// ═══════════════════════════════════════════════════════════
+// DISPLAY LIFECYCLE
+// ═══════════════════════════════════════════════════════════
+
+/// Connect to Wayland display and bind registry globals.
+/// Returns display handle on success, 0n on failure.
+/// The handle is opaque — callers pass it to other Platform.Display
+/// modules but never inspect or dereference it.
+let connect () : nativeint =
+    match wl_display_connect None with
+    | None ->
+        Console.writeln "Platform.Display: Failed to connect to Wayland display"
+        0n
+    | Some disp ->
+        let reg = wl_display_get_registry disp
+
+        let regListener = buildWlRegistryListener
+                            "Platform.Display.Callbacks.registryGlobal"
+                            "Platform.Display.Callbacks.registryGlobalRemove"
+        wl_proxy_add_listener (Some reg) (nativeint &regListener) (Some 0n) |> ignore
+        wl_display_roundtrip (Some disp) |> ignore
+
+        disp
+
+/// Disconnect and clean up display resources.
+let disconnect (display: nativeint) : unit =
+    wl_display_disconnect (Some display)
+
+/// Run one event dispatch cycle.
+/// Returns >= 0 on success, < 0 on error (connection lost).
+let dispatch (display: nativeint) : int =
+    wl_display_dispatch (Some display)
+
+/// Block until all pending requests are processed.
+let roundtrip (display: nativeint) : int =
+    wl_display_roundtrip (Some display)

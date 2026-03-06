@@ -57,8 +57,8 @@ type hipStreamCaptureStatus =
 type hipLaunchAttributeValue = {
     pad: byte
     accessPolicyWindow: hipAccessPolicyWindow
-    cooperative: int32
-    priority: int32
+    cooperative: int
+    priority: int
     syncPolicy: hipSynchronizationPolicy
     memSyncDomainMap: hipLaunchMemSyncDomainMap
     memSyncDomain: hipLaunchMemSyncDomain
@@ -68,5 +68,5 @@ type hipGraphEdgeData = {
     from_port: byte
     reserved: byte
     to_port: byte
-    type: byte
+    ``type``: byte
 }

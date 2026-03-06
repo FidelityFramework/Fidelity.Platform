@@ -171,108 +171,108 @@ type hipDeviceProp_tR0600 = {
     name: byte
     uuid: hipUUID_t
     luid: byte
-    luidDeviceNodeMask: uint32
+    luidDeviceNodeMask: uint
     totalGlobalMem: unativeint
     sharedMemPerBlock: unativeint
-    regsPerBlock: int32
-    warpSize: int32
+    regsPerBlock: int
+    warpSize: int
     memPitch: unativeint
-    maxThreadsPerBlock: int32
-    maxThreadsDim: int32
-    maxGridSize: int32
-    clockRate: int32
+    maxThreadsPerBlock: int
+    maxThreadsDim: int
+    maxGridSize: int
+    clockRate: int
     totalConstMem: unativeint
-    major: int32
-    minor: int32
+    major: int
+    minor: int
     textureAlignment: unativeint
     texturePitchAlignment: unativeint
-    deviceOverlap: int32
-    multiProcessorCount: int32
-    kernelExecTimeoutEnabled: int32
-    integrated: int32
-    canMapHostMemory: int32
-    computeMode: int32
-    maxTexture1D: int32
-    maxTexture1DMipmap: int32
-    maxTexture1DLinear: int32
-    maxTexture2D: int32
-    maxTexture2DMipmap: int32
-    maxTexture2DLinear: int32
-    maxTexture2DGather: int32
-    maxTexture3D: int32
-    maxTexture3DAlt: int32
-    maxTextureCubemap: int32
-    maxTexture1DLayered: int32
-    maxTexture2DLayered: int32
-    maxTextureCubemapLayered: int32
-    maxSurface1D: int32
-    maxSurface2D: int32
-    maxSurface3D: int32
-    maxSurface1DLayered: int32
-    maxSurface2DLayered: int32
-    maxSurfaceCubemap: int32
-    maxSurfaceCubemapLayered: int32
+    deviceOverlap: int
+    multiProcessorCount: int
+    kernelExecTimeoutEnabled: int
+    integrated: int
+    canMapHostMemory: int
+    computeMode: int
+    maxTexture1D: int
+    maxTexture1DMipmap: int
+    maxTexture1DLinear: int
+    maxTexture2D: int
+    maxTexture2DMipmap: int
+    maxTexture2DLinear: int
+    maxTexture2DGather: int
+    maxTexture3D: int
+    maxTexture3DAlt: int
+    maxTextureCubemap: int
+    maxTexture1DLayered: int
+    maxTexture2DLayered: int
+    maxTextureCubemapLayered: int
+    maxSurface1D: int
+    maxSurface2D: int
+    maxSurface3D: int
+    maxSurface1DLayered: int
+    maxSurface2DLayered: int
+    maxSurfaceCubemap: int
+    maxSurfaceCubemapLayered: int
     surfaceAlignment: unativeint
-    concurrentKernels: int32
-    ECCEnabled: int32
-    pciBusID: int32
-    pciDeviceID: int32
-    pciDomainID: int32
-    tccDriver: int32
-    asyncEngineCount: int32
-    unifiedAddressing: int32
-    memoryClockRate: int32
-    memoryBusWidth: int32
-    l2CacheSize: int32
-    persistingL2CacheMaxSize: int32
-    maxThreadsPerMultiProcessor: int32
-    streamPrioritiesSupported: int32
-    globalL1CacheSupported: int32
-    localL1CacheSupported: int32
+    concurrentKernels: int
+    ECCEnabled: int
+    pciBusID: int
+    pciDeviceID: int
+    pciDomainID: int
+    tccDriver: int
+    asyncEngineCount: int
+    unifiedAddressing: int
+    memoryClockRate: int
+    memoryBusWidth: int
+    l2CacheSize: int
+    persistingL2CacheMaxSize: int
+    maxThreadsPerMultiProcessor: int
+    streamPrioritiesSupported: int
+    globalL1CacheSupported: int
+    localL1CacheSupported: int
     sharedMemPerMultiprocessor: unativeint
-    regsPerMultiprocessor: int32
-    managedMemory: int32
-    isMultiGpuBoard: int32
-    multiGpuBoardGroupID: int32
-    hostNativeAtomicSupported: int32
-    singleToDoublePrecisionPerfRatio: int32
-    pageableMemoryAccess: int32
-    concurrentManagedAccess: int32
-    computePreemptionSupported: int32
-    canUseHostPointerForRegisteredMem: int32
-    cooperativeLaunch: int32
-    cooperativeMultiDeviceLaunch: int32
+    regsPerMultiprocessor: int
+    managedMemory: int
+    isMultiGpuBoard: int
+    multiGpuBoardGroupID: int
+    hostNativeAtomicSupported: int
+    singleToDoublePrecisionPerfRatio: int
+    pageableMemoryAccess: int
+    concurrentManagedAccess: int
+    computePreemptionSupported: int
+    canUseHostPointerForRegisteredMem: int
+    cooperativeLaunch: int
+    cooperativeMultiDeviceLaunch: int
     sharedMemPerBlockOptin: unativeint
-    pageableMemoryAccessUsesHostPageTables: int32
-    directManagedMemAccessFromHost: int32
-    maxBlocksPerMultiProcessor: int32
-    accessPolicyMaxWindowSize: int32
+    pageableMemoryAccessUsesHostPageTables: int
+    directManagedMemAccessFromHost: int
+    maxBlocksPerMultiProcessor: int
+    accessPolicyMaxWindowSize: int
     reservedSharedMemPerBlock: unativeint
-    hostRegisterSupported: int32
-    sparseHipArraySupported: int32
-    hostRegisterReadOnlySupported: int32
-    timelineSemaphoreInteropSupported: int32
-    memoryPoolsSupported: int32
-    gpuDirectRDMASupported: int32
-    gpuDirectRDMAFlushWritesOptions: uint32
-    gpuDirectRDMAWritesOrdering: int32
-    memoryPoolSupportedHandleTypes: uint32
-    deferredMappingHipArraySupported: int32
-    ipcEventSupported: int32
-    clusterLaunch: int32
-    unifiedFunctionPointers: int32
-    reserved: int32
-    hipReserved: int32
+    hostRegisterSupported: int
+    sparseHipArraySupported: int
+    hostRegisterReadOnlySupported: int
+    timelineSemaphoreInteropSupported: int
+    memoryPoolsSupported: int
+    gpuDirectRDMASupported: int
+    gpuDirectRDMAFlushWritesOptions: uint
+    gpuDirectRDMAWritesOrdering: int
+    memoryPoolSupportedHandleTypes: uint
+    deferredMappingHipArraySupported: int
+    ipcEventSupported: int
+    clusterLaunch: int
+    unifiedFunctionPointers: int
+    reserved: int
+    hipReserved: int
     gcnArchName: byte
     maxSharedMemoryPerMultiProcessor: unativeint
-    clockInstructionRate: int32
+    clockInstructionRate: int
     arch: hipDeviceArch_t
     hdpMemFlushCntl: nativeint
     hdpRegFlushCntl: nativeint
-    cooperativeMultiDeviceUnmatchedFunc: int32
-    cooperativeMultiDeviceUnmatchedGridDim: int32
-    cooperativeMultiDeviceUnmatchedBlockDim: int32
-    cooperativeMultiDeviceUnmatchedSharedMem: int32
-    isLargeBar: int32
-    asicRevision: int32
+    cooperativeMultiDeviceUnmatchedFunc: int
+    cooperativeMultiDeviceUnmatchedGridDim: int
+    cooperativeMultiDeviceUnmatchedBlockDim: int
+    cooperativeMultiDeviceUnmatchedSharedMem: int
+    isLargeBar: int
+    asicRevision: int
 }

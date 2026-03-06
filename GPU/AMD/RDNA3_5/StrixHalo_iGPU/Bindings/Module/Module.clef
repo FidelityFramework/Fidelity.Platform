@@ -8,124 +8,124 @@ open Fidelity.ROCm.Module.Types
     /// 
     /// C signature: hipError_t hipModuleGetGlobal(hipDeviceptr_t * dptr, size_t * bytes, hipModule_t hmod, const char * name)
     [<FidelityExtern("amdhip64", "hipModuleGetGlobal")>]
-    let hipModuleGetGlobal (dptr: nativeint) (bytes: nativeint) (hmod: hipModule_t) (name: nativeptr<byte>) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleGetGlobal (dptr: option<nativeint>) (bytes: option<nativeint>) (hmod: hipModule_t) (name: option<nativeptr<byte>>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// doxygen end Context Management @ } ------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------- @ { This section describes the module management functions of HIP runtime API. Loads fatbin object fatbin to be loaded as a module Module #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidContext, #hipErrorFileNotFound, #hipErrorOutOfMemory, #hipErrorSharedObjectInitFailed, #hipErrorNotInitialized
     /// 
     /// C signature: hipError_t hipModuleLoadFatBinary(hipModule_t * module, const void * fatbin)
     [<FidelityExtern("amdhip64", "hipModuleLoadFatBinary")>]
-    let hipModuleLoadFatBinary (``module``: nativeint) (fatbin: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLoadFatBinary (``module``: option<nativeint>) (fatbin: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Loads code object from file into a module the currrent context. Filename of code object to load Module File/memory resources allocated in this function are released only in hipModuleUnload. #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidContext, #hipErrorFileNotFound, #hipErrorOutOfMemory, #hipErrorSharedObjectInitFailed, #hipErrorNotInitialized
     /// 
     /// C signature: hipError_t hipModuleLoad(hipModule_t * module, const char * fname)
     [<FidelityExtern("amdhip64", "hipModuleLoad")>]
-    let hipModuleLoad (``module``: nativeint) (fname: nativeptr<byte>) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLoad (``module``: option<nativeint>) (fname: option<nativeptr<byte>>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Frees the module Module to free #hipSuccess, #hipErrorInvalidResourceHandle The module is freed, and the code objects associated with it are destroyed.
     /// 
     /// C signature: hipError_t hipModuleUnload(hipModule_t module)
     [<FidelityExtern("amdhip64", "hipModuleUnload")>]
     let hipModuleUnload (``module``: hipModule_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Function with kname will be extracted if present in module Module to get function from Pointer to the name of function Pointer to function handle #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidContext, #hipErrorNotInitialized, #hipErrorNotFound,
     /// 
     /// C signature: hipError_t hipModuleGetFunction(hipFunction_t * function, hipModule_t module, const char * kname)
     [<FidelityExtern("amdhip64", "hipModuleGetFunction")>]
-    let hipModuleGetFunction (``function``: nativeint) (``module``: hipModule_t) (kname: nativeptr<byte>) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleGetFunction (``function``: option<nativeint>) (``module``: hipModule_t) (kname: option<nativeptr<byte>>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Returns the number of functions within a module. Module to get function count from function count from module #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidContext, #hipErrorNotInitialized, #hipErrorNotFound,
     /// 
     /// C signature: hipError_t hipModuleGetFunctionCount(unsigned int * count, hipModule_t mod)
     [<FidelityExtern("amdhip64", "hipModuleGetFunctionCount")>]
-    let hipModuleGetFunctionCount (count: nativeint) (mod: hipModule_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleGetFunctionCount (count: option<nativeint>) (mod: hipModule_t) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Find out attributes for a given function. Attributes of funtion Pointer to the function handle #hipSuccess, #hipErrorInvalidValue, #hipErrorInvalidDeviceFunction
     /// 
     /// C signature: hipError_t hipFuncGetAttributes(struct hipFuncAttributes * attr, const void * func)
     [<FidelityExtern("amdhip64", "hipFuncGetAttributes")>]
-    let hipFuncGetAttributes (attr: nativeint) (func: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipFuncGetAttributes (attr: option<nativeint>) (func: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// returns the handle of the texture reference with the name from the module. Module Pointer of name of texture reference Pointer of texture reference #hipSuccess, #hipErrorNotInitialized, #hipErrorNotFound, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipModuleGetTexRef(textureReference ** texRef, hipModule_t hmod, const char * name)
     [<FidelityExtern("amdhip64", "hipModuleGetTexRef")>]
-    let hipModuleGetTexRef (texRef: nativeint) (hmod: hipModule_t) (name: nativeptr<byte>) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleGetTexRef (texRef: option<nativeint>) (hmod: hipModule_t) (name: option<nativeptr<byte>>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// builds module from code object data which resides in host memory. The "image" is a pointer to the location of code object data. This data can be either a single code object or a fat binary (fatbin), which serves as the entry point for loading and launching device-specific kernel executions. By default, the following command generates a fatbin: "amdclang++ -O3 -c --offload-device-only --offload-arch=<GPU_ARCH> <input_file> -o <output_file>" For more details, refer to: Kernel Compilation in the HIP kernel language C++ support, or HIP runtime compilation (HIP RTC) . The pointer to the location of data Retuned module hipSuccess, hipErrorNotInitialized, hipErrorOutOfMemory, hipErrorNotInitialized
     /// 
     /// C signature: hipError_t hipModuleLoadData(hipModule_t * module, const void * image)
     [<FidelityExtern("amdhip64", "hipModuleLoadData")>]
-    let hipModuleLoadData (``module``: nativeint) (image: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLoadData (``module``: option<nativeint>) (image: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// builds module from code object which resides in host memory. Image is pointer to that location. Options are not used. hipModuleLoadData is called. The pointer to the location of data Retuned module Number of options Options for JIT Option values for JIT hipSuccess, hipErrorNotInitialized, hipErrorOutOfMemory, hipErrorNotInitialized
     /// 
     /// C signature: hipError_t hipModuleLoadDataEx(hipModule_t * module, const void * image, unsigned int numOptions, hipJitOption * options, void ** optionValues)
     [<FidelityExtern("amdhip64", "hipModuleLoadDataEx")>]
-    let hipModuleLoadDataEx (``module``: nativeint) (image: nativeint) (numOptions: uint32) (options: nativeint) (optionValues: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLoadDataEx (``module``: option<nativeint>) (image: option<nativeint>) (numOptions: uint) (options: option<nativeint>) (optionValues: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// launches kernel f with launch parameters and shared memory on stream with arguments passed to kernelparams or extra Kernel to launch. X grid dimension specified as multiple of blockDimX. Y grid dimension specified as multiple of blockDimY. Z grid dimension specified as multiple of blockDimZ. X block dimensions specified in work-items Y grid dimension specified in work-items Z grid dimension specified in work-items Amount of dynamic shared memory to allocate for this kernel. The HIP-Clang compiler provides support for extern shared declarations. Stream where the kernel should be dispatched.  May be 0, in which case th default stream is used with associated synchronization rules. Kernel parameters to launch Pointer to kernel arguments.   These are passed directly to the kernel and must be in the memory layout and alignment expected by the kernel. All passed arguments must be naturally aligned according to their type. The memory address of each argument should be a multiple of its size in bytes. Please refer to hip_porting_driver_api.md for sample usage. Please note, HIP does not support kernel launch with total work items defined in dimension with size gridDim x blockDim >= 2^32. So gridDim.x * blockDim.x, gridDim.y * blockDim.y and gridDim.z * blockDim.z are always less than 2^32. #hipSuccess, #hipErrorNotInitialized, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipModuleLaunchKernel(hipFunction_t f, unsigned int gridDimX, unsigned int gridDimY, unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY, unsigned int blockDimZ, unsigned int sharedMemBytes, hipStream_t stream, void ** kernelParams, void ** extra)
     [<FidelityExtern("amdhip64", "hipModuleLaunchKernel")>]
-    let hipModuleLaunchKernel (f: hipFunction_t) (gridDimX: uint32) (gridDimY: uint32) (gridDimZ: uint32) (blockDimX: uint32) (blockDimY: uint32) (blockDimZ: uint32) (sharedMemBytes: uint32) (stream: hipStream_t) (kernelParams: nativeint) (extra: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLaunchKernel (f: hipFunction_t) (gridDimX: uint) (gridDimY: uint) (gridDimZ: uint) (blockDimX: uint) (blockDimY: uint) (blockDimZ: uint) (sharedMemBytes: uint) (stream: hipStream_t) (kernelParams: option<nativeint>) (extra: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// @ { launches kernel f with launch parameters and shared memory on stream with arguments passed to kernelParams, where thread blocks can cooperate and synchronize as they execute Kernel to launch. X grid dimension specified as multiple of blockDimX. Y grid dimension specified as multiple of blockDimY. Z grid dimension specified as multiple of blockDimZ. X block dimension specified in work-items. Y block dimension specified in work-items. Z block dimension specified in work-items. Amount of dynamic shared memory to allocate for this kernel. The HIP-Clang compiler provides support for extern shared declarations. Stream where the kernel should be dispatched. May be 0, in which case the default stream is used with associated synchronization rules. A list of kernel arguments. Please note, HIP does not support kernel launch with total work items defined in dimension with size . #hipSuccess, #hipErrorDeinitialized, #hipErrorNotInitialized, #hipErrorInvalidContext, #hipErrorInvalidHandle, #hipErrorInvalidImage, #hipErrorInvalidValue, #hipErrorInvalidConfiguration, #hipErrorLaunchFailure, #hipErrorLaunchOutOfResources, #hipErrorLaunchTimeOut, #hipErrorCooperativeLaunchTooLarge, #hipErrorSharedObjectInitFailed
     /// 
     /// C signature: hipError_t hipModuleLaunchCooperativeKernel(hipFunction_t f, unsigned int gridDimX, unsigned int gridDimY, unsigned int gridDimZ, unsigned int blockDimX, unsigned int blockDimY, unsigned int blockDimZ, unsigned int sharedMemBytes, hipStream_t stream, void ** kernelParams)
     [<FidelityExtern("amdhip64", "hipModuleLaunchCooperativeKernel")>]
-    let hipModuleLaunchCooperativeKernel (f: hipFunction_t) (gridDimX: uint32) (gridDimY: uint32) (gridDimZ: uint32) (blockDimX: uint32) (blockDimY: uint32) (blockDimZ: uint32) (sharedMemBytes: uint32) (stream: hipStream_t) (kernelParams: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLaunchCooperativeKernel (f: hipFunction_t) (gridDimX: uint) (gridDimY: uint) (gridDimZ: uint) (blockDimX: uint) (blockDimY: uint) (blockDimZ: uint) (sharedMemBytes: uint) (stream: hipStream_t) (kernelParams: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Launches kernels on multiple devices where thread blocks can cooperate and synchronize as they execute. List of launch parameters, one per device. Size of the launchParamsList array. Flags to control launch behavior. #hipSuccess, #hipErrorDeinitialized, #hipErrorNotInitialized, #hipErrorInvalidContext, #hipErrorInvalidHandle, #hipErrorInvalidImage, #hipErrorInvalidValue, #hipErrorInvalidConfiguration, #hipErrorInvalidResourceHandle, #hipErrorLaunchFailure, #hipErrorLaunchOutOfResources, #hipErrorLaunchTimeOut, #hipErrorCooperativeLaunchTooLarge, #hipErrorSharedObjectInitFailed
     /// 
     /// C signature: hipError_t hipModuleLaunchCooperativeKernelMultiDevice(hipFunctionLaunchParams * launchParamsList, unsigned int numDevices, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipModuleLaunchCooperativeKernelMultiDevice")>]
-    let hipModuleLaunchCooperativeKernelMultiDevice (launchParamsList: nativeint) (numDevices: uint32) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleLaunchCooperativeKernelMultiDevice (launchParamsList: option<nativeint>) (numDevices: uint) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// ------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------- @ { This section describes the occupancy functions of HIP runtime API. determine the grid and block sizes to achieves maximum occupancy for a kernel minimum grid size for maximum potential occupancy block size for maximum potential occupancy kernel function for which occupancy is calulated dynamic shared memory usage (in bytes) intended for each block the maximum block size for the kernel, use 0 for no limit Please note, HIP does not support kernel launch with total work items defined in dimension with size gridDim x blockDim >= 2^32. #hipSuccess, #hipErrorInvalidValue TODO - Match CUoccupancyB2DSize
     /// 
     /// C signature: hipError_t hipModuleOccupancyMaxPotentialBlockSize(int * gridSize, int * blockSize, hipFunction_t f, size_t dynSharedMemPerBlk, int blockSizeLimit)
     [<FidelityExtern("amdhip64", "hipModuleOccupancyMaxPotentialBlockSize")>]
-    let hipModuleOccupancyMaxPotentialBlockSize (gridSize: nativeint) (blockSize: nativeint) (f: hipFunction_t) (dynSharedMemPerBlk: unativeint) (blockSizeLimit: int32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleOccupancyMaxPotentialBlockSize (gridSize: option<nativeint>) (blockSize: option<nativeint>) (f: hipFunction_t) (dynSharedMemPerBlk: unativeint) (blockSizeLimit: int) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// determine the grid and block sizes to achieves maximum occupancy for a kernel minimum grid size for maximum potential occupancy block size for maximum potential occupancy kernel function for which occupancy is calulated dynamic shared memory usage (in bytes) intended for each block the maximum block size for the kernel, use 0 for no limit Extra flags for occupancy calculation (only default supported) Please note, HIP does not support kernel launch with total work items defined in dimension with size gridDim x blockDim >= 2^32. #hipSuccess, #hipErrorInvalidValue TODO - Match CUoccupancyB2DSize
     /// 
     /// C signature: hipError_t hipModuleOccupancyMaxPotentialBlockSizeWithFlags(int * gridSize, int * blockSize, hipFunction_t f, size_t dynSharedMemPerBlk, int blockSizeLimit, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipModuleOccupancyMaxPotentialBlockSizeWithFlags")>]
-    let hipModuleOccupancyMaxPotentialBlockSizeWithFlags (gridSize: nativeint) (blockSize: nativeint) (f: hipFunction_t) (dynSharedMemPerBlk: unativeint) (blockSizeLimit: int32) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleOccupancyMaxPotentialBlockSizeWithFlags (gridSize: option<nativeint>) (blockSize: option<nativeint>) (f: hipFunction_t) (dynSharedMemPerBlk: unativeint) (blockSizeLimit: int) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Returns occupancy for a device function. Returned occupancy Kernel function (hipFunction) for which occupancy is calulated Block size the kernel is intended to be launched with Dynamic shared memory usage (in bytes) intended for each block #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipModuleOccupancyMaxActiveBlocksPerMultiprocessor(int * numBlocks, hipFunction_t f, int blockSize, size_t dynSharedMemPerBlk)
     [<FidelityExtern("amdhip64", "hipModuleOccupancyMaxActiveBlocksPerMultiprocessor")>]
-    let hipModuleOccupancyMaxActiveBlocksPerMultiprocessor (numBlocks: nativeint) (f: hipFunction_t) (blockSize: int32) (dynSharedMemPerBlk: unativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleOccupancyMaxActiveBlocksPerMultiprocessor (numBlocks: option<nativeint>) (f: hipFunction_t) (blockSize: int) (dynSharedMemPerBlk: unativeint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Returns occupancy for a device function. Returned occupancy Kernel function(hipFunction_t) for which occupancy is calulated Block size the kernel is intended to be launched with Dynamic shared memory usage (in bytes) intended for each block Extra flags for occupancy calculation (only default supported) #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipModuleOccupancyMaxActiveBlocksPerMultiprocessorWithFlags(int * numBlocks, hipFunction_t f, int blockSize, size_t dynSharedMemPerBlk, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipModuleOccupancyMaxActiveBlocksPerMultiprocessorWithFlags")>]
-    let hipModuleOccupancyMaxActiveBlocksPerMultiprocessorWithFlags (numBlocks: nativeint) (f: hipFunction_t) (blockSize: int32) (dynSharedMemPerBlk: unativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipModuleOccupancyMaxActiveBlocksPerMultiprocessorWithFlags (numBlocks: option<nativeint>) (f: hipFunction_t) (blockSize: int) (dynSharedMemPerBlk: unativeint) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C compliant kernel launch API - Kernel stub function pointer. - Number of blocks. - Dimension of a block - Pointer of arguments passed to the kernel. If the kernel has multiple parameters, 'args' should be array of pointers, each points the corresponding argument. - Amount of dynamic shared memory to allocate for this kernel. The HIP-Clang compiler provides support for extern shared declarations. - Stream where the kernel should be dispatched.  May be 0, in which case th default stream is used with associated synchronization rules. #hipSuccess, #hipErrorInvalidValue
     /// 
     /// C signature: hipError_t hipLaunchKernel(const void * function_address, dim3 numBlocks, dim3 dimBlocks, void ** args, size_t sharedMemBytes, hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipLaunchKernel")>]
-    let hipLaunchKernel (function_address: nativeint) (numBlocks: dim3) (dimBlocks: dim3) (args: nativeint) (sharedMemBytes: unativeint) (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipLaunchKernel (function_address: option<nativeint>) (numBlocks: dim3) (dimBlocks: dim3) (args: option<nativeint>) (sharedMemBytes: unativeint) (stream: hipStream_t) : hipError_t =
+        NativeDefault.zeroed ()

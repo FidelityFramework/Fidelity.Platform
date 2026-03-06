@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["SpeakEZ Technologies"]
 description = "Shared substrate-neutral contracts for Fidelity.Platform packages."
 
+[compilation]
+target = "cpu"
+
 [build]
 sources = [
     "PlatformContracts.clef"

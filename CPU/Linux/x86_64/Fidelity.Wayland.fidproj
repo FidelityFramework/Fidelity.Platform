@@ -1,0 +1,32 @@
+[package]
+name = "Fidelity.Wayland"
+version = "0.1.0"
+description = "Generated bindings for wayland-client."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Wayland/Types.clef",
+    "Bindings/Wayland/Core/Types.clef",
+    "Bindings/Wayland/Core/Core.clef",
+    "Bindings/Wayland/Core/CoreApi.clef",
+    "Bindings/Wayland/Protocol/Protocol.clef",
+    "Bindings/Wayland/Protocol/ProtocolApi.clef",
+    "Bindings/Wayland/XdgShell/XdgShell.clef",
+    "Bindings/Wayland/XdgShell/XdgShellApi.clef",
+    "Bindings/Wayland/DmaBuf/DmaBuf.clef",
+    "Bindings/Wayland/DmaBuf/DmaBufApi.clef",
+    "Bindings/Wayland/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }

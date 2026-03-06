@@ -8,38 +8,38 @@ open Fidelity.Pthread.Cond.Types
     /// 
     /// C signature: int pthread_cond_init(pthread_cond_t *restrict __cond, const pthread_condattr_t *restrict __cond_attr)
     [<FidelityExtern("pthread", "pthread_cond_init")>]
-    let pthread_cond_init (cond: nativeint) (cond_attr: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_init (cond: option<nativeint>) (cond_attr: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Destroy condition variable COND.
     /// 
     /// C signature: int pthread_cond_destroy(pthread_cond_t * __cond)
     [<FidelityExtern("pthread", "pthread_cond_destroy")>]
-    let pthread_cond_destroy (cond: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_destroy (cond: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Wake up one thread waiting for condition variable COND.
     /// 
     /// C signature: int pthread_cond_signal(pthread_cond_t * __cond)
     [<FidelityExtern("pthread", "pthread_cond_signal")>]
-    let pthread_cond_signal (cond: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_signal (cond: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Wake up all threads waiting for condition variables COND.
     /// 
     /// C signature: int pthread_cond_broadcast(pthread_cond_t * __cond)
     [<FidelityExtern("pthread", "pthread_cond_broadcast")>]
-    let pthread_cond_broadcast (cond: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_broadcast (cond: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Wait for condition variable COND to be signaled or broadcast. MUTEX is assumed to be locked before. This function is a cancellation point and therefore not marked with __THROW.
     /// 
     /// C signature: int pthread_cond_wait(pthread_cond_t *restrict __cond, pthread_mutex_t *restrict __mutex)
     [<FidelityExtern("pthread", "pthread_cond_wait")>]
-    let pthread_cond_wait (cond: nativeint) (mutex: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_wait (cond: option<nativeint>) (mutex: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int pthread_cond_timedwait(pthread_cond_t *restrict __cond, pthread_mutex_t *restrict __mutex, const struct timespec *restrict __abstime)
     [<FidelityExtern("pthread", "pthread_cond_timedwait")>]
-    let pthread_cond_timedwait (cond: nativeint) (mutex: nativeint) (abstime: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let pthread_cond_timedwait (cond: option<nativeint>) (mutex: option<nativeint>) (abstime: option<nativeint>) : int =
+        NativeDefault.zeroed ()

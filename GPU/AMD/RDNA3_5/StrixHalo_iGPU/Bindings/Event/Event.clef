@@ -7,57 +7,57 @@ open Fidelity.ROCm.Types
     /// 
     /// C signature: hipError_t hipEventCreateWithFlags(hipEvent_t * event, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipEventCreateWithFlags")>]
-    let hipEventCreateWithFlags (event: nativeint) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipEventCreateWithFlags (event: option<nativeint>) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Create an event Returns the newly created event. #hipSuccess, #hipErrorNotInitialized, #hipErrorInvalidValue, #hipErrorLaunchFailure, #hipErrorOutOfMemory hipEventCreateWithFlags, hipEventRecord, hipEventQuery, hipEventSynchronize, hipEventDestroy, hipEventElapsedTime
     /// 
     /// C signature: hipError_t hipEventCreate(hipEvent_t * event)
     [<FidelityExtern("amdhip64", "hipEventCreate")>]
-    let hipEventCreate (event: nativeint) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipEventCreate (event: option<nativeint>) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Record an event in the specified stream. event to record. stream in which to record event. parameter for operations #hipSuccess, #hipErrorInvalidValue, #hipErrorNotInitialized, #hipErrorInvalidHandle, #hipErrorLaunchFailure hipEventQuery() or hipEventSynchronize() must be used to determine when the event transitions from "recording" (after hipEventRecord() is called) to "recorded" (when timestamps are set, if requested). Events which are recorded in a non-NULL stream will transition to from recording to "recorded" state when they reach the head of the specified stream, after all previous commands in that stream have completed executing. Flags include: hipEventRecordDefault: Default event creation flag. hipEventRecordExternal: Event is captured in the graph as an external event node when performing stream capture If hipEventRecord() has been previously called on this event, then this call will overwrite any existing state in event. If this function is called on an event that is currently being recorded, results are undefined - either outstanding recording may save state into the event, and the order is not guaranteed. : If this function is not called before use hipEventQuery() or hipEventSynchronize(), #hipSuccess is returned, meaning no pending event in the stream. hipEventCreate, hipEventCreateWithFlags, hipEventQuery, hipEventSynchronize, hipEventDestroy, hipEventElapsedTime
     /// 
     /// C signature: hipError_t hipEventRecordWithFlags(hipEvent_t event, hipStream_t stream, unsigned int flags)
     [<FidelityExtern("amdhip64", "hipEventRecordWithFlags")>]
-    let hipEventRecordWithFlags (event: hipEvent_t) (stream: hipStream_t) (flags: uint32) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipEventRecordWithFlags (event: hipEvent_t) (stream: hipStream_t) (flags: uint) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipEventRecord(hipEvent_t event, hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipEventRecord")>]
     let hipEventRecord (event: hipEvent_t) (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Destroy the specified event. Event to destroy. #hipSuccess, #hipErrorNotInitialized, #hipErrorInvalidValue, #hipErrorLaunchFailure Releases memory associated with the event.  If the event is recording but has not completed recording when hipEventDestroy() is called, the function will return immediately and the completion_future resources will be released later, when the hipDevice is synchronized. hipEventCreate, hipEventCreateWithFlags, hipEventQuery, hipEventSynchronize, hipEventRecord, hipEventElapsedTime #hipSuccess
     /// 
     /// C signature: hipError_t hipEventDestroy(hipEvent_t event)
     [<FidelityExtern("amdhip64", "hipEventDestroy")>]
     let hipEventDestroy (event: hipEvent_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Wait for an event to complete. This function will block until the event is ready, waiting for all previous work in the stream specified when event was recorded with hipEventRecord(). If hipEventRecord() has not been called on this function returns #hipSuccess when no event is captured. Event on which to wait. #hipSuccess, #hipErrorInvalidValue, #hipErrorNotInitialized, #hipErrorInvalidHandle, #hipErrorLaunchFailure hipEventCreate, hipEventCreateWithFlags, hipEventQuery, hipEventDestroy, hipEventRecord, hipEventElapsedTime
     /// 
     /// C signature: hipError_t hipEventSynchronize(hipEvent_t event)
     [<FidelityExtern("amdhip64", "hipEventSynchronize")>]
     let hipEventSynchronize (event: hipEvent_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// Return the elapsed time between two events. : Return time between start and stop in ms. : Start event. : Stop event. #hipSuccess, #hipErrorInvalidValue, #hipErrorNotReady, #hipErrorInvalidHandle, #hipErrorNotInitialized, #hipErrorLaunchFailure Computes the elapsed time between two events. Time is computed in ms, with a resolution of approximately 1 us. Events which are recorded in a NULL stream will block until all commands on all other streams complete execution, and then record the timestamp. Events which are recorded in a non-NULL stream will record their timestamp when they reach the head of the specified stream, after all previous commands in that stream have completed executing.  Thus the time that the event recorded may be significantly after the host calls hipEventRecord(). If hipEventRecord() has not been called on either event, then #hipErrorInvalidHandle is returned. If hipEventRecord() has been called on both events, but the timestamp has not yet been recorded on one or both events (that is, hipEventQuery() would return #hipErrorNotReady on at least one of the events), then #hipErrorNotReady is returned. hipEventCreate, hipEventCreateWithFlags, hipEventQuery, hipEventDestroy, hipEventRecord, hipEventSynchronize
     /// 
     /// C signature: hipError_t hipEventElapsedTime(float * ms, hipEvent_t start, hipEvent_t stop)
     [<FidelityExtern("amdhip64", "hipEventElapsedTime")>]
-    let hipEventElapsedTime (ms: nativeint) (start: hipEvent_t) (stop: hipEvent_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+    let hipEventElapsedTime (ms: option<nativeint>) (start: hipEvent_t) (stop: hipEvent_t) : hipError_t =
+        NativeDefault.zeroed ()
 
     /// Query event status Event to query. #hipSuccess, #hipErrorNotReady, #hipErrorInvalidHandle, #hipErrorInvalidValue, #hipErrorNotInitialized, #hipErrorLaunchFailure Query the status of the specified event.  This function will return #hipSuccess if all commands in the appropriate stream (specified to hipEventRecord()) have completed.  If any execution has not completed, then #hipErrorNotReady is returned. This API returns #hipSuccess, if hipEventRecord() is not called before this API. hipEventCreate, hipEventCreateWithFlags, hipEventRecord, hipEventDestroy, hipEventSynchronize, hipEventElapsedTime
     /// 
     /// C signature: hipError_t hipEventQuery(hipEvent_t event)
     [<FidelityExtern("amdhip64", "hipEventQuery")>]
     let hipEventQuery (event: hipEvent_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()
 
     /// C signature: hipError_t hipEventRecord_spt(hipEvent_t event, hipStream_t stream)
     [<FidelityExtern("amdhip64", "hipEventRecord_spt")>]
     let hipEventRecord_spt (event: hipEvent_t) (stream: hipStream_t) : hipError_t =
-        Unchecked.defaultof<hipError_t>
+        NativeDefault.zeroed ()

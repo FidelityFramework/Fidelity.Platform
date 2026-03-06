@@ -8,108 +8,108 @@ open Fidelity.Libc.FileStat.Types
     /// 
     /// C signature: int access(const char * __name, int __type)
     [<FidelityExtern("c", "access")>]
-    let access (name: nativeptr<byte>) (``type``: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let access (name: option<nativeptr<byte>>) (``type``: int) : int =
+        NativeDefault.zeroed ()
 
     /// Make a link to FROM named TO.
     /// 
     /// C signature: int link(const char * __from, const char * __to)
     [<FidelityExtern("c", "link")>]
-    let link (from: nativeptr<byte>) (``to``: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let link (from: option<nativeptr<byte>>) (``to``: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Like link but relative paths in TO and FROM are interpreted relative to FROMFD and TOFD respectively.
     /// 
     /// C signature: int linkat(int __fromfd, const char * __from, int __tofd, const char * __to, int __flags)
     [<FidelityExtern("c", "linkat")>]
-    let linkat (fromfd: int32) (from: nativeptr<byte>) (tofd: int32) (``to``: nativeptr<byte>) (flags: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let linkat (fromfd: int) (from: option<nativeptr<byte>>) (tofd: int) (``to``: option<nativeptr<byte>>) (flags: int) : int =
+        NativeDefault.zeroed ()
 
     /// Make a symbolic link to FROM named TO.
     /// 
     /// C signature: int symlink(const char * __from, const char * __to)
     [<FidelityExtern("c", "symlink")>]
-    let symlink (from: nativeptr<byte>) (``to``: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let symlink (from: option<nativeptr<byte>>) (``to``: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Read the contents of the symbolic link PATH into no more than LEN bytes of BUF.  The contents are not null-terminated. Returns the number of characters read, or -1 for errors.
     /// 
     /// C signature: ssize_t readlink(const char *restrict __path, char *restrict __buf, size_t __len)
     [<FidelityExtern("c", "readlink")>]
-    let readlink (path: nativeptr<byte>) (buf: nativeptr<byte>) (len: unativeint) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let readlink (path: option<nativeptr<byte>>) (buf: option<nativeptr<byte>>) (len: unativeint) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Like symlink but a relative path in TO is interpreted relative to TOFD.
     /// 
     /// C signature: int symlinkat(const char * __from, int __tofd, const char * __to)
     [<FidelityExtern("c", "symlinkat")>]
-    let symlinkat (from: nativeptr<byte>) (tofd: int32) (``to``: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let symlinkat (from: option<nativeptr<byte>>) (tofd: int) (``to``: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Like readlink but a relative PATH is interpreted relative to FD.
     /// 
     /// C signature: ssize_t readlinkat(int __fd, const char *restrict __path, char *restrict __buf, size_t __len)
     [<FidelityExtern("c", "readlinkat")>]
-    let readlinkat (fd: int32) (path: nativeptr<byte>) (buf: nativeptr<byte>) (len: unativeint) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let readlinkat (fd: int) (path: option<nativeptr<byte>>) (buf: option<nativeptr<byte>>) (len: unativeint) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Remove the link NAME.
     /// 
     /// C signature: int unlink(const char * __name)
     [<FidelityExtern("c", "unlink")>]
-    let unlink (name: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let unlink (name: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Remove the directory PATH.
     /// 
     /// C signature: int rmdir(const char * __path)
     [<FidelityExtern("c", "rmdir")>]
-    let rmdir (path: nativeptr<byte>) : int32 =
-        Unchecked.defaultof<int32>
+    let rmdir (path: option<nativeptr<byte>>) : int =
+        NativeDefault.zeroed ()
 
     /// Get file attributes for the file, device, pipe, or socket that file descriptor FD is open on and put them in BUF.
     /// 
     /// C signature: int fstat(int __fd, struct stat * __buf)
     [<FidelityExtern("c", "fstat")>]
-    let fstat (fd: int32) (buf: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let fstat (fd: int) (buf: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Get file attributes about FILE and put them in BUF. If FILE is a symbolic link, do not follow it.
     /// 
     /// C signature: int lstat(const char *restrict __file, struct stat *restrict __buf)
     [<FidelityExtern("c", "lstat")>]
-    let lstat (file: nativeptr<byte>) (buf: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let lstat (file: option<nativeptr<byte>>) (buf: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Set file access permissions for FILE to MODE. If FILE is a symbolic link, this affects its target instead.
     /// 
     /// C signature: int chmod(const char * __file, __mode_t __mode)
     [<FidelityExtern("c", "chmod")>]
-    let chmod (file: nativeptr<byte>) (mode: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let chmod (file: option<nativeptr<byte>>) (mode: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int fchmod(int __fd, __mode_t __mode)
     [<FidelityExtern("c", "fchmod")>]
-    let fchmod (fd: int32) (mode: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let fchmod (fd: int) (mode: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Set the file creation mask of the current process to MASK, and return the old creation mask.
     /// 
     /// C signature: __mode_t umask(__mode_t __mask)
     [<FidelityExtern("c", "umask")>]
     let umask (mask: uint32) : uint32 =
-        Unchecked.defaultof<uint32>
+        NativeDefault.zeroed ()
 
     /// Create a new directory named PATH, with permission bits MODE.
     /// 
     /// C signature: int mkdir(const char * __path, __mode_t __mode)
     [<FidelityExtern("c", "mkdir")>]
-    let mkdir (path: nativeptr<byte>) (mode: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let mkdir (path: option<nativeptr<byte>>) (mode: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Like mkdir, create a new directory with permission bits MODE.  But interpret relative PATH names relative to the directory associated with FD.
     /// 
     /// C signature: int mkdirat(int __fd, const char * __path, __mode_t __mode)
     [<FidelityExtern("c", "mkdirat")>]
-    let mkdirat (fd: int32) (path: nativeptr<byte>) (mode: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let mkdirat (fd: int) (path: option<nativeptr<byte>>) (mode: uint32) : int =
+        NativeDefault.zeroed ()

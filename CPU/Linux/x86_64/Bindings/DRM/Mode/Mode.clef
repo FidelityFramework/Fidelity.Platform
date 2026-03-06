@@ -6,366 +6,366 @@ open Fidelity.DRM.Types
 open Fidelity.DRM.Mode.Types
     /// C signature: uint32_t drmModeGetPropertyType(const drmModePropertyRes * prop)
     [<FidelityExtern("drm", "drmModeGetPropertyType")>]
-    let drmModeGetPropertyType (prop: nativeint) : uint32 =
-        Unchecked.defaultof<uint32>
+    let drmModeGetPropertyType (prop: option<nativeint>) : uint32 =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeModeInfo(drmModeModeInfoPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeModeInfo")>]
     let drmModeFreeModeInfo (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeResources(drmModeResPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeResources")>]
     let drmModeFreeResources (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeFB(drmModeFBPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeFB")>]
     let drmModeFreeFB (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeFB2(drmModeFB2Ptr ptr)
     [<FidelityExtern("drm", "drmModeFreeFB2")>]
     let drmModeFreeFB2 (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeCrtc(drmModeCrtcPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeCrtc")>]
     let drmModeFreeCrtc (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeConnector(drmModeConnectorPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeConnector")>]
     let drmModeFreeConnector (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeEncoder(drmModeEncoderPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeEncoder")>]
     let drmModeFreeEncoder (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreePlane(drmModePlanePtr ptr)
     [<FidelityExtern("drm", "drmModeFreePlane")>]
     let drmModeFreePlane (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreePlaneResources(drmModePlaneResPtr ptr)
     [<FidelityExtern("drm", "drmModeFreePlaneResources")>]
     let drmModeFreePlaneResources (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// Retrieves all of the resources associated with a card.
     /// 
     /// C signature: drmModeResPtr drmModeGetResources(int fd)
     [<FidelityExtern("drm", "drmModeGetResources")>]
-    let drmModeGetResources (fd: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetResources (fd: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Retrieve information about framebuffer bufferId
     /// 
     /// C signature: drmModeFBPtr drmModeGetFB(int fd, uint32_t bufferId)
     [<FidelityExtern("drm", "drmModeGetFB")>]
-    let drmModeGetFB (fd: int32) (bufferId: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetFB (fd: int) (bufferId: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeFB2Ptr drmModeGetFB2(int fd, uint32_t bufferId)
     [<FidelityExtern("drm", "drmModeGetFB2")>]
-    let drmModeGetFB2 (fd: int32) (bufferId: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetFB2 (fd: int) (bufferId: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Creates a new framebuffer with an buffer object as its scanout buffer.
     /// 
     /// C signature: int drmModeAddFB(int fd, uint32_t width, uint32_t height, uint8_t depth, uint8_t bpp, uint32_t pitch, uint32_t bo_handle, uint32_t * buf_id)
     [<FidelityExtern("drm", "drmModeAddFB")>]
-    let drmModeAddFB (fd: int32) (width: uint32) (height: uint32) (depth: byte) (bpp: byte) (pitch: uint32) (bo_handle: uint32) (buf_id: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAddFB (fd: int) (width: uint32) (height: uint32) (depth: byte) (bpp: byte) (pitch: uint32) (bo_handle: uint32) (buf_id: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// ...with a specific pixel format
     /// 
     /// C signature: int drmModeAddFB2(int fd, uint32_t width, uint32_t height, uint32_t pixel_format, const uint32_t * bo_handles, const uint32_t * pitches, const uint32_t * offsets, uint32_t * buf_id, uint32_t flags)
     [<FidelityExtern("drm", "drmModeAddFB2")>]
-    let drmModeAddFB2 (fd: int32) (width: uint32) (height: uint32) (pixel_format: uint32) (bo_handles: nativeint) (pitches: nativeint) (offsets: nativeint) (buf_id: nativeint) (flags: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAddFB2 (fd: int) (width: uint32) (height: uint32) (pixel_format: uint32) (bo_handles: option<nativeint>) (pitches: option<nativeint>) (offsets: option<nativeint>) (buf_id: option<nativeint>) (flags: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// ...with format modifiers
     /// 
     /// C signature: int drmModeAddFB2WithModifiers(int fd, uint32_t width, uint32_t height, uint32_t pixel_format, const uint32_t * bo_handles, const uint32_t * pitches, const uint32_t * offsets, const uint64_t * modifier, uint32_t * buf_id, uint32_t flags)
     [<FidelityExtern("drm", "drmModeAddFB2WithModifiers")>]
-    let drmModeAddFB2WithModifiers (fd: int32) (width: uint32) (height: uint32) (pixel_format: uint32) (bo_handles: nativeint) (pitches: nativeint) (offsets: nativeint) (modifier: nativeint) (buf_id: nativeint) (flags: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAddFB2WithModifiers (fd: int) (width: uint32) (height: uint32) (pixel_format: uint32) (bo_handles: option<nativeint>) (pitches: option<nativeint>) (offsets: option<nativeint>) (modifier: option<nativeint>) (buf_id: option<nativeint>) (flags: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Destroies the given framebuffer.
     /// 
     /// C signature: int drmModeRmFB(int fd, uint32_t bufferId)
     [<FidelityExtern("drm", "drmModeRmFB")>]
-    let drmModeRmFB (fd: int32) (bufferId: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeRmFB (fd: int) (bufferId: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Close a framebuffer. Same as drmModeRmFB(), except it doesn't implicitly disable planes and CRTCs.
     /// 
     /// C signature: int drmModeCloseFB(int fd, uint32_t buffer_id)
     [<FidelityExtern("drm", "drmModeCloseFB")>]
-    let drmModeCloseFB (fd: int32) (buffer_id: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCloseFB (fd: int) (buffer_id: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Mark a region of a framebuffer as dirty.
     /// 
     /// C signature: int drmModeDirtyFB(int fd, uint32_t bufferId, drmModeClipPtr clips, uint32_t num_clips)
     [<FidelityExtern("drm", "drmModeDirtyFB")>]
-    let drmModeDirtyFB (fd: int32) (bufferId: uint32) (clips: nativeint) (num_clips: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeDirtyFB (fd: int) (bufferId: uint32) (clips: nativeint) (num_clips: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Retrieve information about the ctrt crtcId
     /// 
     /// C signature: drmModeCrtcPtr drmModeGetCrtc(int fd, uint32_t crtcId)
     [<FidelityExtern("drm", "drmModeGetCrtc")>]
-    let drmModeGetCrtc (fd: int32) (crtcId: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetCrtc (fd: int) (crtcId: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Set the mode on a crtc crtcId with the given mode modeId.
     /// 
     /// C signature: int drmModeSetCrtc(int fd, uint32_t crtcId, uint32_t bufferId, uint32_t x, uint32_t y, uint32_t * connectors, int count, drmModeModeInfoPtr mode)
     [<FidelityExtern("drm", "drmModeSetCrtc")>]
-    let drmModeSetCrtc (fd: int32) (crtcId: uint32) (bufferId: uint32) (x: uint32) (y: uint32) (connectors: nativeint) (count: int32) (mode: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeSetCrtc (fd: int) (crtcId: uint32) (bufferId: uint32) (x: uint32) (y: uint32) (connectors: option<nativeint>) (count: int) (mode: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// Set the cursor on crtc
     /// 
     /// C signature: int drmModeSetCursor(int fd, uint32_t crtcId, uint32_t bo_handle, uint32_t width, uint32_t height)
     [<FidelityExtern("drm", "drmModeSetCursor")>]
-    let drmModeSetCursor (fd: int32) (crtcId: uint32) (bo_handle: uint32) (width: uint32) (height: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeSetCursor (fd: int) (crtcId: uint32) (bo_handle: uint32) (width: uint32) (height: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeSetCursor2(int fd, uint32_t crtcId, uint32_t bo_handle, uint32_t width, uint32_t height, int32_t hot_x, int32_t hot_y)
     [<FidelityExtern("drm", "drmModeSetCursor2")>]
-    let drmModeSetCursor2 (fd: int32) (crtcId: uint32) (bo_handle: uint32) (width: uint32) (height: uint32) (hot_x: int32) (hot_y: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeSetCursor2 (fd: int) (crtcId: uint32) (bo_handle: uint32) (width: uint32) (height: uint32) (hot_x: int32) (hot_y: int32) : int =
+        NativeDefault.zeroed ()
 
     /// Move the cursor on crtc
     /// 
     /// C signature: int drmModeMoveCursor(int fd, uint32_t crtcId, int x, int y)
     [<FidelityExtern("drm", "drmModeMoveCursor")>]
-    let drmModeMoveCursor (fd: int32) (crtcId: uint32) (x: int32) (y: int32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeMoveCursor (fd: int) (crtcId: uint32) (x: int) (y: int) : int =
+        NativeDefault.zeroed ()
 
     /// Encoder functions
     /// 
     /// C signature: drmModeEncoderPtr drmModeGetEncoder(int fd, uint32_t encoder_id)
     [<FidelityExtern("drm", "drmModeGetEncoder")>]
-    let drmModeGetEncoder (fd: int32) (encoder_id: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetEncoder (fd: int) (encoder_id: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Retrieve all information about the connector connectorId. This will do a forced probe on the connector to retrieve remote information such as EDIDs from the display device.
     /// 
     /// C signature: drmModeConnectorPtr drmModeGetConnector(int fd, uint32_t connectorId)
     [<FidelityExtern("drm", "drmModeGetConnector")>]
-    let drmModeGetConnector (fd: int32) (connectorId: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetConnector (fd: int) (connectorId: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Retrieve current information, i.e the currently active mode and encoder, about the connector connectorId. This will not do any probing on the connector or remote device, and only reports what is currently known. For the complete set of modes and encoders associated with the connector use drmModeGetConnector() which will do a probe to determine any display link changes first.
     /// 
     /// C signature: drmModeConnectorPtr drmModeGetConnectorCurrent(int fd, uint32_t connector_id)
     [<FidelityExtern("drm", "drmModeGetConnectorCurrent")>]
-    let drmModeGetConnectorCurrent (fd: int32) (connector_id: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetConnectorCurrent (fd: int) (connector_id: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// Get a bitmask of CRTCs a connector is compatible with. The bits reference CRTC indices. If the n-th CRTC is compatible with the connector, the n-th bit will be set. The indices are taken from the array returned by drmModeGetResources(). The indices are different from the object IDs. Zero is returned on error.
     /// 
     /// C signature: uint32_t drmModeConnectorGetPossibleCrtcs(int fd, const drmModeConnector * connector)
     [<FidelityExtern("drm", "drmModeConnectorGetPossibleCrtcs")>]
-    let drmModeConnectorGetPossibleCrtcs (fd: int32) (connector: nativeint) : uint32 =
-        Unchecked.defaultof<uint32>
+    let drmModeConnectorGetPossibleCrtcs (fd: int) (connector: option<nativeint>) : uint32 =
+        NativeDefault.zeroed ()
 
     /// Attaches the given mode to an connector.
     /// 
     /// C signature: int drmModeAttachMode(int fd, uint32_t connectorId, drmModeModeInfoPtr mode_info)
     [<FidelityExtern("drm", "drmModeAttachMode")>]
-    let drmModeAttachMode (fd: int32) (connectorId: uint32) (mode_info: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAttachMode (fd: int) (connectorId: uint32) (mode_info: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// Detaches a mode from the connector must be unused, by the given mode.
     /// 
     /// C signature: int drmModeDetachMode(int fd, uint32_t connectorId, drmModeModeInfoPtr mode_info)
     [<FidelityExtern("drm", "drmModeDetachMode")>]
-    let drmModeDetachMode (fd: int32) (connectorId: uint32) (mode_info: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeDetachMode (fd: int) (connectorId: uint32) (mode_info: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModePropertyPtr drmModeGetProperty(int fd, uint32_t propertyId)
     [<FidelityExtern("drm", "drmModeGetProperty")>]
-    let drmModeGetProperty (fd: int32) (propertyId: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetProperty (fd: int) (propertyId: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeProperty(drmModePropertyPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeProperty")>]
     let drmModeFreeProperty (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: drmModePropertyBlobPtr drmModeGetPropertyBlob(int fd, uint32_t blob_id)
     [<FidelityExtern("drm", "drmModeGetPropertyBlob")>]
-    let drmModeGetPropertyBlob (fd: int32) (blob_id: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetPropertyBlob (fd: int) (blob_id: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: bool drmModeFormatModifierBlobIterNext(const drmModePropertyBlobRes * blob, drmModeFormatModifierIterator * iter)
     [<FidelityExtern("drm", "drmModeFormatModifierBlobIterNext")>]
-    let drmModeFormatModifierBlobIterNext (blob: nativeint) (iter: nativeint) : bool =
-        Unchecked.defaultof<bool>
+    let drmModeFormatModifierBlobIterNext (blob: option<nativeint>) (iter: option<nativeint>) : bool =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreePropertyBlob(drmModePropertyBlobPtr ptr)
     [<FidelityExtern("drm", "drmModeFreePropertyBlob")>]
     let drmModeFreePropertyBlob (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeConnectorSetProperty(int fd, uint32_t connector_id, uint32_t property_id, uint64_t value)
     [<FidelityExtern("drm", "drmModeConnectorSetProperty")>]
-    let drmModeConnectorSetProperty (fd: int32) (connector_id: uint32) (property_id: uint32) (value: uint64) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeConnectorSetProperty (fd: int) (connector_id: uint32) (property_id: uint32) (value: uint64) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeCrtcSetGamma(int fd, uint32_t crtc_id, uint32_t size, const uint16_t * red, const uint16_t * green, const uint16_t * blue)
     [<FidelityExtern("drm", "drmModeCrtcSetGamma")>]
-    let drmModeCrtcSetGamma (fd: int32) (crtc_id: uint32) (size: uint32) (red: nativeint) (green: nativeint) (blue: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCrtcSetGamma (fd: int) (crtc_id: uint32) (size: uint32) (red: option<nativeint>) (green: option<nativeint>) (blue: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeCrtcGetGamma(int fd, uint32_t crtc_id, uint32_t size, uint16_t * red, uint16_t * green, uint16_t * blue)
     [<FidelityExtern("drm", "drmModeCrtcGetGamma")>]
-    let drmModeCrtcGetGamma (fd: int32) (crtc_id: uint32) (size: uint32) (red: nativeint) (green: nativeint) (blue: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCrtcGetGamma (fd: int) (crtc_id: uint32) (size: uint32) (red: option<nativeint>) (green: option<nativeint>) (blue: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModePageFlip(int fd, uint32_t crtc_id, uint32_t fb_id, uint32_t flags, void * user_data)
     [<FidelityExtern("drm", "drmModePageFlip")>]
-    let drmModePageFlip (fd: int32) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (user_data: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModePageFlip (fd: int) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (user_data: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModePageFlipTarget(int fd, uint32_t crtc_id, uint32_t fb_id, uint32_t flags, void * user_data, uint32_t target_vblank)
     [<FidelityExtern("drm", "drmModePageFlipTarget")>]
-    let drmModePageFlipTarget (fd: int32) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (user_data: nativeint) (target_vblank: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModePageFlipTarget (fd: int) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (user_data: option<nativeint>) (target_vblank: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModePlaneResPtr drmModeGetPlaneResources(int fd)
     [<FidelityExtern("drm", "drmModeGetPlaneResources")>]
-    let drmModeGetPlaneResources (fd: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetPlaneResources (fd: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModePlanePtr drmModeGetPlane(int fd, uint32_t plane_id)
     [<FidelityExtern("drm", "drmModeGetPlane")>]
-    let drmModeGetPlane (fd: int32) (plane_id: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetPlane (fd: int) (plane_id: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeSetPlane(int fd, uint32_t plane_id, uint32_t crtc_id, uint32_t fb_id, uint32_t flags, int32_t crtc_x, int32_t crtc_y, uint32_t crtc_w, uint32_t crtc_h, uint32_t src_x, uint32_t src_y, uint32_t src_w, uint32_t src_h)
     [<FidelityExtern("drm", "drmModeSetPlane")>]
-    let drmModeSetPlane (fd: int32) (plane_id: uint32) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (crtc_x: int32) (crtc_y: int32) (crtc_w: uint32) (crtc_h: uint32) (src_x: uint32) (src_y: uint32) (src_w: uint32) (src_h: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeSetPlane (fd: int) (plane_id: uint32) (crtc_id: uint32) (fb_id: uint32) (flags: uint32) (crtc_x: int32) (crtc_y: int32) (crtc_w: uint32) (crtc_h: uint32) (src_x: uint32) (src_y: uint32) (src_w: uint32) (src_h: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeObjectPropertiesPtr drmModeObjectGetProperties(int fd, uint32_t object_id, uint32_t object_type)
     [<FidelityExtern("drm", "drmModeObjectGetProperties")>]
-    let drmModeObjectGetProperties (fd: int32) (object_id: uint32) (object_type: uint32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeObjectGetProperties (fd: int) (object_id: uint32) (object_type: uint32) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeFreeObjectProperties(drmModeObjectPropertiesPtr ptr)
     [<FidelityExtern("drm", "drmModeFreeObjectProperties")>]
     let drmModeFreeObjectProperties (ptr: nativeint) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeObjectSetProperty(int fd, uint32_t object_id, uint32_t object_type, uint32_t property_id, uint64_t value)
     [<FidelityExtern("drm", "drmModeObjectSetProperty")>]
-    let drmModeObjectSetProperty (fd: int32) (object_id: uint32) (object_type: uint32) (property_id: uint32) (value: uint64) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeObjectSetProperty (fd: int) (object_id: uint32) (object_type: uint32) (property_id: uint32) (value: uint64) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeAtomicReqPtr drmModeAtomicAlloc()
     [<FidelityExtern("drm", "drmModeAtomicAlloc")>]
     let drmModeAtomicAlloc () : drmModeAtomicReqPtr =
-        Unchecked.defaultof<drmModeAtomicReqPtr>
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeAtomicReqPtr drmModeAtomicDuplicate(const drmModeAtomicReqPtr req)
     [<FidelityExtern("drm", "drmModeAtomicDuplicate")>]
     let drmModeAtomicDuplicate (req: nativeint) : drmModeAtomicReqPtr =
-        Unchecked.defaultof<drmModeAtomicReqPtr>
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeAtomicMerge(drmModeAtomicReqPtr base, const drmModeAtomicReqPtr augment)
     [<FidelityExtern("drm", "drmModeAtomicMerge")>]
-    let drmModeAtomicMerge (``base``: drmModeAtomicReqPtr) (augment: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAtomicMerge (``base``: drmModeAtomicReqPtr) (augment: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeAtomicFree(drmModeAtomicReqPtr req)
     [<FidelityExtern("drm", "drmModeAtomicFree")>]
     let drmModeAtomicFree (req: drmModeAtomicReqPtr) : unit =
-        Unchecked.defaultof<unit>
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeAtomicGetCursor(const drmModeAtomicReqPtr req)
     [<FidelityExtern("drm", "drmModeAtomicGetCursor")>]
-    let drmModeAtomicGetCursor (req: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAtomicGetCursor (req: nativeint) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: void drmModeAtomicSetCursor(drmModeAtomicReqPtr req, int cursor)
     [<FidelityExtern("drm", "drmModeAtomicSetCursor")>]
-    let drmModeAtomicSetCursor (req: drmModeAtomicReqPtr) (cursor: int32) : unit =
-        Unchecked.defaultof<unit>
+    let drmModeAtomicSetCursor (req: drmModeAtomicReqPtr) (cursor: int) : unit =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeAtomicAddProperty(drmModeAtomicReqPtr req, uint32_t object_id, uint32_t property_id, uint64_t value)
     [<FidelityExtern("drm", "drmModeAtomicAddProperty")>]
-    let drmModeAtomicAddProperty (req: drmModeAtomicReqPtr) (object_id: uint32) (property_id: uint32) (value: uint64) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAtomicAddProperty (req: drmModeAtomicReqPtr) (object_id: uint32) (property_id: uint32) (value: uint64) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeAtomicCommit(int fd, const drmModeAtomicReqPtr req, uint32_t flags, void * user_data)
     [<FidelityExtern("drm", "drmModeAtomicCommit")>]
-    let drmModeAtomicCommit (fd: int32) (req: nativeint) (flags: uint32) (user_data: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeAtomicCommit (fd: int) (req: nativeint) (flags: uint32) (user_data: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeCreatePropertyBlob(int fd, const void * data, size_t size, uint32_t * id)
     [<FidelityExtern("drm", "drmModeCreatePropertyBlob")>]
-    let drmModeCreatePropertyBlob (fd: int32) (data: nativeint) (size: unativeint) (id: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCreatePropertyBlob (fd: int) (data: option<nativeint>) (size: unativeint) (id: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeDestroyPropertyBlob(int fd, uint32_t id)
     [<FidelityExtern("drm", "drmModeDestroyPropertyBlob")>]
-    let drmModeDestroyPropertyBlob (fd: int32) (id: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeDestroyPropertyBlob (fd: int) (id: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// DRM mode lease APIs. These create and manage new drm_masters with access to a subset of the available DRM resources
     /// 
     /// C signature: int drmModeCreateLease(int fd, const uint32_t * objects, int num_objects, int flags, uint32_t * lessee_id)
     [<FidelityExtern("drm", "drmModeCreateLease")>]
-    let drmModeCreateLease (fd: int32) (objects: nativeint) (num_objects: int32) (flags: int32) (lessee_id: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCreateLease (fd: int) (objects: option<nativeint>) (num_objects: int) (flags: int) (lessee_id: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeLesseeListPtr drmModeListLessees(int fd)
     [<FidelityExtern("drm", "drmModeListLessees")>]
-    let drmModeListLessees (fd: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeListLessees (fd: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: drmModeObjectListPtr drmModeGetLease(int fd)
     [<FidelityExtern("drm", "drmModeGetLease")>]
-    let drmModeGetLease (fd: int32) : nativeint =
-        Unchecked.defaultof<nativeint>
+    let drmModeGetLease (fd: int) : nativeint =
+        NativeDefault.zeroed ()
 
     /// C signature: int drmModeRevokeLease(int fd, uint32_t lessee_id)
     [<FidelityExtern("drm", "drmModeRevokeLease")>]
-    let drmModeRevokeLease (fd: int32) (lessee_id: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeRevokeLease (fd: int) (lessee_id: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Get a string describing a connector type. NULL is returned if the connector type is unsupported. Callers should handle this gracefully, e.g. by falling back to "Unknown" or printing the raw value.
     /// 
     /// C signature: const char * drmModeGetConnectorTypeName(uint32_t connector_type)
     [<FidelityExtern("drm", "drmModeGetConnectorTypeName")>]
-    let drmModeGetConnectorTypeName (connector_type: uint32) : nativeptr<byte> =
-        Unchecked.defaultof<nativeptr<byte>>
+    let drmModeGetConnectorTypeName (connector_type: uint32) : option<nativeptr<byte>> =
+        NativeDefault.zeroed ()
 
     /// Create a dumb buffer. Given a width, height and bits-per-pixel, the kernel will return a buffer handle, pitch and size. The flags must be zero. Returns 0 on success, negative errno on error.
     /// 
     /// C signature: int drmModeCreateDumbBuffer(int fd, uint32_t width, uint32_t height, uint32_t bpp, uint32_t flags, uint32_t * handle, uint32_t * pitch, uint64_t * size)
     [<FidelityExtern("drm", "drmModeCreateDumbBuffer")>]
-    let drmModeCreateDumbBuffer (fd: int32) (width: uint32) (height: uint32) (bpp: uint32) (flags: uint32) (handle: nativeint) (pitch: nativeint) (size: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeCreateDumbBuffer (fd: int) (width: uint32) (height: uint32) (bpp: uint32) (flags: uint32) (handle: option<nativeint>) (pitch: option<nativeint>) (size: option<nativeint>) : int =
+        NativeDefault.zeroed ()
 
     /// Destroy a dumb buffer. Returns 0 on success, negative errno on error.
     /// 
     /// C signature: int drmModeDestroyDumbBuffer(int fd, uint32_t handle)
     [<FidelityExtern("drm", "drmModeDestroyDumbBuffer")>]
-    let drmModeDestroyDumbBuffer (fd: int32) (handle: uint32) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeDestroyDumbBuffer (fd: int) (handle: uint32) : int =
+        NativeDefault.zeroed ()
 
     /// Prepare a dumb buffer for mapping. The kernel returns an offset which can be used as an argument to mmap(2) on the DRM FD. Returns 0 on success, negative errno on error.
     /// 
     /// C signature: int drmModeMapDumbBuffer(int fd, uint32_t handle, uint64_t * offset)
     [<FidelityExtern("drm", "drmModeMapDumbBuffer")>]
-    let drmModeMapDumbBuffer (fd: int32) (handle: uint32) (offset: nativeint) : int32 =
-        Unchecked.defaultof<int32>
+    let drmModeMapDumbBuffer (fd: int) (handle: uint32) (offset: option<nativeint>) : int =
+        NativeDefault.zeroed ()

@@ -1,0 +1,29 @@
+[package]
+name = "Fidelity.DRM"
+version = "0.1.0"
+description = "Generated bindings for drm."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/DRM/Types.clef",
+    "Bindings/DRM/Core/Types.clef",
+    "Bindings/DRM/Core/Core.clef",
+    "Bindings/DRM/Core/CoreApi.clef",
+    "Bindings/DRM/Mode/Types.clef",
+    "Bindings/DRM/Mode/Mode.clef",
+    "Bindings/DRM/Mode/ModeApi.clef",
+    "Bindings/DRM/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }

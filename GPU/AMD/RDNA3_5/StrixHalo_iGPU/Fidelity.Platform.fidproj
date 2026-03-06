@@ -15,20 +15,20 @@ sources = [
     "Bindings/HipError.clef",
     "Bindings/Device/Types.clef",
     "Bindings/Device/Device.clef",
-    "Bindings/Device/DeviceWrappers.clef",
+    "Bindings/Device/DeviceApi.clef",
     "Bindings/Memory/Types.clef",
     "Bindings/Memory/Memory.clef",
-    "Bindings/Memory/MemoryWrappers.clef",
+    "Bindings/Memory/MemoryApi.clef",
     "Bindings/Stream/Types.clef",
     "Bindings/Stream/Stream.clef",
-    "Bindings/Stream/StreamWrappers.clef",
+    "Bindings/Stream/StreamApi.clef",
     "Bindings/Event/Event.clef",
-    "Bindings/Event/EventWrappers.clef",
+    "Bindings/Event/EventApi.clef",
     "Bindings/Module/Types.clef",
     "Bindings/Module/Module.clef",
-    "Bindings/Module/ModuleWrappers.clef",
+    "Bindings/Module/ModuleApi.clef",
     "Bindings/Error/Error.clef",
-    "Bindings/Error/ErrorWrappers.clef",
+    "Bindings/Error/ErrorApi.clef",
 ]
 output = "fidelity-platform-gpu-strixhalo"
 output_kind = "library"
@@ -39,4 +39,4 @@ arch = "rdna3_5"
 word_size = 64
 
 [dependencies]
-contracts = { path = "../../../../Contracts" }
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

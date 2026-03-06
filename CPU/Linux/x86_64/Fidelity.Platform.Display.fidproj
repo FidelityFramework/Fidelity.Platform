@@ -1,0 +1,36 @@
+[package]
+name = "Fidelity.Platform.Display"
+version = "0.1.0"
+description = "Platform display layer — Wayland connection, xdg shell, DRM/GBM graphics, SVG rasterization. All C machinery internalized."
+authors = ["SpeakEZ Technologies, Inc."]
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Display/Callbacks.clef",
+    "Display/Connection.clef",
+    "Display/Graphics.clef",
+    "Display/Surface.clef",
+    "Display/Svg.clef"
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+platform = { path = "Fidelity.Platform.fidproj" }
+wayland = { path = "Fidelity.Wayland.fidproj" }
+wayland-bridge = { path = "Fidelity.Wayland.Bridge.fidproj" }
+drm = { path = "Fidelity.DRM.fidproj" }
+gbm = { path = "Fidelity.GBM.fidproj" }
+libc = { path = "Fidelity.Libc.fidproj" }
+resvg = { path = "../../../../Fidelity.Image/CPU/Linux/x86_64/Fidelity.Image.Resvg.fidproj" }
+
+[link]
+libraries = ["wayland-client", "drm", "gbm", "resvg"]
