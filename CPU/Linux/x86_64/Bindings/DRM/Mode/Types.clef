@@ -11,7 +11,10 @@ type drmModeAtomicReqPtr = {
 
 module drmModeAtomicReqPtr =
         let zero () : drmModeAtomicReqPtr =
-            { Handle = 0n }
+            { drmModeAtomicReqPtr.Handle = 0n }
 
         let isNull (h: drmModeAtomicReqPtr) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : drmModeAtomicReqPtr =
+            { drmModeAtomicReqPtr.Handle = h }

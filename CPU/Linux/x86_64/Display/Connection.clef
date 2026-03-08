@@ -1,10 +1,9 @@
 /// Platform.Display.Connection — Wayland display lifecycle
 ///
-/// Connects to Wayland display, discovers registry globals,
-/// and manages the event dispatch loop.
+/// Connects to Wayland display, discovers registry globals.
+/// Returns display handle and globals buffer pointer.
 ///
-/// All C types (nativeint, dlsym, listener structs) are internal.
-/// Consuming code sees only opaque handles.
+/// All handles are nativeint (CCS FieldLabels workaround).
 module Platform.Display.Connection
 
 open Console
@@ -19,23 +18,46 @@ open Fidelity.Wayland.Bridge.Callbacks
 
 /// Connect to Wayland display and bind registry globals.
 /// Returns display handle on success, 0n on failure.
-/// The handle is opaque — callers pass it to other Platform.Display
-/// modules but never inspect or dereference it.
-let connect () : nativeint =
+/// Globals buffer (4 nativeint slots) is allocated and returned via globalsOut.
+/// Caller reads: [0]=display, [1]=compositor, [2]=xdg_wm_base, [3]=dmabuf
+let connect (globalsOut: nativeptr<nativeint>) : nativeint =
     match wl_display_connect None with
     | None ->
         Console.writeln "Platform.Display: Failed to connect to Wayland display"
         0n
     | Some disp ->
-        let reg = wl_display_get_registry disp
+    let _ = NativePtr.set globalsOut 0 disp
 
-        let regListener = buildWlRegistryListener
-                            "Platform.Display.Callbacks.registryGlobal"
-                            "Platform.Display.Callbacks.registryGlobalRemove"
-        wl_proxy_add_listener (Some reg) (nativeint &regListener) (Some 0n) |> ignore
-        wl_display_roundtrip (Some disp) |> ignore
+    // Transient callback data buffer: 3 nativeint slots for registry globals
+    let globalsRaw =
+        match Fidelity.Libc.Memory.malloc (unativeint 24) with
+        | Some v -> v
+        | None -> 0n
+    let globalsPtr = NativePtr.ofNativeInt<nativeint> globalsRaw
+    let _ = NativePtr.set globalsPtr 0 0n
+    let _ = NativePtr.set globalsPtr 1 0n
+    let _ = NativePtr.set globalsPtr 2 0n
 
-        disp
+    match wl_display_get_registry disp with
+    | None ->
+        Console.writeln "Platform.Display: Failed to get registry"
+        let _ = Fidelity.Libc.Memory.free (Some globalsRaw)
+        0n
+    | Some reg ->
+
+    let regListener = buildWlRegistryListener
+                        "Platform.Display.Callbacks.registryGlobal"
+                        "Platform.Display.Callbacks.registryGlobalRemove"
+    wl_proxy_add_listener (Some reg) (nativeint &regListener) (Some globalsRaw) |> ignore
+    wl_display_roundtrip (Some disp) |> ignore
+
+    // Copy bound globals to output buffer
+    let _ = NativePtr.set globalsOut 1 (NativePtr.get globalsPtr 0)
+    let _ = NativePtr.set globalsOut 2 (NativePtr.get globalsPtr 1)
+    let _ = NativePtr.set globalsOut 3 (NativePtr.get globalsPtr 2)
+    let _ = Fidelity.Libc.Memory.free (Some globalsRaw)
+
+    disp
 
 /// Disconnect and clean up display resources.
 let disconnect (display: nativeint) : unit =
@@ -49,3 +71,18 @@ let dispatch (display: nativeint) : int =
 /// Block until all pending requests are processed.
 let roundtrip (display: nativeint) : int =
     wl_display_roundtrip (Some display)
+
+/// Run the event loop until the close flag is set or connection is lost.
+/// closeFlagPtr points to a nativeint slot; 0n = running, 1n = close requested.
+let eventLoop (display: nativeint) (closeFlagPtr: nativeptr<nativeint>) : unit =
+    let mutable running = true
+    while running do
+        let result = wl_display_dispatch (Some display)
+        if result < 0 then
+            running <- false
+        else
+            let flag = NativePtr.get closeFlagPtr 0
+            if flag = 1n then
+                running <- false
+            else
+                ()

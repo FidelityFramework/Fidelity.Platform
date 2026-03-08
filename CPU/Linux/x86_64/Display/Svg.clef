@@ -49,8 +49,18 @@ let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
             0n
         | Some pix ->
             let _ = Fidelity.Libc.Memory.memset (Some pix) 0 (unativeint bufferSize)
-            // TODO: resvg_render with identity transform
-            // For now, return the allocated pixmap buffer
+
+            // Read tree pointer from out-param storage
+            let treePtr = NativePtr.read (NativePtr.ofNativeInt<nativeint> treePtrStorage)
+
+            // Render SVG with identity transform (constructed manually —
+            // resvg_transform_identity is a FidelityExtern that returns zeroed memory)
+            let transform = { a = 1.0f; b = 0.0f; c = 0.0f; d = 1.0f; e = 0.0f; f = 0.0f }
+            Fidelity.Image.Resvg.resvg_render (Some treePtr) transform (uint32 width) (uint32 height)
+                (Some (NativePtr.ofNativeInt<byte> pix))
+
+            // Clean up tree and options
+            Fidelity.Image.Resvg.resvg_tree_destroy (Some treePtr)
             Fidelity.Libc.Memory.free (Some treePtrStorage)
             Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
             pix

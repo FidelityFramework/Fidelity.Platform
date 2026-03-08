@@ -4,10 +4,11 @@ module Fidelity.Pthread.Mutex.Api
 
 open Fidelity.Pthread.Mutex
 open Fidelity.Pthread.Errno
+open Fidelity.Pthread.Errno.Errno
 
     /// Capture errno as human-readable description string from header comments.
     let captureErrno () : string =
-        Errno.describe (NativePtr.read (NativePtr.ofNativeInt (__errno_location ())))
+        describe (NativePtr.read (NativePtr.ofNativeInt (__errno_location ())))
 
 
 

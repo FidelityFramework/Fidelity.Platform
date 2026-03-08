@@ -17,6 +17,8 @@ open Fidelity.Libc.IO
 let private renderNodePath () : string = "/dev/dri/renderD128"
 let private gbmBoUseRenderingLinear () : uint32 = uint32 0x14
 let private formatArgb8888 () : uint32 = uint32 0x34325241
+let private formatAbgr8888 () : uint32 = uint32 0x34324241
+let private gbmBoTransferWrite () : uint32 = uint32 2
 
 // ═══════════════════════════════════════════════════════════
 // GRAPHICS SETUP
@@ -36,14 +38,53 @@ let createDevice () : nativeint =
         0n
     | Some dev -> dev
 
-/// Allocate a GBM buffer object and export its DMA-BUF fd.
-/// Returns (bufferObject, dmaBufFd) on success, (0n, -1) on failure.
-let allocateBuffer (device: nativeint) (width: int) (height: int) : nativeint * int =
+/// Allocate a GBM buffer object.
+/// Returns buffer object handle on success, 0n on failure.
+let allocateBufferObject (device: nativeint) (width: int) (height: int) : nativeint =
     match gbm_bo_create (Some device) (uint32 width) (uint32 height)
                         (formatArgb8888 ()) (gbmBoUseRenderingLinear ()) with
     | None ->
         Console.writeln "Platform.Display: Failed to create GBM buffer"
-        (0n, -1)
-    | Some bo ->
-        let fd = gbm_bo_get_fd (Some bo)
-        (bo, fd)
+        0n
+    | Some bo -> bo
+
+/// Allocate a GBM buffer in ABGR8888 format (matches resvg RGBA byte order).
+let allocateRgbaBuffer (device: nativeint) (width: int) (height: int) : nativeint =
+    match gbm_bo_create (Some device) (uint32 width) (uint32 height)
+                        (formatAbgr8888 ()) (gbmBoUseRenderingLinear ()) with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create RGBA GBM buffer"
+        0n
+    | Some bo -> bo
+
+/// Map a buffer object for writing. Returns mapped pointer, or 0n on failure.
+/// Caller must allocate strideOut (4 bytes) and mapDataOut (8 bytes) before calling.
+let mapBufferWrite (bo: nativeint) (width: int) (height: int)
+                   (strideOut: nativeint) (mapDataOut: nativeint) : nativeint =
+    match gbm_bo_map (Some bo) (uint32 0) (uint32 0)
+                     (uint32 width) (uint32 height)
+                     (gbmBoTransferWrite ()) (Some strideOut) (Some mapDataOut) with
+    | None ->
+        Console.writeln "Platform.Display: Failed to map GBM buffer"
+        0n
+    | Some ptr -> ptr
+
+/// Unmap a previously mapped buffer.
+let unmapBuffer (bo: nativeint) (mapData: nativeint) : unit =
+    gbm_bo_unmap (Some bo) (Some mapData)
+
+/// Get the stride (bytes per row) of a buffer object.
+let getBufferStride (bo: nativeint) : int =
+    int (gbm_bo_get_stride (Some bo))
+
+/// Get the pixel format of a buffer object.
+let getBufferFormat (bo: nativeint) : uint32 =
+    gbm_bo_get_format (Some bo)
+
+/// Export DMA-BUF file descriptor from a buffer object.
+let getBufferFd (bo: nativeint) : int =
+    gbm_bo_get_fd (Some bo)
+
+/// Destroy a buffer object.
+let destroyBuffer (bo: nativeint) : unit =
+    gbm_bo_destroy (Some bo)

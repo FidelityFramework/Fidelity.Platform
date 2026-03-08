@@ -8,7 +8,7 @@ open Fidelity.Libc.Errno.Errno
 
     /// Capture errno as human-readable description string from header comments.
     let captureErrno () : string =
-        Fidelity.Libc.Errno.Errno.describe (NativePtr.read (NativePtr.ofNativeInt (__errno_location ())))
+        describe (NativePtr.read (NativePtr.ofNativeInt (__errno_location ())))
 
 
 

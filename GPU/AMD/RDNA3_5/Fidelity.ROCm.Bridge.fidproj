@@ -1,7 +1,7 @@
 [package]
 name = "Fidelity.ROCm.Bridge"
 version = "0.1.0"
-description = "Layer 3 bridge for amdhip64 — protocol dispatch and callback wrappers."
+description = "Layer 2 marshaling for amdhip64 — protocol dispatch and callback wrappers."
 
 [compilation]
 target = "cpu"

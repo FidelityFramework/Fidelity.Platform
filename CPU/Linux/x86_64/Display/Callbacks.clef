@@ -4,21 +4,50 @@
 /// via dlsym(RTLD_DEFAULT, "Platform.Display.Callbacks.*") by the
 /// listener builder functions in Fidelity.Wayland.Bridge.
 ///
-/// Absorbs HelloWayland's Callbacks.clef — the application no longer
-/// needs to define or know about protocol callbacks.
+/// Callback parameters are ABI-fixed (nativeint from the Wayland C runtime).
+/// Protocol dispatch functions take nativeint directly (CCS FieldLabels
+/// workaround), so no handle wrapping is needed.
+/// This is the membrane — C idioms (NativePtr, strcmp, dlsym) are correct here.
 module Platform.Display.Callbacks
 
+open Fidelity.Wayland.Bridge.Protocol
 open Fidelity.Wayland.Bridge.XdgShell
+open Fidelity.Wayland.Bridge.ProtocolInterfaces
 
 // ═══════════════════════════════════════════════════════════
 // REGISTRY CALLBACKS
 // ═══════════════════════════════════════════════════════════
 
 /// Called for each global object in the Wayland registry.
-/// TODO: string comparison on iface to bind compositor, xdg_wm_base, dmabuf
+/// data points to a malloc'd buffer of 3 nativeint slots:
+///   [0] = compositor, [1] = xdg_wm_base, [2] = dmabuf
 let registryGlobal (data: nativeint) (registry: nativeint) (name: uint32)
                     (iface: nativeptr<byte>) (version: uint32) : unit =
-    ()
+    let dataPtr = NativePtr.ofNativeInt data
+    if Fidelity.Libc.String.strcmp (Some iface) (Some "wl_compositor".Pointer) = 0 then
+        let ifacePtr =
+            match Fidelity.Libc.DynamicLink.dlsym (Some 0n) (Some "wl_compositor_interface".Pointer) with
+            | Some v -> v
+            | None -> 0n
+        match wl_registry_bind registry name ifacePtr (uint32 4) with
+        | Some bound -> let _ = NativePtr.set dataPtr 0 bound in ()
+        | None -> ()
+    else
+        ()
+    if Fidelity.Libc.String.strcmp (Some iface) (Some "xdg_wm_base".Pointer) = 0 then
+        let ifacePtr = xdgWmBase ()
+        match wl_registry_bind registry name ifacePtr (uint32 2) with
+        | Some bound -> let _ = NativePtr.set dataPtr 1 bound in ()
+        | None -> ()
+    else
+        ()
+    if Fidelity.Libc.String.strcmp (Some iface) (Some "zwp_linux_dmabuf_v1".Pointer) = 0 then
+        let ifacePtr = zwpLinuxDmabufV1 ()
+        match wl_registry_bind registry name ifacePtr (uint32 3) with
+        | Some bound -> let _ = NativePtr.set dataPtr 2 bound in ()
+        | None -> ()
+    else
+        ()
 
 /// Called when a global object is removed from the registry.
 let registryGlobalRemove (data: nativeint) (registry: nativeint)
@@ -49,8 +78,10 @@ let toplevelConfigure (data: nativeint) (toplevel: nativeint)
     ()
 
 /// Handle toplevel close request.
-/// TODO: signal close to event loop via data pointer
+/// data points to a single nativeint slot; set it to 1n to signal close.
 let toplevelClose (data: nativeint) (toplevel: nativeint) : unit =
+    let dataPtr = NativePtr.ofNativeInt data
+    let _ = NativePtr.set dataPtr 0 1n
     ()
 
 /// Handle toplevel configure bounds.

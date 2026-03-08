@@ -10,10 +10,16 @@ type hipEvent_t = {
 
 module hipEvent_t =
         let zero () : hipEvent_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipEvent_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipEvent_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -25,10 +31,16 @@ type hipGraphExec_t = {
 
 module hipGraphExec_t =
         let zero () : hipGraphExec_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipGraphExec_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipGraphExec_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -40,10 +52,16 @@ type hipKernel_t = {
 
 module hipKernel_t =
         let zero () : hipKernel_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipKernel_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipKernel_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -55,10 +73,16 @@ type hipLibrary_t = {
 
 module hipLibrary_t =
         let zero () : hipLibrary_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipLibrary_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipLibrary_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -70,10 +94,16 @@ type hipLinkState_t = {
 
 module hipLinkState_t =
         let zero () : hipLinkState_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipLinkState_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipLinkState_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -85,10 +115,16 @@ type hipMemGenericAllocationHandle_t = {
 
 module hipMemGenericAllocationHandle_t =
         let zero () : hipMemGenericAllocationHandle_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipMemGenericAllocationHandle_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipMemGenericAllocationHandle_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -100,10 +136,16 @@ type hipMemPool_t = {
 
 module hipMemPool_t =
         let zero () : hipMemPool_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipMemPool_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipMemPool_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -115,10 +157,16 @@ type hipStream_t = {
 
 module hipStream_t =
         let zero () : hipStream_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipStream_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipStream_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -130,10 +178,16 @@ type hipSurfaceObject_t = {
 
 module hipSurfaceObject_t =
         let zero () : hipSurfaceObject_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipSurfaceObject_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipSurfaceObject_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -145,10 +199,16 @@ type hipTextureObject_t = {
 
 module hipTextureObject_t =
         let zero () : hipTextureObject_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipTextureObject_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipTextureObject_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -160,10 +220,16 @@ type hipUserObject_t = {
 
 module hipUserObject_t =
         let zero () : hipUserObject_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipUserObject_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipUserObject_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 

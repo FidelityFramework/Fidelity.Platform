@@ -11,10 +11,16 @@ type hipCtx_t = {
 
 module hipCtx_t =
         let zero () : hipCtx_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipCtx_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipCtx_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 

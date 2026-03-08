@@ -3,7 +3,8 @@
 /// Creates xdg toplevel surfaces, manages listeners, and handles
 /// buffer attachment + frame presentation.
 ///
-/// Absorbs HelloWayland's Window.clef protocol choreography.
+/// All handles are nativeint (CCS FieldLabels workaround — will be
+/// replaced with typed opaque handles when .clefi lands).
 module Platform.Display.Surface
 
 open Console
@@ -23,42 +24,56 @@ open Fidelity.Wayland.Bridge.Callbacks
 ///   compositor.create_surface → xdg_wm_base.get_xdg_surface →
 ///   xdg_surface.get_toplevel → set_title → set_app_id → commit → roundtrip
 ///
-/// Returns surface handle on success, 0n on failure.
-/// Parameters are opaque handles from registry binding.
+/// Returns the wl_surface handle for buffer attachment, or None on failure.
 let createToplevel (display: nativeint) (compositor: nativeint)
-                   (xdgWmBase: nativeint) (title: string) (appId: string) : nativeint =
+                   (xdgWmBase: nativeint) (closeFlag: nativeint)
+                   (title: string) (appId: string) : option<nativeint> =
     // xdg_wm_base ping listener
     let wmBaseListener = buildXdgWmBaseListener
                             "Platform.Display.Callbacks.wmBasePing"
 
     // Create wl_surface
-    let surf = wl_compositor_create_surface compositor
+    match wl_compositor_create_surface compositor with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create surface"
+        None
+    | Some surf ->
 
     // Get xdg_surface from wl_surface
-    let xdgSurf = xdg_wm_base_get_xdg_surface xdgWmBase surf
+    match xdg_wm_base_get_xdg_surface xdgWmBase surf with
+    | None ->
+        Console.writeln "Platform.Display: Failed to get xdg_surface"
+        None
+    | Some xdgSurf ->
 
     let xdgSurfaceListener = buildXdgSurfaceListener
                                 "Platform.Display.Callbacks.surfaceConfigure"
     wl_proxy_add_listener (Some xdgSurf) (nativeint &xdgSurfaceListener) (Some 0n) |> ignore
 
     // Get toplevel from xdg_surface
-    let tl = xdg_surface_get_toplevel xdgSurf
+    match xdg_surface_get_toplevel xdgSurf with
+    | None ->
+        Console.writeln "Platform.Display: Failed to get toplevel"
+        None
+    | Some tl ->
 
     let toplevelListener = buildXdgToplevelListener
                             "Platform.Display.Callbacks.toplevelConfigure"
                             "Platform.Display.Callbacks.toplevelClose"
                             "Platform.Display.Callbacks.toplevelConfigureBounds"
                             "Platform.Display.Callbacks.toplevelWmCapabilities"
-    wl_proxy_add_listener (Some tl) (nativeint &toplevelListener) (Some 0n) |> ignore
+    wl_proxy_add_listener (Some tl) (nativeint &toplevelListener) (Some closeFlag) |> ignore
 
-    xdg_toplevel_set_title tl (nativeint title.Pointer)
-    xdg_toplevel_set_app_id tl (nativeint appId.Pointer)
+    let titlePtr = nativeint title.Pointer
+    let appIdPtr = nativeint appId.Pointer
+    xdg_toplevel_set_title tl titlePtr
+    xdg_toplevel_set_app_id tl appIdPtr
 
     // Initial commit triggers configure sequence
     wl_surface_commit surf
     wl_display_roundtrip (Some display) |> ignore
 
-    surf
+    Some surf
 
 // ═══════════════════════════════════════════════════════════
 // BUFFER PRESENTATION
@@ -69,11 +84,21 @@ let createToplevel (display: nativeint) (compositor: nativeint)
 let presentDmaBuf (surface: nativeint) (dmabuf: nativeint)
                   (dmaBufFd: int) (width: int) (height: int)
                   (stride: int) (format: uint32) : unit =
-    let bufParams = zwp_linux_dmabuf_v1_create_params dmabuf
+    match zwp_linux_dmabuf_v1_create_params dmabuf with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create buffer params"
+    | Some bufParams ->
+
+    // Add the DMA-BUF fd BEFORE creating the buffer
     zwp_linux_buffer_params_v1_add bufParams (int32 dmaBufFd)
         (uint32 0) (uint32 0) (uint32 stride) (uint32 0) (uint32 0)
-    let buffer = zwp_linux_buffer_params_v1_create_immed bufParams
-                    (int32 width) (int32 height) format (uint32 0)
+
+    match zwp_linux_buffer_params_v1_create_immed bufParams
+                    (int32 width) (int32 height) format (uint32 0) with
+    | None ->
+        Console.writeln "Platform.Display: Failed to create buffer"
+        zwp_linux_buffer_params_v1_destroy bufParams
+    | Some buffer ->
     zwp_linux_buffer_params_v1_destroy bufParams
 
     wl_surface_attach surface buffer (int32 0) (int32 0)

@@ -11,10 +11,16 @@ type hipGraphNode_t = {
 
 module hipGraphNode_t =
         let zero () : hipGraphNode_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipGraphNode_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipGraphNode_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -26,10 +32,16 @@ type hipGraph_t = {
 
 module hipGraph_t =
         let zero () : hipGraph_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipGraph_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipGraph_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 

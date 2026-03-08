@@ -11,10 +11,16 @@ type hipFunction_t = {
 
 module hipFunction_t =
         let zero () : hipFunction_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipFunction_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipFunction_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -26,10 +32,16 @@ type hipModule_t = {
 
 module hipModule_t =
         let zero () : hipModule_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipModule_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipModule_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 

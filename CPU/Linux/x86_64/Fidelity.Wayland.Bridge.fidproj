@@ -1,7 +1,7 @@
 [package]
 name = "Fidelity.Wayland.Bridge"
 version = "0.1.0"
-description = "Layer 3 bridge for wayland-client — protocol dispatch and callback wrappers."
+description = "Layer 2 marshaling for wayland-client — protocol dispatch and callback wrappers."
 
 [compilation]
 target = "cpu"
@@ -9,6 +9,7 @@ target = "cpu"
 [build]
 output_kind = "library"
 sources = [
+    "Bindings/WaylandBridge/ProtocolInterfaces.clef",
     "Bindings/WaylandBridge/ProtocolDispatch.clef",
     "Bindings/WaylandBridge/XdgShellDispatch.clef",
     "Bindings/WaylandBridge/DmaBufDispatch.clef",

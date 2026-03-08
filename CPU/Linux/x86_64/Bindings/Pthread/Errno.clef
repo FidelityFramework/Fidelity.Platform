@@ -534,4 +534,4 @@ module Errno =
             | ENOTRECOVERABLE -> "State not recoverable"
             | ERFKILL -> "Operation not possible due to RF-kill"
             | EHWPOISON -> "Memory page has hardware error"
-            | _ -> "Unknown error"
+            | other -> "Unknown error"

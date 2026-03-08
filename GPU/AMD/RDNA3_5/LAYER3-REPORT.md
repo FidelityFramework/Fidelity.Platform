@@ -1,4 +1,4 @@
-# Layer 3 Bridge Report: Fidelity.ROCm.Bridge
+# Layer 2 Marshaling Report: Fidelity.ROCm.Bridge
 
 ## Generated
 

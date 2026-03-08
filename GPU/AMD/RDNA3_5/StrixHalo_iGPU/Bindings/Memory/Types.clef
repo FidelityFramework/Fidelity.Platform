@@ -11,10 +11,16 @@ type hipArray_const_t = {
 
 module hipArray_const_t =
         let zero () : hipArray_const_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipArray_const_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipArray_const_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
@@ -26,10 +32,16 @@ type hipArray_t = {
 
 module hipArray_t =
         let zero () : hipArray_t =
-            { Handle = 0n }
+            NativeDefault.zeroed ()
 
         let isNull (h: hipArray_t) : bool =
             h.Handle = 0n
+
+        let ofHandle (h: nativeint) : hipArray_t =
+            let mutable s = NativeDefault.zeroed ()
+            let p = NativePtr.ofNativeInt<nativeint> (nativeint &s)
+            NativePtr.write p h
+            s
 
 
 
