@@ -15,7 +15,7 @@ This repository is organized substrate-first so platform bindings do not collaps
 
 ## Current Leaves
 
-- `CPU/Linux/X86_64/StrixHalo`
+- `CPU/Linux/x86_64`
 - `MCU/ST/STM32F7/MeadowF7`
 - `MCU/Renesas/RA6M5/EK_RA6M5`
 - `GPU/AMD/RDNA3_5/StrixHalo_iGPU`
@@ -25,6 +25,5 @@ This repository is organized substrate-first so platform bindings do not collaps
 
 ## Notes
 
-- Existing `Linux_x86_64/` remains in place as the active legacy package currently referenced by existing samples.
 - New packages use `.fidproj` as the dependency boundary expected by CCS/Composer source resolution.
 - External application projects (e.g., `HelloArty`) can point their `platform` dependency at one leaf package.

@@ -35,7 +35,6 @@ Fidelity.Platform/
 ├── CGRA/                                # Reserved substrate space
 ├── Profiles/
 │   └── StrixHalo_ArtyLab/
-└── Linux_x86_64/                        # Existing package used by current samples
 ```
 
 For additional details, see `PLATFORM_STRUCTURE.md`.
@@ -49,11 +48,11 @@ Reference the specific platform package your project targets:
 platform = { path = "/home/hhh/repos/Fidelity.Platform/FPGA/Xilinx/Artix7/ArtyA7_100T" }
 ```
 
-Or use the currently active Linux package used by existing sample projects:
+Or use the current Linux/x86_64 CPU package used by existing sample projects:
 
 ```toml
 [dependencies]
-platform = { path = "/home/hhh/repos/Fidelity.Platform/Linux_x86_64" }
+platform = { path = "/home/hhh/repos/Fidelity.Platform/CPU/Linux/x86_64" }
 ```
 
 ## Architecture
