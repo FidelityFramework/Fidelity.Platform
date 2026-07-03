@@ -1,0 +1,27 @@
+module Fidelity.XRT.XrtError
+
+// XRT error helper — converts int return codes and null handles to Result<>
+// XRT C API convention: 0 = success, negative = error for status functions;
+// nullptr = failure for handle-allocating functions.
+
+open Fidelity.XRT.Types
+
+    /// Describe an XRT error code as a human-readable string.
+    /// XRT does not expose an error-to-string C function, so we provide
+    /// the raw integer. Callers may extend this with domain-specific mapping.
+    let describe (code: int) : string =
+        $"XRT error (code {code})"
+
+    /// Wrap an int-returning XRT call into Result<unit, string>.
+    /// 0 = Ok (), nonzero = Error with description.
+    let inline checkStatus (code: int) : Result<unit, string> =
+        match code with
+        | 0 -> Ok ()
+        | err -> Error (describe err)
+
+    /// Wrap a handle-returning XRT call into Result<nativeint, string>.
+    /// Non-null = Ok handle, null = Error.
+    let inline checkHandle (handle: nativeint) (fnName: string) : Result<nativeint, string> =
+        match handle with
+        | 0n -> Error ($"{fnName} returned null handle")
+        | h -> Ok h

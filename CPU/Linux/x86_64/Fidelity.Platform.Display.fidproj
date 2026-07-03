@@ -11,6 +11,7 @@ target = "cpu"
 output_kind = "library"
 sources = [
     "Display/Callbacks.clef",
+    "Display/Compositing.clef",
     "Display/Connection.clef",
     "Display/Graphics.clef",
     "Display/Surface.clef",

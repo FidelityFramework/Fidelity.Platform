@@ -3,8 +3,8 @@
 module Fidelity.Wayland.Bridge.ProtocolInterfaces
 
 /// Write a wl_message: name at +0, signature at +8, types=NULL at +16
-let private writeMsg (base_: nativeint) (idx: int) (name: nativeptr<byte>) (sig_: nativeptr<byte>) : unit =
-    let off = nativeint idx * 24n
+let private writeMsg (base_: nativeint) (idx: nativeint) (name: nativeptr<byte>) (sig_: nativeptr<byte>) : unit =
+    let off = idx * 24n
     let nameSlot = NativePtr.ofNativeInt<nativeptr<byte>> (base_ + off)
     NativePtr.set nameSlot 0 name
     let sigSlot = NativePtr.ofNativeInt<nativeptr<byte>> (base_ + off + 8n)
@@ -42,132 +42,132 @@ let xdgWmBase () : nativeint =
     let methods = allocMessages 4
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "create_positioner".Pointer "n".Pointer
-    writeMsg methods 2 "get_xdg_surface".Pointer "no".Pointer
-    writeMsg methods 3 "pong".Pointer "u".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "create_positioner".Pointer "n".Pointer
+    writeMsg methods 2n "get_xdg_surface".Pointer "no".Pointer
+    writeMsg methods 3n "pong".Pointer "u".Pointer
     let events = allocMessages 1
     if events = 0n then 0n
     else
-    writeMsg events 0 "ping".Pointer "u".Pointer
+    writeMsg events 0n "ping".Pointer "u".Pointer
     buildInterface "xdg_wm_base".Pointer (int32 7) (int32 4) methods (int32 1) events
 
 let xdgPositioner () : nativeint =
     let methods = allocMessages 10
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "set_size".Pointer "ii".Pointer
-    writeMsg methods 2 "set_anchor_rect".Pointer "iiii".Pointer
-    writeMsg methods 3 "set_anchor".Pointer "u".Pointer
-    writeMsg methods 4 "set_gravity".Pointer "u".Pointer
-    writeMsg methods 5 "set_constraint_adjustment".Pointer "u".Pointer
-    writeMsg methods 6 "set_offset".Pointer "ii".Pointer
-    writeMsg methods 7 "set_reactive".Pointer "3".Pointer
-    writeMsg methods 8 "set_parent_size".Pointer "3ii".Pointer
-    writeMsg methods 9 "set_parent_configure".Pointer "3u".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "set_size".Pointer "ii".Pointer
+    writeMsg methods 2n "set_anchor_rect".Pointer "iiii".Pointer
+    writeMsg methods 3n "set_anchor".Pointer "u".Pointer
+    writeMsg methods 4n "set_gravity".Pointer "u".Pointer
+    writeMsg methods 5n "set_constraint_adjustment".Pointer "u".Pointer
+    writeMsg methods 6n "set_offset".Pointer "ii".Pointer
+    writeMsg methods 7n "set_reactive".Pointer "3".Pointer
+    writeMsg methods 8n "set_parent_size".Pointer "3ii".Pointer
+    writeMsg methods 9n "set_parent_configure".Pointer "3u".Pointer
     buildInterface "xdg_positioner".Pointer (int32 7) (int32 10) methods (int32 0) 0n
 
 let xdgSurface () : nativeint =
     let methods = allocMessages 5
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "get_toplevel".Pointer "n".Pointer
-    writeMsg methods 2 "get_popup".Pointer "n?oo".Pointer
-    writeMsg methods 3 "set_window_geometry".Pointer "iiii".Pointer
-    writeMsg methods 4 "ack_configure".Pointer "u".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "get_toplevel".Pointer "n".Pointer
+    writeMsg methods 2n "get_popup".Pointer "n?oo".Pointer
+    writeMsg methods 3n "set_window_geometry".Pointer "iiii".Pointer
+    writeMsg methods 4n "ack_configure".Pointer "u".Pointer
     let events = allocMessages 1
     if events = 0n then 0n
     else
-    writeMsg events 0 "configure".Pointer "u".Pointer
+    writeMsg events 0n "configure".Pointer "u".Pointer
     buildInterface "xdg_surface".Pointer (int32 7) (int32 5) methods (int32 1) events
 
 let xdgToplevel () : nativeint =
     let methods = allocMessages 14
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "set_parent".Pointer "?o".Pointer
-    writeMsg methods 2 "set_title".Pointer "s".Pointer
-    writeMsg methods 3 "set_app_id".Pointer "s".Pointer
-    writeMsg methods 4 "show_window_menu".Pointer "ouii".Pointer
-    writeMsg methods 5 "move".Pointer "ou".Pointer
-    writeMsg methods 6 "resize".Pointer "ouu".Pointer
-    writeMsg methods 7 "set_max_size".Pointer "ii".Pointer
-    writeMsg methods 8 "set_min_size".Pointer "ii".Pointer
-    writeMsg methods 9 "set_maximized".Pointer "".Pointer
-    writeMsg methods 10 "unset_maximized".Pointer "".Pointer
-    writeMsg methods 11 "set_fullscreen".Pointer "?o".Pointer
-    writeMsg methods 12 "unset_fullscreen".Pointer "".Pointer
-    writeMsg methods 13 "set_minimized".Pointer "".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "set_parent".Pointer "?o".Pointer
+    writeMsg methods 2n "set_title".Pointer "s".Pointer
+    writeMsg methods 3n "set_app_id".Pointer "s".Pointer
+    writeMsg methods 4n "show_window_menu".Pointer "ouii".Pointer
+    writeMsg methods 5n "move".Pointer "ou".Pointer
+    writeMsg methods 6n "resize".Pointer "ouu".Pointer
+    writeMsg methods 7n "set_max_size".Pointer "ii".Pointer
+    writeMsg methods 8n "set_min_size".Pointer "ii".Pointer
+    writeMsg methods 9n "set_maximized".Pointer "".Pointer
+    writeMsg methods 10n "unset_maximized".Pointer "".Pointer
+    writeMsg methods 11n "set_fullscreen".Pointer "?o".Pointer
+    writeMsg methods 12n "unset_fullscreen".Pointer "".Pointer
+    writeMsg methods 13n "set_minimized".Pointer "".Pointer
     let events = allocMessages 4
     if events = 0n then 0n
     else
-    writeMsg events 0 "configure".Pointer "iia".Pointer
-    writeMsg events 1 "close".Pointer "".Pointer
-    writeMsg events 2 "configure_bounds".Pointer "4ii".Pointer
-    writeMsg events 3 "wm_capabilities".Pointer "5a".Pointer
+    writeMsg events 0n "configure".Pointer "iia".Pointer
+    writeMsg events 1n "close".Pointer "".Pointer
+    writeMsg events 2n "configure_bounds".Pointer "4ii".Pointer
+    writeMsg events 3n "wm_capabilities".Pointer "5a".Pointer
     buildInterface "xdg_toplevel".Pointer (int32 7) (int32 14) methods (int32 4) events
 
 let xdgPopup () : nativeint =
     let methods = allocMessages 3
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "grab".Pointer "ou".Pointer
-    writeMsg methods 2 "reposition".Pointer "3ou".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "grab".Pointer "ou".Pointer
+    writeMsg methods 2n "reposition".Pointer "3ou".Pointer
     let events = allocMessages 3
     if events = 0n then 0n
     else
-    writeMsg events 0 "configure".Pointer "iiii".Pointer
-    writeMsg events 1 "popup_done".Pointer "".Pointer
-    writeMsg events 2 "repositioned".Pointer "3u".Pointer
+    writeMsg events 0n "configure".Pointer "iiii".Pointer
+    writeMsg events 1n "popup_done".Pointer "".Pointer
+    writeMsg events 2n "repositioned".Pointer "3u".Pointer
     buildInterface "xdg_popup".Pointer (int32 7) (int32 3) methods (int32 3) events
 
 let zwpLinuxDmabufV1 () : nativeint =
     let methods = allocMessages 4
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "create_params".Pointer "n".Pointer
-    writeMsg methods 2 "get_default_feedback".Pointer "4n".Pointer
-    writeMsg methods 3 "get_surface_feedback".Pointer "4no".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "create_params".Pointer "n".Pointer
+    writeMsg methods 2n "get_default_feedback".Pointer "4n".Pointer
+    writeMsg methods 3n "get_surface_feedback".Pointer "4no".Pointer
     let events = allocMessages 2
     if events = 0n then 0n
     else
-    writeMsg events 0 "format".Pointer "u".Pointer
-    writeMsg events 1 "modifier".Pointer "3uuu".Pointer
+    writeMsg events 0n "format".Pointer "u".Pointer
+    writeMsg events 1n "modifier".Pointer "3uuu".Pointer
     buildInterface "zwp_linux_dmabuf_v1".Pointer (int32 5) (int32 4) methods (int32 2) events
 
 let zwpLinuxDmabufFeedbackV1 () : nativeint =
     let methods = allocMessages 1
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
     let events = allocMessages 7
     if events = 0n then 0n
     else
-    writeMsg events 0 "done".Pointer "".Pointer
-    writeMsg events 1 "format_table".Pointer "hu".Pointer
-    writeMsg events 2 "main_device".Pointer "a".Pointer
-    writeMsg events 3 "tranche_done".Pointer "".Pointer
-    writeMsg events 4 "tranche_target_device".Pointer "a".Pointer
-    writeMsg events 5 "tranche_formats".Pointer "a".Pointer
-    writeMsg events 6 "tranche_flags".Pointer "u".Pointer
+    writeMsg events 0n "done".Pointer "".Pointer
+    writeMsg events 1n "format_table".Pointer "hu".Pointer
+    writeMsg events 2n "main_device".Pointer "a".Pointer
+    writeMsg events 3n "tranche_done".Pointer "".Pointer
+    writeMsg events 4n "tranche_target_device".Pointer "a".Pointer
+    writeMsg events 5n "tranche_formats".Pointer "a".Pointer
+    writeMsg events 6n "tranche_flags".Pointer "u".Pointer
     buildInterface "zwp_linux_dmabuf_feedback_v1".Pointer (int32 5) (int32 1) methods (int32 7) events
 
 let zwpLinuxBufferParamsV1 () : nativeint =
     let methods = allocMessages 4
     if methods = 0n then 0n
     else
-    writeMsg methods 0 "destroy".Pointer "".Pointer
-    writeMsg methods 1 "add".Pointer "huuuuu".Pointer
-    writeMsg methods 2 "create".Pointer "iiuu".Pointer
-    writeMsg methods 3 "create_immed".Pointer "2niiuu".Pointer
+    writeMsg methods 0n "destroy".Pointer "".Pointer
+    writeMsg methods 1n "add".Pointer "huuuuu".Pointer
+    writeMsg methods 2n "create".Pointer "iiuu".Pointer
+    writeMsg methods 3n "create_immed".Pointer "2niiuu".Pointer
     let events = allocMessages 2
     if events = 0n then 0n
     else
-    writeMsg events 0 "created".Pointer "n".Pointer
-    writeMsg events 1 "failed".Pointer "".Pointer
+    writeMsg events 0n "created".Pointer "n".Pointer
+    writeMsg events 1n "failed".Pointer "".Pointer
     buildInterface "zwp_linux_buffer_params_v1".Pointer (int32 5) (int32 4) methods (int32 2) events

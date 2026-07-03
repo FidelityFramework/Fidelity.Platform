@@ -1,0 +1,104 @@
+/// Platform.Display.Compositing — Pixel-level buffer operations
+///
+/// Gradient fills and alpha compositing for splash screens.
+/// Works on raw RGBA pixel buffers (nativeint pointers from malloc/mmap).
+/// Pixel format: ABGR8888 (R at byte 0, G at byte 1, B at byte 2, A at byte 3).
+module Platform.Display.Compositing
+
+/// Paint a diagonal gradient from (r0,g0,b0) to (r1,g1,b1) into a pixel buffer.
+/// Gradient direction: top-left → bottom-right.
+/// stride = bytes per row (from GBM — may be > width*4 due to alignment padding).
+/// Fully opaque (alpha = 255).
+let paintDiagonalGradient (buffer: nativeint) (width: int) (height: int) (stride: int)
+                          (r0: int) (g0: int) (b0: int)
+                          (r1: int) (g1: int) (b1: int) : unit =
+    let pixels = NativePtr.ofNativeInt<byte> buffer
+    let total = width + height - 2  // max value of (x + y)
+    let mutable y = 0
+    while y < height do
+        let rowBase = y * stride
+        let mutable x = 0
+        while x < width do
+            // t = (x + y) relative to diagonal, scaled 0..255
+            let diag = x + y
+            let t = if total > 0 then (diag * 255) / total else 0
+            let invT = 255 - t
+            let r = byte ((r0 * invT + r1 * t) / 255)
+            let g = byte ((g0 * invT + g1 * t) / 255)
+            let b = byte ((b0 * invT + b1 * t) / 255)
+            let offset = rowBase + x * 4
+            NativePtr.set pixels (offset + 0) r
+            NativePtr.set pixels (offset + 1) g
+            NativePtr.set pixels (offset + 2) b
+            NativePtr.set pixels (offset + 3) (byte 255)
+            x <- x + 1
+        y <- y + 1
+
+/// Fill a buffer with a solid opaque color.
+/// stride = bytes per row (from GBM).
+let paintSolidColor (buffer: nativeint) (width: int) (height: int) (stride: int)
+                    (r: int) (g: int) (b: int) : unit =
+    let pixels = NativePtr.ofNativeInt<byte> buffer
+    let rb = byte r
+    let gb = byte g
+    let bb = byte b
+    let mutable y = 0
+    while y < height do
+        let rowBase = y * stride
+        let mutable x = 0
+        while x < width do
+            let offset = rowBase + x * 4
+            NativePtr.set pixels (offset + 0) rb
+            NativePtr.set pixels (offset + 1) gb
+            NativePtr.set pixels (offset + 2) bb
+            NativePtr.set pixels (offset + 3) (byte 255)
+            x <- x + 1
+        y <- y + 1
+
+/// Alpha-composite an RGBA source buffer onto a destination buffer at (destX, destY).
+/// Both buffers are ABGR8888. Source pixels with alpha < 255 blend over destination.
+/// destStride = bytes per row of destination buffer (from GBM).
+/// Source buffer (from resvg) is always contiguous: srcWidth*4 bytes per row.
+let compositeOver (dest: nativeint) (destWidth: int) (destHeight: int) (destStride: int)
+                  (src: nativeint) (srcWidth: int) (srcHeight: int)
+                  (destX: int) (destY: int) : unit =
+    let destPixels = NativePtr.ofNativeInt<byte> dest
+    let srcPixels = NativePtr.ofNativeInt<byte> src
+    let mutable sy = 0
+    while sy < srcHeight do
+        let dy = destY + sy
+        if dy >= 0 && dy < destHeight then
+            let mutable sx = 0
+            while sx < srcWidth do
+                let dx = destX + sx
+                if dx >= 0 && dx < destWidth then
+                    let srcOff = (sy * srcWidth + sx) * 4
+                    let dstOff = dy * destStride + dx * 4
+                    // Mask with 255 to workaround sext bug (byte→int sign-extends in Alex,
+                    // so 0xFF becomes -1 instead of 255; &&& 255 forces unsigned range)
+                    let sa = int (NativePtr.get srcPixels (srcOff + 3)) &&& 255
+                    if sa = 255 then
+                        // Fully opaque — direct copy
+                        NativePtr.set destPixels (dstOff + 0) (NativePtr.get srcPixels (srcOff + 0))
+                        NativePtr.set destPixels (dstOff + 1) (NativePtr.get srcPixels (srcOff + 1))
+                        NativePtr.set destPixels (dstOff + 2) (NativePtr.get srcPixels (srcOff + 2))
+                        NativePtr.set destPixels (dstOff + 3) (byte 255)
+                    else if sa > 0 then
+                        // Alpha blend: out = src * sa + dst * (255 - sa)
+                        let invSa = 255 - sa
+                        let dr = int (NativePtr.get destPixels (dstOff + 0)) &&& 255
+                        let dg = int (NativePtr.get destPixels (dstOff + 1)) &&& 255
+                        let db = int (NativePtr.get destPixels (dstOff + 2)) &&& 255
+                        let sr = int (NativePtr.get srcPixels (srcOff + 0)) &&& 255
+                        let sg = int (NativePtr.get srcPixels (srcOff + 1)) &&& 255
+                        let sb = int (NativePtr.get srcPixels (srcOff + 2)) &&& 255
+                        NativePtr.set destPixels (dstOff + 0) (byte ((sr * sa + dr * invSa) / 255))
+                        NativePtr.set destPixels (dstOff + 1) (byte ((sg * sa + dg * invSa) / 255))
+                        NativePtr.set destPixels (dstOff + 2) (byte ((sb * sa + db * invSa) / 255))
+                        NativePtr.set destPixels (dstOff + 3) (byte 255)
+                    else
+                        ()  // Fully transparent — skip
+                sx <- sx + 1
+            sy <- sy + 1
+        else
+            sy <- sy + 1

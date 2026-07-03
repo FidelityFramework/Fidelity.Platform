@@ -1,0 +1,223 @@
+/// Platform.Display.Text — FreeType text rendering bridge (Layer 3)
+///
+/// Renders text strings to RGBA pixel buffers using FreeType glyph rasterization.
+/// Uses manual struct offset reading because FT_GlyphSlot/FT_Face are opaque handles.
+/// Platform-specific: Linux x86-64 struct layout offsets.
+///
+/// Glyph bitmap pixels (grayscale) are composited as alpha over a given text color.
+module Platform.Display.Text
+
+open Console
+open Fidelity.Font.FreeType.Core.Types
+
+// ═══════════════════════════════════════════════════════════
+// FreeType struct offsets — Linux x86-64 (from offsetof())
+// ═══════════════════════════════════════════════════════════
+
+// FT_FaceRec offsets
+let private faceGlyphOffset = 152   // offsetof(FT_FaceRec, glyph) — FT_GlyphSlot pointer
+
+// FT_GlyphSlotRec offsets
+let private slotAdvanceOffset = 128  // offsetof(FT_GlyphSlotRec, advance) — FT_Vector
+let private slotBitmapOffset = 152   // offsetof(FT_GlyphSlotRec, bitmap) — FT_Bitmap inline
+let private slotBitmapLeftOffset = 192  // offsetof(FT_GlyphSlotRec, bitmap_left)
+let private slotBitmapTopOffset = 196   // offsetof(FT_GlyphSlotRec, bitmap_top)
+
+// FT_Bitmap offsets (relative to bitmap start)
+let private bitmapRowsOffset = 0     // unsigned int
+let private bitmapWidthOffset = 4    // unsigned int
+let private bitmapPitchOffset = 8    // int
+let private bitmapBufferOffset = 16  // unsigned char*
+
+// FT_LOAD_RENDER = (1 << 2)
+let private ftLoadRender = 4
+
+/// Read a 32-bit signed int from a pointer at byte offset.
+let private readInt32At (ptr: nativeint) (offset: int) : int =
+    int (NativePtr.read (NativePtr.ofNativeInt<int32> (ptr + nativeint offset)))
+
+/// Read a 32-bit unsigned int from a pointer at byte offset.
+let private readUInt32At (ptr: nativeint) (offset: int) : int =
+    int (NativePtr.read (NativePtr.ofNativeInt<uint32> (ptr + nativeint offset)))
+
+/// Read a 64-bit signed int from a pointer at byte offset (for FT_Vector / advance).
+let private readInt64At (ptr: nativeint) (offset: int) : int =
+    int (NativePtr.read (NativePtr.ofNativeInt<int64> (ptr + nativeint offset)))
+
+/// Read a native pointer from a pointer at byte offset.
+let private readPtrAt (ptr: nativeint) (offset: int) : nativeint =
+    NativePtr.read (NativePtr.ofNativeInt<nativeint> (ptr + nativeint offset))
+
+/// Render a text string into an RGBA pixel buffer.
+/// Returns pixmap nativeint (0n on failure). Writes width/height to outWidth/outHeight.
+/// Caller must free pixmap via Fidelity.Libc.Memory.free.
+/// Text is rendered in a single color (r, g, b) with grayscale glyph alpha.
+/// outWidth/outHeight are pointers to int-sized storage (8 bytes each on x86-64).
+let renderText (fontPath: string) (fontSize: int) (text: string)
+               (r: int) (g: int) (b: int)
+               (outWidth: nativeint) (outHeight: nativeint) : nativeint =
+    // Init FreeType
+    match Fidelity.Libc.Memory.malloc (unativeint 8) with
+    | None ->
+        Console.writeln "Text: malloc failed for library storage"
+        0n
+    | Some libStorage ->
+
+    let err = Fidelity.Font.FreeType.Core.FT_Init_FreeType (Some libStorage)
+    if err <> 0 then
+        Console.writeln "Text: FT_Init_FreeType failed"
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    else
+
+    let lib = NativePtr.read (NativePtr.ofNativeInt<nativeint> libStorage)
+    let ftLib = FT_Library.ofHandle lib
+
+    // Load face
+    match Fidelity.Libc.Memory.malloc (unativeint 8) with
+    | None ->
+        Console.writeln "Text: malloc failed for face storage"
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    | Some faceStorage ->
+
+    let faceErr = Fidelity.Font.FreeType.Core.FT_New_Face ftLib (Some fontPath.Pointer) 0L (Some faceStorage)
+    if faceErr <> 0 then
+        Console.write "Text: FT_New_Face failed for "
+        Console.writeln fontPath
+        Fidelity.Libc.Memory.free (Some faceStorage)
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    else
+
+    let facePtr = NativePtr.read (NativePtr.ofNativeInt<nativeint> faceStorage)
+    let face = FT_Face.ofHandle facePtr
+
+    // Set pixel size
+    let sizeErr = Fidelity.Font.FreeType.Core.FT_Set_Pixel_Sizes face (uint fontSize) (uint fontSize)
+    if sizeErr <> 0 then
+        Console.writeln "Text: FT_Set_Pixel_Sizes failed"
+        Fidelity.Font.FreeType.Core.FT_Done_Face face |> ignore
+        Fidelity.Libc.Memory.free (Some faceStorage)
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    else
+
+    // First pass: measure total width and max height
+    let textBytes = text.Pointer
+    let textLen = text.Length
+    let mutable totalWidth = 0
+    let mutable maxAscent = 0
+    let mutable maxDescent = 0
+    let mutable measureOk = true
+    let mutable i = 0
+
+    while i < textLen && measureOk do
+        let ch = int (NativePtr.get textBytes i) &&& 255
+        // Only render ASCII bytes; skip UTF-8 continuation bytes (0x80-0xBF)
+        let isAscii = ch < 128
+        if isAscii then
+            let loadErr = Fidelity.Font.FreeType.Core.FT_Load_Char face (uint64 ch) ftLoadRender
+            if loadErr <> 0 then
+                measureOk <- false
+            else
+                let glyphSlot = readPtrAt facePtr faceGlyphOffset
+                let bitmapTop = readInt32At glyphSlot slotBitmapTopOffset
+                let bitmapRows = readUInt32At glyphSlot (slotBitmapOffset + bitmapRowsOffset)
+                let advanceX = readInt64At glyphSlot slotAdvanceOffset
+                totalWidth <- totalWidth + (advanceX / 64)
+                if bitmapTop > maxAscent then
+                    maxAscent <- bitmapTop
+                let descent = bitmapRows - bitmapTop
+                if descent > maxDescent then
+                    maxDescent <- descent
+        i <- i + 1
+
+    if not measureOk then
+        Console.writeln "Text: glyph measurement failed"
+        Fidelity.Font.FreeType.Core.FT_Done_Face face |> ignore
+        Fidelity.Libc.Memory.free (Some faceStorage)
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    else
+
+    let pixWidth = totalWidth + 2  // small padding
+    let pixHeight = maxAscent + maxDescent + 2
+    let bufSize = pixWidth * pixHeight * 4
+
+    Console.write "Text: rendering \""
+    Console.write text
+    Console.write "\" "
+    Console.write (Format.int pixWidth)
+    Console.write "x"
+    Console.writeln (Format.int pixHeight)
+
+    // Write dimensions to out-params
+    NativePtr.write (NativePtr.ofNativeInt<int> outWidth) pixWidth
+    NativePtr.write (NativePtr.ofNativeInt<int> outHeight) pixHeight
+
+    // Allocate RGBA buffer (zeroed — transparent black)
+    match Fidelity.Libc.Memory.malloc (unativeint bufSize) with
+    | None ->
+        Console.writeln "Text: pixmap malloc failed"
+        Fidelity.Font.FreeType.Core.FT_Done_Face face |> ignore
+        Fidelity.Libc.Memory.free (Some faceStorage)
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+        0n
+    | Some pixmap ->
+        let _ = Fidelity.Libc.Memory.memset (Some pixmap) 0 (unativeint bufSize)
+
+        let pixels = NativePtr.ofNativeInt<byte> pixmap
+        let baseline = maxAscent
+
+        // Second pass: render glyphs into buffer
+        let mutable penX = 0
+        let mutable j = 0
+        while j < textLen do
+            let ch2 = int (NativePtr.get textBytes j) &&& 255
+            let isAscii2 = ch2 < 128
+            if isAscii2 then
+                let loadErr = Fidelity.Font.FreeType.Core.FT_Load_Char face (uint64 ch2) ftLoadRender
+                if loadErr = 0 then
+                    let glyphSlot = readPtrAt facePtr faceGlyphOffset
+                    let bitmapLeft = readInt32At glyphSlot slotBitmapLeftOffset
+                    let bitmapTop = readInt32At glyphSlot slotBitmapTopOffset
+                    let bRows = readUInt32At glyphSlot (slotBitmapOffset + bitmapRowsOffset)
+                    let bWidth = readUInt32At glyphSlot (slotBitmapOffset + bitmapWidthOffset)
+                    let bPitch = readInt32At glyphSlot (slotBitmapOffset + bitmapPitchOffset)
+                    let bBuffer = readPtrAt glyphSlot (slotBitmapOffset + bitmapBufferOffset)
+                    let advanceX = readInt64At glyphSlot slotAdvanceOffset
+                    let glyphPixels = NativePtr.ofNativeInt<byte> bBuffer
+                    // Composite glyph bitmap (grayscale → alpha) into RGBA buffer
+                    let mutable gy = 0
+                    while gy < bRows do
+                        let destY = baseline - bitmapTop + gy
+                        if destY >= 0 && destY < pixHeight then
+                            let mutable gx = 0
+                            while gx < bWidth do
+                                let destX = penX + bitmapLeft + gx
+                                if destX >= 0 && destX < pixWidth then
+                                    let alpha = int (NativePtr.get glyphPixels (gy * bPitch + gx)) &&& 255
+                                    if alpha > 0 then
+                                        let off = (destY * pixWidth + destX) * 4
+                                        NativePtr.set pixels (off + 0) (byte r)
+                                        NativePtr.set pixels (off + 1) (byte g)
+                                        NativePtr.set pixels (off + 2) (byte b)
+                                        NativePtr.set pixels (off + 3) (byte alpha)
+                                gx <- gx + 1
+                        gy <- gy + 1
+                    penX <- penX + (advanceX / 64)
+            j <- j + 1
+
+        // Cleanup FreeType resources
+        Fidelity.Font.FreeType.Core.FT_Done_Face face |> ignore
+        Fidelity.Libc.Memory.free (Some faceStorage)
+        Fidelity.Font.FreeType.Core.FT_Done_FreeType ftLib |> ignore
+        Fidelity.Libc.Memory.free (Some libStorage)
+
+        pixmap

@@ -28,9 +28,10 @@ open Fidelity.Wayland.Bridge.Callbacks
 let createToplevel (display: nativeint) (compositor: nativeint)
                    (xdgWmBase: nativeint) (closeFlag: nativeint)
                    (title: string) (appId: string) : option<nativeint> =
-    // xdg_wm_base ping listener
+    // xdg_wm_base ping listener — must respond to keep compositor happy
     let wmBaseListener = buildXdgWmBaseListener
                             "Platform.Display.Callbacks.wmBasePing"
+    wl_proxy_add_listener (Some xdgWmBase) (nativeint &wmBaseListener) (Some 0n) |> ignore
 
     // Create wl_surface
     match wl_compositor_create_surface compositor with

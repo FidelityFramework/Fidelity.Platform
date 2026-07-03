@@ -1,0 +1,61 @@
+[library]
+name = "xrt_coreutil"
+headers = [
+    "/usr/include/xrt/xrt_device.h",
+    "/usr/include/xrt/xrt_bo.h",
+    "/usr/include/xrt/xrt_kernel.h",
+    "/usr/include/xrt/xrt_aie.h",
+    "/usr/include/xrt/xrt_graph.h",
+    "/usr/include/xrt/experimental/xrt_xclbin.h",
+]
+include_paths = ["/usr/include/xrt", "/usr/include"]
+defines = []
+transitive_headers = ["detail/ert.h", "detail/xrt_mem.h", "detail/xrt_error_code.h"]
+macro_prefixes = ["XRT_", "ERT_", "XCL_"]
+
+[output]
+mode = "fidelity"
+directory = "../Bindings"
+
+[error_conventions]
+default = "return_code"
+
+[options]
+opaque_handles = true
+flags_enums = true
+
+[[namespace]]
+name = "Fidelity.XRT.Device"
+description = "Device open, close, and xclbin registration"
+library = "xrt_coreutil"
+prefixes = ["xrtDevice"]
+
+[[namespace]]
+name = "Fidelity.XRT.Buffer"
+description = "Buffer object allocation, mapping, sync, read, write"
+library = "xrt_coreutil"
+prefixes = ["xrtBO"]
+
+[[namespace]]
+name = "Fidelity.XRT.Kernel"
+description = "Kernel handle acquisition, argument setting, run dispatch and wait"
+library = "xrt_coreutil"
+prefixes = ["xrtKernel", "xrtRun", "xrtPLKernel"]
+
+[[namespace]]
+name = "Fidelity.XRT.Xclbin"
+description = "Xclbin loading and UUID management"
+library = "xrt_coreutil"
+prefixes = ["xrtXclbin"]
+
+[[namespace]]
+name = "Fidelity.XRT.Graph"
+description = "AIE graph management"
+library = "xrt_coreutil"
+prefixes = ["xrtGraph"]
+
+[[namespace]]
+name = "Fidelity.XRT.AIE"
+description = "AIE array operations, sync, profiling"
+library = "xrt_coreutil"
+prefixes = ["xrtAIE"]

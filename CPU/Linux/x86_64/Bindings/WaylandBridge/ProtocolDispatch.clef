@@ -46,9 +46,9 @@ open Fidelity.Wayland.Core
         let _ = NativePtr.set argsPtr 0 (nativeint (name))
         // args[1] must be the interface name STRING (wire signature 's'),
         // not the interface struct pointer. The wl_interface struct's first
-        // field is `const char *name`, so dereference to get the name pointer.
-        let nameStr = NativePtr.read (NativePtr.ofNativeInt<nativeint> ``interface``)
-        let _ = NativePtr.set argsPtr 1 nameStr
+        // field is `const char *name`, so copy the 8-byte name pointer directly
+        // from offset 0 of the wl_interface struct into args[1].
+        let _ = Fidelity.Libc.Memory.memcpy (Some (argsRaw + 8n)) (Some ``interface``) (unativeint 8)
         let _ = NativePtr.set argsPtr 2 (nativeint (version))
         let _ = NativePtr.set argsPtr 3 0n
         let result = wl_proxy_marshal_array_flags (Some self) (uint32 (0)) (Some ``interface``) version (uint32 (0)) (Some argsRaw)
