@@ -11,7 +11,6 @@ target = "cpu"
 sources = [
     "Types.clef",
     "Helpers.clef",
-    "Platform.clef",
     "Syscalls.clef",
     "Format.clef",
     "Parse.clef",
