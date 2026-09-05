@@ -164,21 +164,28 @@ let heap: MemorySpace = {
 
 /// read(2): the kernel writes at most `count` bytes into `buf` and returns
 /// how many, 0 at end of input, or a negative errno (man 2 read). This is the
-/// fact the input-bound obligations rest on.
+/// fact the input-bound obligations rest on. The return bound is data: at
+/// least the errno floor (-4095, the kernel's MAX_ERRNO negated, since every
+/// error is a negative return) and at most the `count` argument; the compiler
+/// reads the return's range [Floor, hi(count)] from this declaration alone.
 let readBound: Contract = {
     Name = "read-bound"
     Statement = "writes at most count bytes into buf and returns n with 0 <= n <= count; n = 0 is end of input; a negative return is an errno"
     Logic = Logic.Assumed
     Refs = [| "CWE-120" |]
+    Floor = -4095L
+    AtMost = "count"
 }
 
 /// write(2): the kernel reads at most `count` bytes from `buf` and returns how
-/// many it wrote, or a negative errno (man 2 write).
+/// many it wrote, or a negative errno (man 2 write); the same declared bound.
 let writeBound: Contract = {
     Name = "write-bound"
     Statement = "writes at most count bytes from buf and returns the number written or a negative errno"
     Logic = Logic.Assumed
     Refs = [| "CWE-125" |]
+    Floor = -4095L
+    AtMost = "count"
 }
 
 /// `read`, syscall 0 (`Syscalls.SYS_read`).
