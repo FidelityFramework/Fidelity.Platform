@@ -40,6 +40,87 @@ module ResetKind =
     let External: ResetKind = "External"
     let Internal: ResetKind = "Internal"
 
+type OsName = string          // "linux" | "windows" | "macos" | "freebsd" | "none"
+type ArchName = string        // "x86_64" | "arm_cortex_m33" | "aarch64" | ...
+type Endianness = string      // "little" | "big"
+type RuntimeName = string     // "libc" | "freestanding" | "bare" | "rocm" | "xdna"
+
+// The numeric vocabulary of a core (plan D8; BAREWire Platform/Tags.fs spells
+// the same tags): string-aliased like every tag above.
+
+/// The capability a target has for one numeric representation
+/// (numeric-selection.md §7): native, emulated, or unavailable.
+type Capability = string
+[<RequireQualifiedAccess>]
+module Capability =
+    let Native: Capability = "native"
+    let Emulated: Capability = "emulated"
+    let Unavailable: Capability = "unavailable"
+
+/// The family of a numeric representation; adding one is a declaration.
+type RepresentationFamily = string
+[<RequireQualifiedAccess>]
+module RepresentationFamily =
+    let Int: RepresentationFamily = "int"
+    let UInt: RepresentationFamily = "uint"
+    let Ieee: RepresentationFamily = "ieee"
+    let Posit: RepresentationFamily = "posit"
+    let Fixed: RepresentationFamily = "fixed"
+
+/// What an operation does at a representation's boundary
+/// (numeric-selection.md §9 item 6): a declared fact of the target.
+type Boundary = string
+[<RequireQualifiedAccess>]
+module Boundary =
+    let Wrap: Boundary = "wrap"
+    let Saturate: Boundary = "saturate"
+    let Exact: Boundary = "exact"
+
+/// One named width dimension the core declares
+/// (ntu-dimensional-architecture.md §7.1): the language names it, the
+/// description says how many bits it is here. An undeclared dimension is a
+/// located diagnostic in the compiler, never a default.
+[<CLIMutable>]
+type WidthDeclaration = {
+    Name: string
+    Bits: int
+}
+
+/// One numeric representation the target offers (platform-bindings.md,
+/// descriptor requirements). MinMagnitude and MaxMagnitude bound the
+/// representable range as exact decimal text.
+[<CLIMutable>]
+type Representation = {
+    Name: string
+    Capability: Capability
+    Family: RepresentationFamily
+    Bits: int
+    MinMagnitude: string
+    MaxMagnitude: string
+    Boundary: Boundary
+}
+
+/// The ISA/ABI facts of a processor core (docs/CANONICAL_PLATFORM_SPEC.md,
+/// "Schema: extend the live descriptor with a TargetCore block"), with the
+/// width dimensions and numeric representations it declares. The twin of
+/// BAREWire.Platform.TargetCore in this vocabulary.
+[<CLIMutable>]
+type TargetCore = {
+    Os: OsName
+    Arch: ArchName
+    WordSizeBits: int
+    Endianness: Endianness
+    Runtime: RuntimeName
+    /// Force a triple; else derived from (Os, Arch, Runtime).
+    TripleOverride: string option
+    /// -mcpu, e.g. "cortex-m33"; distinguishes M33 from M55.
+    CpuModel: string option
+    /// The width dimensions by name: a CPU or MCU declares Pointer and Register.
+    Widths: WidthDeclaration list
+    /// The numeric representations offered, each with capability, range and boundary.
+    Representations: Representation list
+}
+
 [<CLIMutable>]
 type PinEndpoint = {
     LogicalName: string
@@ -96,6 +177,8 @@ type PlatformDescriptor = {
     Device: string
     Package: string
     SpeedGrade: string
+    /// ISA/ABI half: None for a pure-hardware leaf (an FPGA has no core to describe).
+    Core: TargetCore option
     Clocks: ClockEndpoint list
     Resets: ResetEndpoint list
     Groups: EndpointGroup list

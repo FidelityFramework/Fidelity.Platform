@@ -1,0 +1,251 @@
+module Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Description
+
+open BAREWire.Platform
+
+// The Arty A7-100T as a BAREWire-described platform (BAREWire docs/11;
+// Readiness Audit §4 step 9). This file is additive: `Platform.descriptor` in
+// ArtyA7_100T.Bindings.clef stays the authority for the pin map and the
+// device part until Composer projects XDC from this description (Audit step
+// 10), so the compiler's pin resolution keeps matching PinEndpoint,
+// ClockEndpoint, ResetEndpoint and PlatformDescriptor by name. Every fact
+// here is a plain typed record with an explicit annotation, extracted
+// structurally from the PSG by field name (CANONICAL_PLATFORM_SPEC.md, "The
+// mechanism constraint"); no quotation, no function application in a value.
+//
+// Sources, all under docs/ of this folder: the Digilent Arty A7 reference
+// manual (its Artix-7 feature table for the XC7A100TCSG324-1 column, §"Quad-
+// SPI Flash", §"USB-UART Bridge", §"DDR3L"), Arty-A7-100-Master.xdc for
+// package pins, and ArtyA7_100T.Bindings.clef for the clock and reset facts
+// already declared there.
+
+// ---------------------------------------------------------------------------
+// Memory spaces
+// ---------------------------------------------------------------------------
+
+/// Block RAM of the XC7A100T: 4,860 Kbit in the reference manual's feature
+/// table ("Block RAM 607.5 KB"), 622,080 bytes. That figure counts the parity
+/// bits of every RAMB36; they are addressable as data only at x9/x18/x36 port
+/// widths. Granularity is the data half of one RAMB18 (16 Kbit, 2,048 bytes),
+/// the smallest block the synthesizer allocates. No base: block RAM is not
+/// address-mapped until a design instantiates it.
+let bram: MemorySpace = {
+    Name = "bram"
+    Kind = MemoryKind.BlockRam
+    Capacity = 622080L
+    Alignment = 1
+    Granularity = 2048
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "XC7A100T block RAM, 4,860 Kbit including parity (Arty A7 reference manual feature table); allocated per RAMB18/RAMB36 by synthesis"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The register fabric: 126,800 flip-flops in the reference manual's feature
+/// table, 15,850 bytes. Every `seq.compreg` the compiler synthesises for a
+/// design's state consumes flip-flops of its inferred width, so this is the
+/// space a state record's size is an obligation against.
+let registers: MemorySpace = {
+    Name = "registers"
+    Kind = MemoryKind.Registers
+    Capacity = 15850L
+    Alignment = 1
+    Granularity = 1
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "XC7A100T flip-flops, 126,800 (Arty A7 reference manual feature table), stated in bytes; register widths are inferred per design"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The Quad-SPI configuration flash: a 128 Mbit (16 MB) serial device
+/// (S25FL128S or S25FL127S by board revision; reference manual §"Quad-SPI
+/// Flash"). The configuration image occupies the bottom of the device and the
+/// remainder is user data. Read-only from the fabric's point of view; the
+/// erase granularity is the 64 KB sector every listed part shares (each
+/// part's smaller parameter sectors are a per-part fact the manual does not
+/// state and this space does not model).
+let flash: MemorySpace = {
+    Name = "flash"
+    Kind = MemoryKind.Flash
+    Capacity = 16777216L
+    Alignment = 1
+    Granularity = 65536
+    Growth = Growth.Fixed
+    Access = Access.ReadOnly
+    Base = None
+    Notes = "Quad-SPI configuration flash, 128 Mbit (Arty A7 reference manual, Quad-SPI Flash, Table 5.2.1: N25Q128A13ESF40, S25FL128S or S25FL127S by board revision); 64 KB erase sectors, the parts' smaller parameter sectors not modeled"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+// ---------------------------------------------------------------------------
+// Boundary surface: the package pins the description binds today
+// ---------------------------------------------------------------------------
+
+/// The I/O standard every user pin on this board uses (reference manual;
+/// Platform.descriptor's first note). Declared once as a surface default so
+/// no endpoint restates it.
+let ioStandard: Default = {
+    Key = "io-standard"
+    Value = "LVCMOS33"
+}
+
+/// USB-UART transmit from the FPGA, package pin D10 (Arty-A7-100-Master.xdc
+/// `uart_rxd_out`, named from the PC's side). The same pin is Pins.uartTx in
+/// ArtyA7_100T.Bindings.clef; the two literals agree until the pin map is
+/// re-homed here (Audit step 10).
+let uartTxPin: Endpoint = {
+    Name = "uart_tx"
+    Location = EndpointKind.PackagePin
+    Address = "D10"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// USB-UART receive into the FPGA, package pin A9 (Arty-A7-100-Master.xdc
+/// `uart_txd_in`). Pins.uartRx in the bindings.
+let uartRxPin: Endpoint = {
+    Name = "uart_rx"
+    Location = EndpointKind.PackagePin
+    Address = "A9"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// The 100 MHz oscillator input, package pin E3 (Arty-A7-100-Master.xdc
+/// `CLK100MHZ`). Pins.sysClk in the bindings carries the same pin with the
+/// frequency; the frequency lives in `lifecycle` here.
+let sysClkPin: Endpoint = {
+    Name = "sys_clk"
+    Location = EndpointKind.PackagePin
+    Address = "E3"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// The package-pin surface. Only the pins a declared transport or clock binds
+/// are here today; the remaining user pins stay in Platform.descriptor until
+/// Composer reads endpoints of kind PackagePin for XDC.
+let pins: BoundarySurface = {
+    Name = "pins"
+    Kind = SurfaceKind.Pins
+    Endpoints = [| uartTxPin; uartRxPin; sysClkPin |]
+    Defaults = [| ioStandard |]
+    Contracts = [||]
+}
+
+// ---------------------------------------------------------------------------
+// Buffer schemas
+// ---------------------------------------------------------------------------
+
+/// The UART transmit buffer carrying HelloArty's `ArtyReport`
+/// (~/repos/HelloArty/src/Shared/Contract.clef). Framed with the BAREWire
+/// envelope (BAREWire docs/05): a 4-byte length prefix and a 5-byte header
+/// before the payload. The payload is at most 12 bytes on the wire (two
+/// one-byte tags and a zigzag `int` of up to 10 bytes), so 21 bytes framed;
+/// 32 is the declared ceiling the obligations check, and the schema consumer
+/// (Audit step 8) computes the exact figure from the type. Lives for the
+/// life of the design. `Slot` is the ring slot size and is 0 for every
+/// framing but `Framing.Ring`.
+let uartTx: BufferSchema = {
+    Name = "uartTx"
+    Schema = "ArtyReport"
+    Capacity = 32L
+    Framing = Framing.LengthPrefixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "bram"
+    Lifetime = Lifetime.Program
+    Access = Access.ReadWrite
+    Slot = 0
+}
+
+// ---------------------------------------------------------------------------
+// Transports
+// ---------------------------------------------------------------------------
+
+/// The on-board FTDI FT2232HQ USB-UART bridge (reference manual §"USB-UART
+/// Bridge") as a transport: 115200 baud is Uart.usbUart's DefaultBaud in the
+/// bindings, stated here as the symbol rate; one framed `ArtyReport` is the
+/// largest unit and equals the transmit buffer's capacity. Bytes arrive in
+/// order.
+let uart: Transport = {
+    Name = "uart"
+    Kind = TransportKind.Uart
+    Endpoints = [| "uart_tx"; "uart_rx" |]
+    RateHz = 115200L
+    MaxUnit = 32L
+    Ordered = true
+    Schema = "ArtyReport"
+    Since = ""
+    Until = ""
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
+/// The system clock: 100 MHz on-board oscillator (Pins.sysClk).
+// SUBSET(record-inference): preferred spelling is the unqualified literal under
+// the annotation; the labels are qualified because ClockEndpoint in Contracts
+// shares both of them and the checker types the literal by its labels.
+let sysClk: Clock = {
+    Clock.Name = "sys_clk"
+    Clock.FrequencyHz = 100000000L
+}
+
+/// The power-on reset: internal, active-high, single cycle; the Arty A7 has no
+/// user-accessible reset pin (Pins.resetEndpoint and its note).
+let por: Reset = {
+    Name = "rst"
+    External = false
+    ActiveHigh = true
+}
+
+/// A device lifecycle: one clock, one reset, no entry or teardown symbol,
+/// volatile state (configuration is reloaded from flash at power-on).
+let lifecycle: LifecycleFacts = {
+    Clocks = [| sysClk |]
+    Resets = [| por |]
+    Entry = ""
+    Teardown = ""
+    Persistence = Persistence.Volatile
+}
+
+// ---------------------------------------------------------------------------
+// The description
+// ---------------------------------------------------------------------------
+
+/// The Arty A7-100T description. Same Id as Platform.descriptor so the two
+/// values name one board; no core (an FPGA has none to describe); no limits.
+let description: PlatformDescription = {
+    Id = "fpga-xilinx-artix7-arty-a7-100t"
+    DisplayName = "Digilent Arty A7-100T (Rev D/E)"
+    Substrate = "FPGA"
+    Core = None
+    Spaces = [| bram; registers; flash |]
+    Surfaces = [| pins |]
+    Buffers = [| uartTx |]
+    Transports = [| uart |]
+    Lifecycle = lifecycle
+    Notes = [|
+        "Block RAM and flip-flop totals: Arty A7 reference manual, Artix-7 feature table, XC7A100TCSG324-1 column."
+        "Flash: Arty A7 reference manual, Quad-SPI Flash; 128 Mbit S25FL128S/S25FL127S by board revision."
+        "UART: Arty A7 reference manual, USB-UART Bridge (FT2232HQ); pins D10/A9 from Arty-A7-100-Master.xdc; baud from Uart.usbUart."
+        "The 256 MB DDR3L (MT41K128M16JT-125) and the distributed RAM total are not declared: the vocabulary has no DRAM kind yet and the manual states no LUT RAM figure."
+        "Pin map and device part remain in Platform.descriptor until Composer projects XDC from this description."
+    |]
+    Limits = [||]
+}

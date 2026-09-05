@@ -361,6 +361,7 @@ module Platform =
         Device = "XC7A100T"
         Package = "CSG324"
         SpeedGrade = "-1"
+        Core = None
         Clocks = [ sysClk ]
         Resets = [ resetEndpoint ]
         Groups = [ greenLeds; rgb0; rgb1; rgb2; rgb3; buttons; switches; chipKitDigitalGpio ]

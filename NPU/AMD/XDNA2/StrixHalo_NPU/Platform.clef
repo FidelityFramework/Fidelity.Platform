@@ -12,6 +12,7 @@ module Platform =
         Device = "Strix Halo NPU"
         Package = "Host"
         SpeedGrade = "n/a"
+        Core = None
         Clocks = []
         Groups = []
         Uarts = []

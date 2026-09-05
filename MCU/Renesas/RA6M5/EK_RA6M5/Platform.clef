@@ -17,6 +17,41 @@ module Platform =
         "Interrupts"
     ]
 
+    // The core's width dimensions (ntu-dimensional-architecture.md §7.1): the
+    // Cortex-M33 is a 32-bit ARMv8-M core; addresses and registers are 32 bits.
+    let pointerWidth: WidthDeclaration = { Name = "Pointer"; Bits = 32 }
+    let registerWidth: WidthDeclaration = { Name = "Register"; Bits = 32 }
+
+    // The integer representations the core offers natively: two's-complement
+    // and unsigned at 8, 16, 32 and 64 bits, wrapping at their boundaries
+    // (64-bit arithmetic is register pairs on ARMv8-M, still native and
+    // wrapping). Ranges as exact decimal text.
+    let repInt8: Representation = { Name = "int8"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 8; MinMagnitude = "-128"; MaxMagnitude = "127"; Boundary = Boundary.Wrap }
+    let repInt16: Representation = { Name = "int16"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 16; MinMagnitude = "-32768"; MaxMagnitude = "32767"; Boundary = Boundary.Wrap }
+    let repInt32: Representation = { Name = "int32"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 32; MinMagnitude = "-2147483648"; MaxMagnitude = "2147483647"; Boundary = Boundary.Wrap }
+    let repInt64: Representation = { Name = "int64"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 64; MinMagnitude = "-9223372036854775808"; MaxMagnitude = "9223372036854775807"; Boundary = Boundary.Wrap }
+    let repUInt8: Representation = { Name = "uint8"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 8; MinMagnitude = "0"; MaxMagnitude = "255"; Boundary = Boundary.Wrap }
+    let repUInt16: Representation = { Name = "uint16"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 16; MinMagnitude = "0"; MaxMagnitude = "65535"; Boundary = Boundary.Wrap }
+    let repUInt32: Representation = { Name = "uint32"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 32; MinMagnitude = "0"; MaxMagnitude = "4294967295"; Boundary = Boundary.Wrap }
+    let repUInt64: Representation = { Name = "uint64"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 64; MinMagnitude = "0"; MaxMagnitude = "18446744073709551615"; Boundary = Boundary.Wrap }
+
+    /// The core (docs/CANONICAL_PLATFORM_SPEC.md, "TargetCore"): the facts of
+    /// this package's [platform] table, the CPU model LLVM is handed, and the
+    /// widths and representations above. The RA6M5 has a single-precision FPU;
+    /// its float representations are declared once the RA6M5 source pack is
+    /// staged in docs/, so a float32 seal against this leaf is refused today.
+    let core: TargetCore = {
+        Os = "none"
+        Arch = "arm_cortex_m33"
+        WordSizeBits = 32
+        Endianness = "little"
+        Runtime = "bare"
+        TripleOverride = None
+        CpuModel = Some "cortex-m33"
+        Widths = [ pointerWidth; registerWidth ]
+        Representations = [ repInt8; repInt16; repInt32; repInt64; repUInt8; repUInt16; repUInt32; repUInt64 ]
+    }
+
     let descriptor: PlatformDescriptor = {
         Id = "mcu-renesas-ra6m5-ek-ra6m5"
         DisplayName = "Renesas EK-RA6M5"
@@ -26,6 +61,7 @@ module Platform =
         Device = "EK-RA6M5"
         Package = "Board"
         SpeedGrade = "n/a"
+        Core = Some core
         Clocks = []
         Groups = []
         Uarts = []

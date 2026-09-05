@@ -80,8 +80,8 @@ The quotation is authoritative (decided — do not re-open). This section fixes 
 
 Before any type: the `<@ @>` quotation is inert at the backend today . `SemanticKind.Quote` has exactly one consumer in all of Composer — `SSAAssignment.fs:1000 → false`. No evaluator, no splicer, no `Expr`-reflection exists. And the DU-import wall is real : Contracts string-aliases `SubstrateKind = string` et al. specifically to avoid cross-assembly DU layout failures. So "quotation-centric" cannot mean an `Expr` interpreter carrying rich DUs. It is realized on the only built mechanism :
 
-Author Plain typed record Developer writes a `PlatformDescriptor` value — not a quoted `Expr`. 
-CCS → PSG Elaborated to Binding clef lowers the `let` to a typed `RecordExpr` node that survives into the flattened graph. 
+Author Quoted typed record Developer writes the descriptor value as a quotation, `<@ { ... } @>` (the spec's form, clef-lang-spec platform-bindings.md "Platform Descriptor"), or plainly; the quotation is kept because it carries the record's type over facts that arrive stringly typed or untyped (vendor documents, board packs, project files). Decided 2026-09-04. 
+CCS → PSG Elaborated to Binding clef lowers the `let` to a typed `RecordExpr` node that survives into the flattened graph, inside a `Quote` node when quoted; the reader follows the quotation to the record and never evaluates it. 
 Backend Structural extraction Read by field-name string, exactly as `PlatformPinResolution` already does for FPGA pins. 
 
 This is quotation- centric authoring (the descriptor is the single authored source of truth) realized over the live carrier. It is buildable now, blocked on no interpreter. Everything downstream follows from this call.
@@ -446,10 +446,10 @@ Honor the DU-import wall: OS/arch/runtime cross the assembly boundary as closed-
 
 Recommend: RATIFY as the lower-risk canonical choice. The alternative (fix the DU-import wall first) is a larger Composer project that blocks the MCU on unrelated work. 
 
-D4 The `<@ @>` syntax stays as authoring surface, but does not carry facts 
-"Quotation-centric" is realized as authored typed records over the live PSG-record carrier; the `Expr` quotation is not on the fact-carrying path. Tradeoff: if you want the literal `<@ @>` to be metaprogrammable at the backend later, that remains unbuilt (Quote evaluator + DU-import wall). This pass does not close that; it delivers the facts on the mechanism that works.
+D4 The `<@ @>` syntax is the authoring surface and carries the facts by structure (decided 2026-09-04) 
+The descriptor is authored as a quotation; the compiler reads the typed record inside it structurally, by type name and field name (clef `PSGSaturation/SemanticGraph/PlatformResolution.fs` follows the `Quote` node to the record), and never evaluates it. No `Expr` evaluator is on the fact-carrying path, and none is needed for it; the DU-import wall is honoured by the closed-vocabulary strings above. A plain record is read the same way, so the leaves as written today are read without rewriting; the quotation is the form of record because it keeps type-carrying information over sources that are stringly typed or not typed at all.
 
-Needs sign-off: is authored-typed-record enough for "quotation is central," or do you want the Expr-evaluator on the roadmap as a named Phase-2? The design works either way; this only sets expectations. 
+Sign-off received (2026-09-04): "I DEFINITELY want to keep Don Syme's quotations for Fidelity.Platform - it's a way to keep type-carrying information from sources that may be stringly typed or not typed at all." The Expr-evaluator question is closed: reading is not evaluating. 
 
 07 
 ## Open questions & risks

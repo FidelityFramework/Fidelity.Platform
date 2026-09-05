@@ -33,7 +33,6 @@ sources = [
 runtime_model = "libc"
 os = "linux"
 arch = "x86_64"
-word_size = 64
 
 [dependencies]
 Fidelity.Platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.fidproj" }

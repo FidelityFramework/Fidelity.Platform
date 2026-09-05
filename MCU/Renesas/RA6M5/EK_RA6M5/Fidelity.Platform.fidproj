@@ -18,7 +18,6 @@ output_kind = "library"
 runtime_model = "bare"
 os = "none"
 arch = "arm_cortex_m33"
-word_size = 32
 
 [dependencies]
 contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

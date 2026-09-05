@@ -11,6 +11,7 @@ target = "fpga"
 sources = [
     "../../../../Contracts/PlatformContracts.clef",
     "ArtyA7_100T.Bindings.clef",
+    "ArtyA7_100T.Description.clef",
     "ArtyA7_100T.Prelude.clef"
 ]
 output = "fidelity-platform-fpga-arty-a7-100t"
@@ -24,3 +25,8 @@ family = "artix7"
 device = "xc7a100t"
 clock_mhz = 100
 ns_per_weight_unit = 1.6
+
+[dependencies]
+# The description vocabulary (MemorySpace, BufferSchema, Transport, ...) and
+# its observers; ArtyA7_100T.Description.clef is written in it (docs/BAREWire_Rebase_Plan.md).
+barewire = { path = "../../../../../BAREWire/src/BAREWire.fidproj" }

@@ -1,0 +1,532 @@
+/// The Linux x86-64 platform, described (BAREWire docs/11; Readiness Audit §4
+/// step 11).
+///
+/// Every fact a program on this platform relies on for its memory layout, its
+/// boundary with the kernel, its buffer capacities and its transports is a
+/// plain typed record value in this file, in BAREWire's vocabulary. Three
+/// observers read this one value and nothing else: the compiler's lowering
+/// (the capacity `Console.readln` reads into), the memory-map manifest
+/// (`Manifest.emit`), and the proof obligations (`Obligations.ofDescription`).
+/// A number that appears here is authored here, or in the one `[<Literal>]`
+/// this file cites, and nowhere else.
+///
+/// Declaration form: module-level `let name: Type = { ... }`, values composed
+/// by reference, every field spelled out. The compiler extracts these
+/// structurally from the PSG by type name and field name, following a
+/// reference to the binding it names; a constructor call would hide the fields
+/// from it (docs/CANONICAL_PLATFORM_SPEC.md, "The mechanism constraint").
+module Fidelity.Platform.Linux_x86_64.Description
+
+open BAREWire.Platform
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Memory spaces: the process image the loader maps, then the three the
+// program consumes. The linker and the kernel place them (no declared base);
+// capacities of the mapped sections are budgets, confirmed against the ELF.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// `.text`: the program's code, mapped read-execute in whole pages. The
+/// capacity is a one-page budget, confirmed against HelloProof's `helloworld`
+/// (`readelf -lW`: R E segment 0x489 bytes; `.text` 0x40b).
+let text: MemorySpace = {
+    Name = "text"
+    Kind = MemoryKind.Text
+    Capacity = 4096L
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadExecute
+    Base = None
+    Notes = "linker-placed code; one-page budget confirmed against the ELF R E segment"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.rodata`: string literals and constants, mapped read-only. HelloProof's
+/// `.rodata` is 50 bytes (`readelf -SW`, section 14), the bytes the Rocq coda
+/// tiles; the capacity is the declared budget the reachable string storages
+/// are proved to fit.
+let rodata: MemorySpace = {
+    Name = "rodata"
+    Kind = MemoryKind.Rodata
+    Capacity = 4096L
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadOnly
+    Base = None
+    Notes = "linker-placed constants; one-page budget, 50 bytes used by HelloProof"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.data`: initialised variables, mapped read-write. One-page budget
+/// (HelloProof: 16 bytes).
+let data: MemorySpace = {
+    Name = "data"
+    Kind = MemoryKind.Data
+    Capacity = 4096L
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "linker-placed initialised data; one-page budget"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.bss`: zero-initialised variables the loader maps without file backing.
+/// One-page budget (HelloProof: 8 bytes).
+let bss: MemorySpace = {
+    Name = "bss"
+    Kind = MemoryKind.Bss
+    Capacity = 4096L
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "zero-initialised data; one-page budget"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The process stack: 8 MiB, the Linux default `RLIMIT_STACK` soft limit
+/// (setrlimit(2); `ulimit -s` reports 8192 KiB), growing down from an address
+/// the kernel chooses. The 16-byte alignment is the System V AMD64 ABI's
+/// call-site rule (§3.2.2).
+let stack: MemorySpace = {
+    Name = "stack"
+    Kind = MemoryKind.Stack
+    Capacity = 8388608L
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Down
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "RLIMIT_STACK default soft limit; SysV AMD64 16-byte alignment"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The scope arena: bump allocation over a caller-provided 4096-byte block
+/// (BAREWire docs/Arena_Design.md; the `Arena` intrinsic), byte-granular,
+/// 16-byte aligned, growing up, freed when the scope ends. `consoleReadln`
+/// lives here.
+let arena: MemorySpace = {
+    Name = "arena"
+    Kind = MemoryKind.Arena
+    Capacity = 4096L
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Up
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "bump discipline of docs/Arena_Design.md; caller-provided block"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The heap: brk(2) and mmap(2) memory the kernel hands out on demand, with
+/// no declared base and no declared budget. Its capacity is the ceiling the
+/// address space imposes when `RLIMIT_DATA` is at its default of unlimited:
+/// `TASK_SIZE_MAX` for 4-level paging, (1 << 47) - 4096 bytes
+/// (arch/x86/include/asm/page_64_types.h). 16-byte alignment is malloc(3)'s
+/// guarantee on this ABI.
+let heap: MemorySpace = {
+    Name = "heap"
+    Kind = MemoryKind.Heap
+    Capacity = 140737488351232L
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Up
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "brk/mmap memory; capacity is TASK_SIZE_MAX, the address-space ceiling"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// The syscall surface: the boundary with the kernel. Numbers are those of
+// Syscalls.clef (arch/x86/entry/syscalls/syscall_64.tbl). Contracts on the
+// far side are trusted-base assumptions, stated and cited but not proven
+// (docs/11, "The TCB, mechanized").
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// read(2): the kernel writes at most `count` bytes into `buf` and returns
+/// how many, 0 at end of input, or a negative errno (man 2 read). This is the
+/// fact the input-bound obligations rest on.
+let readBound: Contract = {
+    Name = "read-bound"
+    Statement = "writes at most count bytes into buf and returns n with 0 <= n <= count; n = 0 is end of input; a negative return is an errno"
+    Logic = Logic.Assumed
+    Refs = [| "CWE-120" |]
+}
+
+/// write(2): the kernel reads at most `count` bytes from `buf` and returns how
+/// many it wrote, or a negative errno (man 2 write).
+let writeBound: Contract = {
+    Name = "write-bound"
+    Statement = "writes at most count bytes from buf and returns the number written or a negative errno"
+    Logic = Logic.Assumed
+    Refs = [| "CWE-125" |]
+}
+
+/// `read`, syscall 0 (`Syscalls.SYS_read`).
+let sysRead: Endpoint = {
+    Name = "read"
+    Location = EndpointKind.SyscallNumber
+    Address = "0"
+    Contracts = [| readBound |]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `write`, syscall 1 (`Syscalls.SYS_write`).
+let sysWrite: Endpoint = {
+    Name = "write"
+    Location = EndpointKind.SyscallNumber
+    Address = "1"
+    Contracts = [| writeBound |]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `mmap`, syscall 9 (`Syscalls.SYS_mmap`).
+let sysMmap: Endpoint = {
+    Name = "mmap"
+    Location = EndpointKind.SyscallNumber
+    Address = "9"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `munmap`, syscall 11 (`Syscalls.SYS_munmap`).
+let sysMunmap: Endpoint = {
+    Name = "munmap"
+    Location = EndpointKind.SyscallNumber
+    Address = "11"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `exit_group`, syscall 231 (`Syscalls.SYS_exit_group`): the teardown.
+let sysExitGroup: Endpoint = {
+    Name = "exit_group"
+    Location = EndpointKind.SyscallNumber
+    Address = "231"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `clock_gettime`, syscall 228 (`Syscalls.SYS_clock_gettime`).
+let sysClockGettime: Endpoint = {
+    Name = "clock_gettime"
+    Location = EndpointKind.SyscallNumber
+    Address = "228"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// Every syscall returns its error as a negative errno in the result register.
+let errnoConvention: Default = {
+    Key = "errno-convention"
+    Value = "negative-return"
+}
+
+/// The syscall table as a described interface.
+let syscalls: BoundarySurface = {
+    Name = "syscalls"
+    Kind = SurfaceKind.Syscall
+    Endpoints = [| sysRead; sysWrite; sysMmap; sysMunmap; sysExitGroup; sysClockGettime |]
+    Defaults = [| errnoConvention |]
+    Contracts = [||]
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Buffers: the declared homes of the console's capacities.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// `Console.readln`'s line buffer: a `str` read from stdin into the arena,
+/// delimited by newline (byte 10), the delimiter trimmed from the value. The
+/// capacity is `Console.READLINE_CAPACITY`, authored once in Console.clef;
+/// the compiler's `Sys.readline` lowering and the `input_bound_consolereadln`
+/// and `input_copy_bound_consolereadln` obligations both read it from this
+/// declaration (HelloProof, proof-trace 04-the-input-bounds).
+let consoleReadln: BufferSchema = {
+    Name = "consoleReadln"
+    Schema = "str"
+    Capacity = int64 Console.READLINE_CAPACITY
+    Framing = Framing.Delimited
+    Delimiter = 10
+    TrimDelimiter = true
+    Space = "arena"
+    Lifetime = Lifetime.Scope
+    Access = Access.ReadWrite
+    Slot = 0
+}
+
+/// `Console.write`'s source: a `str` handed to write(2) with its own length,
+/// read from `rodata` when it is a literal. The write path allocates no
+/// buffer of its own, so the capacity is the `rodata` budget a literal is
+/// bounded by; program lifetime, read-only.
+let consoleWrite: BufferSchema = {
+    Name = "consoleWrite"
+    Schema = "str"
+    Capacity = 4096L
+    Framing = Framing.Fixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "rodata"
+    Lifetime = Lifetime.Program
+    Access = Access.ReadOnly
+    Slot = 0
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Transports: declared surfaces of this platform, not bound to endpoints
+// until the socket and Wayland syscalls are described on the surface above.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// WebSocket over TCP: `WebSocket/Server.clef` caps a frame at `MaxFrameSize`,
+/// 65536 bytes; frames arrive in order. Declared, not yet bound.
+let websocket: Transport = {
+    Name = "websocket"
+    Kind = TransportKind.WebSocket
+    Endpoints = [||]
+    RateHz = 0L
+    MaxUnit = 65536L
+    Ordered = true
+    Schema = ""
+    Since = ""
+    Until = ""
+}
+
+/// Wayland over a Unix socket (`Fidelity.Wayland.fidproj`): declared, not yet
+/// bound; rate and largest unit undeclared.
+let wayland: Transport = {
+    Name = "wayland"
+    Kind = TransportKind.Wayland
+    Endpoints = [||]
+    RateHz = 0L
+    MaxUnit = 0L
+    Ordered = true
+    Schema = ""
+    Since = ""
+    Until = ""
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Lifecycle, core, and the description that composes them.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// A hosted ELF process: libc's `_start` runs `main`; exit_group(2) ends every
+/// thread; nothing survives the process. No clocks or resets to declare.
+let lifecycle: LifecycleFacts = {
+    Clocks = [||]
+    Resets = [||]
+    Entry = "_start"
+    Teardown = "exit_group"
+    Persistence = Persistence.Volatile
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// The width dimensions and the numeric representations this core declares
+// (plan D8; ntu-dimensional-architecture.md §7.1; numeric-selection.md §7,
+// §9 item 6). The language names a dimension (`Pointer`, `Register`) and a
+// representation (`int32`, `float64`); this file says what each is on
+// x86-64. A name not declared here has no width and no representation: the
+// compiler refuses the site that needed it. Ranges are exact decimal text.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// The address width: 64 bits (a canonical-form virtual address; the whole
+/// register is the pointer under the System V AMD64 ABI).
+let pointerWidth: WidthDeclaration = {
+    Name = "Pointer"
+    Bits = 64
+}
+
+/// The natural computational word: the 64-bit general-purpose register.
+let registerWidth: WidthDeclaration = {
+    Name = "Register"
+    Bits = 64
+}
+
+/// Two's-complement integers at 8, 16, 32 and 64 bits: native, wrapping at
+/// their boundaries (the ALU discards the carry; no trap, no saturation).
+let repInt8: Representation = {
+    Name = "int8"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 8
+    MinMagnitude = "-128"
+    MaxMagnitude = "127"
+    Boundary = Boundary.Wrap
+}
+
+let repInt16: Representation = {
+    Name = "int16"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 16
+    MinMagnitude = "-32768"
+    MaxMagnitude = "32767"
+    Boundary = Boundary.Wrap
+}
+
+let repInt32: Representation = {
+    Name = "int32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 32
+    MinMagnitude = "-2147483648"
+    MaxMagnitude = "2147483647"
+    Boundary = Boundary.Wrap
+}
+
+let repInt64: Representation = {
+    Name = "int64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 64
+    MinMagnitude = "-9223372036854775808"
+    MaxMagnitude = "9223372036854775807"
+    Boundary = Boundary.Wrap
+}
+
+/// Unsigned integers at 8, 16, 32 and 64 bits: native, wrapping.
+let repUInt8: Representation = {
+    Name = "uint8"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 8
+    MinMagnitude = "0"
+    MaxMagnitude = "255"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt16: Representation = {
+    Name = "uint16"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 16
+    MinMagnitude = "0"
+    MaxMagnitude = "65535"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt32: Representation = {
+    Name = "uint32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 32
+    MinMagnitude = "0"
+    MaxMagnitude = "4294967295"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt64: Representation = {
+    Name = "uint64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 64
+    MinMagnitude = "0"
+    MaxMagnitude = "18446744073709551615"
+    Boundary = Boundary.Wrap
+}
+
+/// IEEE 754 binary32 and binary64 on SSE2: native; the boundary is exact,
+/// since IEEE has no wrap and its overflow is its own infinity. The bounds
+/// are the greatest finite values, (2^24 - 1) * 2^104 and (2^53 - 1) * 2^971,
+/// written out.
+let repFloat32: Representation = {
+    Name = "float32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Ieee
+    Bits = 32
+    MinMagnitude = "-340282346638528859811704183484516925440"
+    MaxMagnitude = "340282346638528859811704183484516925440"
+    Boundary = Boundary.Exact
+}
+
+let repFloat64: Representation = {
+    Name = "float64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Ieee
+    Bits = 64
+    MinMagnitude = "-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"
+    MaxMagnitude = "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"
+    Boundary = Boundary.Exact
+}
+
+/// posit32 (es = 2): no posit unit on x86-64, so emulated in software; a
+/// posit saturates at maxpos = 2^120 rather than overflowing.
+let repPosit32: Representation = {
+    Name = "posit32"
+    Capability = Capability.Emulated
+    Family = RepresentationFamily.Posit
+    Bits = 32
+    MinMagnitude = "-1329227995784915872903807060280344576"
+    MaxMagnitude = "1329227995784915872903807060280344576"
+    Boundary = Boundary.Saturate
+}
+
+/// The core (docs/CANONICAL_PLATFORM_SPEC.md, "TargetCore"): the facts of
+/// Fidelity.Platform.fidproj's `[platform]` table, plus the triple LLVM is
+/// handed, and the widths and representations declared above. No CPU model:
+/// the toolchain's generic x86-64.
+let core: TargetCore = {
+    Os = "linux"
+    Arch = "x86_64"
+    WordSizeBits = 64
+    Endianness = "little"
+    Runtime = "libc"
+    Triple = "x86_64-unknown-linux-gnu"
+    CpuModel = ""
+    Widths = [| pointerWidth; registerWidth |]
+    Representations = [| repInt8; repInt16; repInt32; repInt64; repUInt8; repUInt16; repUInt32; repUInt64; repFloat32; repFloat64; repPosit32 |]
+}
+
+/// The platform. The compiler finds this binding by its type name and reads
+/// every table through the bindings above. A CPU declares no `Limits`; the
+/// kernel leaf will.
+let description: PlatformDescription = {
+    Id = "cpu-linux-x86_64"
+    DisplayName = "Linux x86-64 (libc)"
+    Substrate = "CPU"
+    Core = Some core
+    Spaces = [| text; rodata; data; bss; stack; arena; heap |]
+    Surfaces = [| syscalls |]
+    Buffers = [| consoleReadln; consoleWrite |]
+    Transports = [| websocket; wayland |]
+    Lifecycle = lifecycle
+    Notes = [|
+        "syscall numbers: Syscalls.clef, arch/x86/entry/syscalls/syscall_64.tbl"
+        "stack: RLIMIT_STACK default soft limit 8 MiB (setrlimit(2)); 16-byte alignment, System V AMD64 ABI 3.2.2"
+        "arena: BAREWire docs/Arena_Design.md, the caller-provided 4096-byte scope arena"
+        "heap: TASK_SIZE_MAX for 4-level paging, arch/x86/include/asm/page_64_types.h, with RLIMIT_DATA unlimited"
+        "consoleReadln capacity: Console.READLINE_CAPACITY in Console.clef"
+        "section budgets: one page each, confirmed against HelloProof targets/helloworld (readelf -SW)"
+        "websocket unit: WebSocket/Server.clef MaxFrameSize"
+    |]
+    Limits = [||]
+}

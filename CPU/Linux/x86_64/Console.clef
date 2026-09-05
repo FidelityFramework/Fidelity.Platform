@@ -44,3 +44,11 @@ let errorln (s: string) : unit =
     error s
     let _ = Sys.write STDERR "\n"
     ()
+
+/// Capacity in bytes of the line buffer `readln` reads into. Authored here
+/// once: `Description.clef` declares it as the `consoleReadln` buffer schema,
+/// and the compiler's `Sys.readline` lowering and the input-bound proof
+/// obligations read it from that declaration, never from a literal of their
+/// own (BAREWire docs/11, "three observers, one truth").
+[<Literal>]
+let READLINE_CAPACITY = 1024

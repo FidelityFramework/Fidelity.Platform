@@ -26,6 +26,7 @@ module Platform =
         Device = "Meadow F7"
         Package = "Board"
         SpeedGrade = "n/a"
+        Core = None
         Clocks = []
         Groups = []
         Uarts = []

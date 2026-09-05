@@ -69,6 +69,54 @@ let mapBufferWrite (bo: nativeint) (width: int) (height: int)
         0n
     | Some ptr -> ptr
 
+/// Everything a successful CPU mapping yields, in one value.
+type MappedBuffer = {
+    /// Base address of the mapping.
+    Mapped: nativeint
+    /// Bytes per row, which may exceed width * 4.
+    Stride: int
+    /// Opaque token gbm requires back at unmap.
+    MapData: nativeint
+}
+
+/// Map a buffer object for CPU write.
+///
+/// `mapBufferWrite` returns one value and delivers two more through C
+/// out-parameters, so every caller had to allocate two scratch slots, thread
+/// them through its own signature, and — the part that actually bites —
+/// remember that gbm requires `*map_data == NULL` on entry. That precondition
+/// was satisfied by writing 0n at each call site: correct, invisible, and one
+/// edit away from being silently dropped, with undefined behaviour and no
+/// diagnostic as the failure mode.
+///
+/// Here the scratch and the precondition are owned by the wrapper and the
+/// three results come back as one value. This is the membrane the boundary
+/// spec describes: C out-parameter mechanics stay on this side of it.
+let mapBufferForWrite (bo: nativeint) (width: int) (height: int)
+                      : option<MappedBuffer> =
+    match Fidelity.Libc.Memory.malloc (unativeint 4) with
+    | None -> None
+    | Some strideOut ->
+
+    match Fidelity.Libc.Memory.malloc (unativeint 8) with
+    | None ->
+        Fidelity.Libc.Memory.free (Some strideOut) |> ignore
+        None
+    | Some mapDataOut ->
+
+    // the gbm contract, enforced once instead of at every call site
+    NativePtr.write (NativePtr.ofNativeInt<nativeint> mapDataOut) 0n
+    let ptr = mapBufferWrite bo width height strideOut mapDataOut
+    let result =
+        if ptr = 0n then None
+        else
+            Some { Mapped = ptr
+                   Stride = int (NativePtr.read (NativePtr.ofNativeInt<uint32> strideOut))
+                   MapData = NativePtr.read (NativePtr.ofNativeInt<nativeint> mapDataOut) }
+    Fidelity.Libc.Memory.free (Some strideOut) |> ignore
+    Fidelity.Libc.Memory.free (Some mapDataOut) |> ignore
+    result
+
 /// Unmap a previously mapped buffer.
 let unmapBuffer (bo: nativeint) (mapData: nativeint) : unit =
     gbm_bo_unmap (Some bo) (Some mapData)

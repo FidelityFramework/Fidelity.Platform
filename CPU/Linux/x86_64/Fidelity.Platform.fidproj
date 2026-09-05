@@ -15,6 +15,7 @@ sources = [
     "Format.clef",
     "Parse.clef",
     "Console.clef",
+    "Description.clef",
     "WebView.clef",
     "WebViewWrapper.clef"
 ]
@@ -23,8 +24,8 @@ sources = [
 runtime_model = "libc"
 os = "linux"
 arch = "x86_64"
-word_size = 64
 
 [dependencies]
-# BAREWire will be added when WebSocket bindings need it
-# For now, Console/WebView only need CCS intrinsics
+# BAREWire supplies the vocabulary Description.clef declares this platform in
+# (BAREWire docs/11); its sources are spliced ahead of this tree's.
+barewire = { path = "../../../../BAREWire/src/BAREWire.fidproj" }

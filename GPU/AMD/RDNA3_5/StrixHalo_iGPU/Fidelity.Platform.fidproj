@@ -36,7 +36,6 @@ output_kind = "library"
 [platform]
 runtime_model = "rocm"
 arch = "rdna3_5"
-word_size = 64
 
 [dependencies]
 contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

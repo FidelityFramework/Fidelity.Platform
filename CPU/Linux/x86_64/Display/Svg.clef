@@ -13,10 +13,22 @@ open Console
 // SVG RASTERIZATION
 // ═══════════════════════════════════════════════════════════
 
-/// Rasterize an SVG file into a pixel buffer.
+/// Rasterize an SVG file into a pixel buffer, applying a CSS stylesheet.
+///
+/// The stylesheet is applied at parse time, so it can select on the ids and
+/// classes in the document — which makes one asset able to carry several
+/// variants and have the caller choose between them. Toggling a `display`
+/// is the usual case: a document that holds both a CPU and a GPU row can be
+/// rendered either way without duplicating the file, and elements with
+/// explicit coordinates do not reflow when a sibling is hidden.
+///
+/// Pass an empty string for no stylesheet; `rasterize` is exactly this with
+/// none supplied.
+///
 /// Returns pixel buffer handle on success, 0n on failure.
 /// Caller is responsible for freeing the buffer via freePixmap.
-let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
+let rasterizeStyled (svgPath: string) (width: int) (height: int)
+                    (css: string) : nativeint =
     let bufferSize = width * height * 4
 
     match Fidelity.Image.Resvg.resvg_options_create () with
@@ -25,6 +37,10 @@ let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
         0n
     | Some opts ->
         Fidelity.Image.Resvg.resvg_options_load_system_fonts (Some opts)
+        if String.length css > 0 then
+            Fidelity.Image.Resvg.resvg_options_set_stylesheet (Some opts) (Some css.Pointer)
+        else
+            ()
 
         match Fidelity.Libc.Memory.malloc (unativeint 8) with
         | None ->
@@ -64,6 +80,12 @@ let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
             Fidelity.Libc.Memory.free (Some treePtrStorage)
             Fidelity.Image.Resvg.resvg_options_destroy (Some opts)
             pix
+
+/// Rasterize an SVG file into a pixel buffer.
+/// Returns pixel buffer handle on success, 0n on failure.
+/// Caller is responsible for freeing the buffer via freePixmap.
+let rasterize (svgPath: string) (width: int) (height: int) : nativeint =
+    rasterizeStyled svgPath width height ""
 
 /// Free a pixel buffer returned by rasterize.
 let freePixmap (pixmap: nativeint) : unit =
