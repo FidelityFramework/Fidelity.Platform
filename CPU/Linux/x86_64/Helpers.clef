@@ -2,7 +2,6 @@
 /// These are compiled as MLIR functions and linked into the final binary.
 namespace Fidelity.Platform.Linux_x86_64
 
-open Microsoft.FSharp.Quotations
 
 /// Helper function descriptors - signatures and MLIR implementations
 module Helpers =

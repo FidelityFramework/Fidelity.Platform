@@ -2,7 +2,6 @@
 /// These are the raw syscall numbers for the Linux kernel on x86-64.
 namespace Fidelity.Platform.Linux_x86_64
 
-open Microsoft.FSharp.Quotations
 
 module Syscalls =
 
