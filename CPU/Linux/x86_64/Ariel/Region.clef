@@ -1,0 +1,334 @@
+/// One process-wide synchronous region over persistent pthread carriers.
+/// State and borrowed work are ordinary typed Clef values. POSIX objects remain
+/// opaque CHandles, passed only across their declared foreign boundaries.
+module Fidelity.Ariel.Region
+
+open Fidelity.Pthread.Types
+open BAREWire.Descriptors
+
+[<Literal>]
+let Busy = 16
+[<Literal>]
+let Invalid = 22
+[<Literal>]
+let Stopped = 125
+
+type private Storage = {
+    Mutex: CHandle<pthread_mutex_t>
+    Wake: CHandle<pthread_cond_t>
+    Done: CHandle<pthread_cond_t>
+    Context: CHandle<unit>
+}
+
+let private maximumCarriers = Fidelity.Platform.Linux_x86_64.ArielCapabilities.carrier_budget
+let mutable private storage: Storage option = None
+let mutable private started: bool = false
+let mutable private stopping: bool = false
+let mutable private active: bool = false
+let mutable private generation: int = 0
+let mutable private next: int = 0
+let mutable private domain: int = 0
+let mutable private chunk: int = 1
+let mutable private outstanding: int = 0
+let mutable private completed: int = 0
+let mutable private unfinished: int = 0
+let mutable private failure: int = 0
+let mutable private created: int = 0
+let mutable private ready: int = 0
+let private handles: int array = Array.zeroCreate maximumCarriers
+let private handleOut: int array = Array.zeroCreate 1
+let private emptyWork: int -> int -> int = fun _lo _hi -> 0
+let private emptyRetirement: unit -> unit = fun () -> ()
+let mutable private publishedWork: int -> int -> int = emptyWork
+let mutable private publishedRetirement: unit -> unit = emptyRetirement
+
+let private requireSync (status: int) : unit =
+    if status <> 0 then Fidelity.Pthread.Storage.exitProcess 126 else ()
+
+let private lock (state: Storage) : unit =
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_lock state.Mutex)
+let private unlock (state: Storage) : unit =
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_unlock state.Mutex)
+let private notifyDone (state: Storage) : unit =
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_broadcast state.Done)
+let private notifyWork (state: Storage) : unit =
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_broadcast state.Wake)
+
+/// Publication, claims and acknowledgments use the same mutex. The local work
+/// closure remains borrowed until its retirement callback and release complete.
+let private participate (state: Storage) : unit =
+    lock state
+    let work = publishedWork
+    let retire = publishedRetirement
+    unlock state
+    let mutable executing: bool = true
+    while executing do
+        lock state
+        let lo = next
+        if failure = 0 && lo < domain then
+            let available = domain - lo
+            let length = if chunk < available then chunk else available
+            let hi = lo + length
+            next <- hi
+            unlock state
+            let status = work lo hi
+            lock state
+            unfinished <- unfinished - length
+            if status <> 0 && failure = 0 then failure <- status else ()
+            unlock state
+        else
+            completed <- completed + 1
+            unlock state
+            executing <- false
+    retire ()
+    lock state
+    outstanding <- outstanding - 1
+    notifyDone state
+    unlock state
+    // This participant makes no further access to the region or its captures.
+
+/// Native callback carries an opaque, known-nonnull context through unchanged.
+/// Shared state is reached through typed module storage, never a pointer cast.
+let private workerEntry (context: CHandle<unit>) : CHandle<unit> =
+    match storage with
+    | None ->
+        Fidelity.Pthread.Storage.exitProcess 126
+        context
+    | Some state ->
+        let mutable seen: int = 0
+        let mutable running: bool = true
+        lock state
+        ready <- ready + 1
+        notifyDone state
+        unlock state
+        while running do
+            lock state
+            while not stopping && generation = seen do
+                requireSync (Fidelity.Pthread.Cond.pthread_cond_wait state.Wake state.Mutex)
+            if stopping then
+                unlock state
+                running <- false
+            else
+                seen <- generation
+                unlock state
+                participate state
+        context
+
+let private freeObjects (state: Storage) : unit =
+    Fidelity.Pthread.Storage.freeContext state.Context
+    Fidelity.Pthread.Storage.freeCond state.Done
+    Fidelity.Pthread.Storage.freeCond state.Wake
+    Fidelity.Pthread.Storage.freeMutex state.Mutex
+
+let private allocateObjects () : Result<Storage, int> =
+    let budget = Fidelity.Platform.Linux_x86_64.ArielCapabilities.synchronization_storage_budget
+    if pthread_mutex_t.Size <= 0 || pthread_mutex_t.Size > budget
+       || pthread_cond_t.Size <= 0 || pthread_cond_t.Size > budget then Error Invalid
+    else
+        match Fidelity.Pthread.Storage.mallocMutex pthread_mutex_t.Size with
+        | None -> Error 12
+        | Some mutex ->
+            match Fidelity.Pthread.Storage.mallocCond pthread_cond_t.Size with
+            | None ->
+                Fidelity.Pthread.Storage.freeMutex mutex
+                Error 12
+            | Some wake ->
+                match Fidelity.Pthread.Storage.mallocCond pthread_cond_t.Size with
+                | None ->
+                    Fidelity.Pthread.Storage.freeCond wake
+                    Fidelity.Pthread.Storage.freeMutex mutex
+                    Error 12
+                | Some doneCondition ->
+                    match Fidelity.Pthread.Storage.mallocContext 1 with
+                    | None ->
+                        Fidelity.Pthread.Storage.freeCond doneCondition
+                        Fidelity.Pthread.Storage.freeCond wake
+                        Fidelity.Pthread.Storage.freeMutex mutex
+                        Error 12
+                    | Some context ->
+                        Ok { Mutex = mutex; Wake = wake; Done = doneCondition; Context = context }
+
+let private initializeObjects (state: Storage) : int =
+    let mutexStatus = Fidelity.Pthread.Mutex.pthread_mutex_init state.Mutex None
+    if mutexStatus <> 0 then mutexStatus
+    else
+        let wakeStatus = Fidelity.Pthread.Cond.pthread_cond_init state.Wake None
+        if wakeStatus <> 0 then
+            requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy state.Mutex)
+            wakeStatus
+        else
+            let doneStatus = Fidelity.Pthread.Cond.pthread_cond_init state.Done None
+            if doneStatus <> 0 then
+                requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy state.Wake)
+                requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy state.Mutex)
+            else ()
+            doneStatus
+
+let private destroyObjects (state: Storage) : unit =
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy state.Done)
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy state.Wake)
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy state.Mutex)
+    freeObjects state
+
+let private joinCreated () : int =
+    let mutable result: int = 0
+    let mutable index: int = 0
+    while index < created do
+        let status = Fidelity.Pthread.Thread.pthread_join (Array.get handles index) None
+        if status <> 0 && result = 0 then result <- status else ()
+        index <- index + 1
+    result
+
+/// Startup and teardown require exclusive pool ownership. carrierCount includes
+/// the caller; one creates no pthread. failAfter=-1 disables failure injection.
+let startWithLimit (carrierCount: int) (failAfter: int) : int =
+    if started then Busy
+    elif carrierCount < 1 || carrierCount > maximumCarriers || failAfter < -1 then Invalid
+    else
+        match allocateObjects () with
+        | Error error -> error
+        | Ok state ->
+            let initialized = initializeObjects state
+            if initialized <> 0 then
+                freeObjects state
+                initialized
+            else
+                stopping <- false
+                active <- false
+                generation <- 0
+                created <- 0
+                ready <- 0
+                storage <- Some state
+                let entry = FnPtr.ofFunction workerEntry
+                let mutable createError: int = 0
+                while created < carrierCount - 1 && createError = 0 do
+                    let status =
+                        if failAfter >= 0 && created = failAfter then 11
+                        else Fidelity.Pthread.Thread.pthread_create handleOut None entry state.Context
+                    if status <> 0 then createError <- status
+                    else
+                        Array.set handles created (Array.get handleOut 0)
+                        created <- created + 1
+                if createError <> 0 then
+                    lock state
+                    stopping <- true
+                    notifyWork state
+                    unlock state
+                    requireSync (joinCreated ())
+                    destroyObjects state
+                    storage <- None
+                    createError
+                else
+                    lock state
+                    while ready <> created do
+                        requireSync (Fidelity.Pthread.Cond.pthread_cond_wait state.Done state.Mutex)
+                    started <- true
+                    unlock state
+                    0
+
+let start (carrierCount: int) : int = startWithLimit carrierCount -1
+
+/// The allowed CPU mask is a runtime process property. Its native storage stays
+/// opaque; libc owns both mask population and population counting. Failure of
+/// this bounded query selects the caller alone.
+let allowedCarrierCount () : int =
+    let budget = Fidelity.Platform.Linux_x86_64.ArielCapabilities.synchronization_storage_budget
+    if cpu_set_t.Size <= 0 || cpu_set_t.Size > budget then 1
+    else
+        match Fidelity.Pthread.Storage.mallocAffinity cpu_set_t.Size with
+        | None -> 1
+        | Some mask ->
+            let status = Fidelity.Pthread.Affinity.sched_getaffinity 0 cpu_set_t.Size mask
+            let available =
+                if status = 0 then Fidelity.Pthread.Affinity.cpuCount cpu_set_t.Size mask
+                else 1
+            Fidelity.Pthread.Storage.freeAffinity mask
+            if available < 1 then 1
+            elif available > maximumCarriers then maximumCarriers
+            else available
+
+let startAllowed () : int = start (allowedCarrierCount ())
+
+/// Borrow work/captures synchronously. Competing and nested submissions return
+/// Busy. Nonzero work status stops new claims but every participant still retires.
+let runWithRetirement (count: int) (chunkSize: int) (work: int -> int -> int)
+                      (retire: unit -> unit) : int =
+    if count < 0 || chunkSize <= 0 then Invalid
+    else
+        match storage with
+        | None -> Stopped
+        | Some state ->
+            lock state
+            if not started || stopping then
+                unlock state
+                Stopped
+            elif active then
+                unlock state
+                Busy
+            else
+                active <- true
+                // All participants retired the previous generation before
+                // admission reopened, so two alternating tokens are sufficient.
+                generation <- if generation = 1 then 2 else 1
+                next <- 0
+                domain <- count
+                chunk <- chunkSize
+                outstanding <- created + 1
+                completed <- 0
+                unfinished <- count
+                failure <- 0
+                publishedWork <- work
+                publishedRetirement <- retire
+                notifyWork state
+                unlock state
+                participate state
+                lock state
+                while outstanding <> 0 do
+                    requireSync (Fidelity.Pthread.Cond.pthread_cond_wait state.Done state.Mutex)
+                let result = failure
+                publishedWork <- emptyWork
+                publishedRetirement <- emptyRetirement
+                active <- false
+                unlock state
+                result
+
+let run (count: int) (chunkSize: int) (work: int -> int -> int) : int =
+    runWithRetirement count chunkSize work emptyRetirement
+
+// These synchronous borrow contracts are discharged by outstanding=0 under
+// the mutex, followed by clearing both published callbacks before return.
+// Native lifecycle gates cover delayed retirement, including failure/zero work.
+let runScopedCallback: Expr<BAREWire.Descriptors.ScopedCallbackDescriptor> = <@ {
+    Binding = "Fidelity.Ariel.Region.run"; Parameter = "work"
+} @>
+let runWithRetirementWorkScoped: Expr<BAREWire.Descriptors.ScopedCallbackDescriptor> = <@ {
+    Binding = "Fidelity.Ariel.Region.runWithRetirement"; Parameter = "work"
+} @>
+let runWithRetirementRetirementScoped: Expr<BAREWire.Descriptors.ScopedCallbackDescriptor> = <@ {
+    Binding = "Fidelity.Ariel.Region.runWithRetirement"; Parameter = "retire"
+} @>
+
+/// Requires exclusive handle lifetime ownership. Failed join is terminal: do
+/// not retry already-completed joins or free possibly still-live carrier state.
+let stop () : int =
+    match storage with
+    | None -> Stopped
+    | Some state ->
+        lock state
+        if stopping then
+            unlock state
+            Stopped
+        elif active then
+            unlock state
+            Busy
+        else
+            stopping <- true
+            notifyWork state
+            unlock state
+            let status = joinCreated ()
+            if status = 0 then
+                destroyObjects state
+                storage <- None
+                started <- false
+            else ()
+            status

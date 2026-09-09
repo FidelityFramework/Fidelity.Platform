@@ -1,57 +1,133 @@
 [library]
+# Hosted x86-64/glibc 2.34+ profile; installed headers and measured storage.
 name = "pthread"
-headers = ["/usr/include/pthread.h"]
+headers = ["/usr/include/pthread.h", "/usr/include/stdlib.h", "/usr/include/unistd.h"]
 include_paths = ["/usr/include"]
+defines = ["_GNU_SOURCE"]
 macro_prefixes = ["PTHREAD_"]
 
 [output]
 mode = "fidelity"
 directory = "../Bindings/Pthread"
 
-[error_conventions]
-default = "errno"
-
 [options]
-opaque_handles = false
+c_header_mode = true
+descriptor_only_dependencies = true
+abi_critical_structs = ["typedef pthread_t", "typedef pthread_mutex_t", "typedef pthread_cond_t", "typedef cpu_set_t"]
+generate_descriptors = true
+
+# A single pthread_t output cell, never an unbounded source pointer.
+[[options.bindings]]
+name = "pthread_create"
+reference_parameters = [0]
+# This profile requires a nonnull context and returns it from the worker.
+nonnull_callbacks = [2]
+parameter_handles = ["", "unit"]
+
+[[options.bindings]]
+name = "pthread_mutex_init"
+parameter_handles = ["", "unit"]
+
+[[options.bindings]]
+name = "pthread_cond_init"
+parameter_handles = ["", "unit"]
+
+# Phantom specializations of real malloc/free declarations. No native shim.
+[[options.bindings]]
+name = "mallocMutex"
+symbol = "malloc"
+ownership = "caller_owns"
+return_handle = "pthread_mutex_t"
+[[options.bindings]]
+name = "mallocCond"
+symbol = "malloc"
+ownership = "caller_owns"
+return_handle = "pthread_cond_t"
+[[options.bindings]]
+name = "mallocContext"
+symbol = "malloc"
+ownership = "caller_owns"
+return_handle = "unit"
+[[options.bindings]]
+name = "freeMutex"
+symbol = "free"
+ownership = "callee_owns"
+parameter_handles = ["pthread_mutex_t"]
+[[options.bindings]]
+name = "freeCond"
+symbol = "free"
+ownership = "callee_owns"
+parameter_handles = ["pthread_cond_t"]
+[[options.bindings]]
+name = "freeContext"
+symbol = "free"
+ownership = "callee_owns"
+parameter_handles = ["unit"]
+
+[[options.bindings]]
+name = "exitProcess"
+symbol = "_exit"
+
+# CPU_COUNT_S's real glibc entry reads an opaque set; no source memory view.
+[[options.bindings]]
+name = "cpuCount"
+symbol = "__sched_cpucount"
+[[options.bindings]]
+name = "mallocAffinity"
+symbol = "malloc"
+return_handle = "cpu_set_t"
+ownership = "caller_owns"
+[[options.bindings]]
+name = "freeAffinity"
+symbol = "free"
+parameter_handles = ["cpu_set_t"]
+ownership = "callee_owns"
+
+[annotations.nonnull]
+sched_getaffinity = [2]
+cpuCount = [1]
+freeAffinity = [0]
+pthread_create = [0, 3]
+pthread_mutex_init = [0]
+pthread_mutex_destroy = [0]
+pthread_mutex_lock = [0]
+pthread_mutex_trylock = [0]
+pthread_mutex_unlock = [0]
+pthread_cond_init = [0]
+pthread_cond_destroy = [0]
+pthread_cond_wait = [0, 1]
+pthread_cond_broadcast = [0]
+pthread_cond_signal = [0]
+freeMutex = [0]
+freeCond = [0]
+freeContext = [0]
 
 [[namespace]]
 name = "Fidelity.Pthread.Thread"
-description = "Thread creation, joining, and lifecycle"
-library = "pthread"
-functions = [
-    "pthread_create", "pthread_join", "pthread_detach",
-    "pthread_exit", "pthread_self", "pthread_equal",
-    "pthread_cancel", "pthread_once"
-]
+description = "Bounded thread creation and joining"
+library = "c"
+functions = ["pthread_create", "pthread_join", "pthread_self", "pthread_equal"]
 
 [[namespace]]
 name = "Fidelity.Pthread.Mutex"
-description = "Mutex locking primitives"
-library = "pthread"
-functions = [
-    "pthread_mutex_init", "pthread_mutex_destroy",
-    "pthread_mutex_lock", "pthread_mutex_trylock",
-    "pthread_mutex_timedlock", "pthread_mutex_unlock"
-]
+description = "Opaque mutex operations"
+library = "c"
+functions = ["pthread_mutex_init", "pthread_mutex_destroy", "pthread_mutex_lock", "pthread_mutex_trylock", "pthread_mutex_unlock"]
 
 [[namespace]]
 name = "Fidelity.Pthread.Cond"
-description = "Condition variable primitives"
-library = "pthread"
-functions = [
-    "pthread_cond_init", "pthread_cond_destroy",
-    "pthread_cond_wait", "pthread_cond_timedwait",
-    "pthread_cond_signal", "pthread_cond_broadcast"
-]
+description = "Opaque condition variable operations"
+library = "c"
+functions = ["pthread_cond_init", "pthread_cond_destroy", "pthread_cond_wait", "pthread_cond_signal", "pthread_cond_broadcast"]
 
 [[namespace]]
-name = "Fidelity.Pthread.Attr"
-description = "Thread and mutex attribute management"
-library = "pthread"
-functions = [
-    "pthread_attr_init", "pthread_attr_destroy",
-    "pthread_attr_setdetachstate", "pthread_attr_getdetachstate",
-    "pthread_attr_setstacksize", "pthread_attr_getstacksize",
-    "pthread_mutexattr_init", "pthread_mutexattr_destroy",
-    "pthread_mutexattr_settype", "pthread_mutexattr_gettype"
-]
+name = "Fidelity.Pthread.Storage"
+description = "Typed opaque allocation and native lifecycle support"
+library = "c"
+functions = ["mallocMutex", "mallocCond", "mallocContext", "freeMutex", "freeCond", "freeContext", "mallocAffinity", "freeAffinity", "exitProcess", "usleep"]
+
+[[namespace]]
+name = "Fidelity.Pthread.Affinity"
+description = "Allowed CPU count through an opaque measured cpu_set_t"
+library = "c"
+functions = ["sched_getaffinity", "cpuCount"]

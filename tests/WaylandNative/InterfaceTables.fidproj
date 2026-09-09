@@ -1,0 +1,12 @@
+[package]
+name = "WaylandInterfaceTablesProbe"
+version = "0.1.0"
+[compilation]
+target = "cpu"
+[dependencies]
+platform = { path = "../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+wayland = { path = "../../CPU/Linux/x86_64/Fidelity.Wayland.Native.fidproj" }
+[build]
+sources = ["InterfaceTables.clef"]
+output = "wayland-interface-tables"
+output_kind = "console"

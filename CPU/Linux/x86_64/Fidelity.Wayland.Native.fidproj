@@ -1,0 +1,36 @@
+[package]
+name = "Fidelity.Wayland.Native"
+version = "0.1.0"
+description = "Generated bindings for wayland-client."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/WaylandNative/Types.clef",
+    "Bindings/WaylandNative/Core/Core.clef",
+    "Bindings/WaylandNative/Protocol/Protocol.clef",
+    "Bindings/WaylandNative/XdgShell/XdgShell.clef",
+    "Bindings/WaylandNative/DmaBuf/DmaBuf.clef",
+    "Bindings/WaylandNative/Bridge/Types.clef",
+    "Bindings/WaylandNative/Bridge/NativeStorage.clef",
+    "Bindings/WaylandNative/Bridge/ProtocolInterfaces.clef",
+    "Bindings/WaylandNative/Bridge/Callbacks.clef",
+    "Bindings/WaylandNative/Bridge/Protocol.clef",
+    "Bindings/WaylandNative/Bridge/XdgShell.clef",
+    "Bindings/WaylandNative/Bridge/DmaBuf.clef",
+]
+
+[link]
+libraries = ["wayland-client"]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+BAREWire = { path = "../../../../BAREWire/src/BAREWire.BindingMetadata.fidproj" }

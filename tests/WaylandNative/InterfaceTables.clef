@@ -1,0 +1,25 @@
+module InterfaceTables
+
+open Fidelity.Wayland.Bridge.ProtocolInterfaces
+
+let private exists (value: option<CHandle<unit>>) : bool =
+    match value with
+    | Some _ -> true
+    | None -> false
+
+[<EntryPoint>]
+let main (_args: string array) : int =
+    if not (initialize ()) then 1
+    else
+        // Initialization is idempotent while the caller owns the table lifetime.
+        let second = initialize ()
+        let present =
+            exists wl_display && exists wl_registry && exists wl_compositor
+            && exists wl_surface && exists xdg_wm_base && exists xdg_surface
+            && exists xdg_toplevel && exists zwp_linux_dmabuf_v1
+            && exists zwp_linux_buffer_params_v1
+        shutdown ()
+        // A fresh session must own fresh table storage after complete teardown.
+        if not second || not present then 2
+        else if not (initialize ()) then 3
+        else shutdown (); 0

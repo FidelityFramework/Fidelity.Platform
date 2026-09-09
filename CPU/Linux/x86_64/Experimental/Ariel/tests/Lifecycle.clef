@@ -1,0 +1,137 @@
+// Experimental native harness, not yet compiled under current Clef.
+module ArielLifecycle
+
+open Fidelity.Ariel.Region
+
+[<FidelityExtern("c", "usleep")>]
+let private usleep (microseconds: uint32) : int32 = NativeDefault.zeroed ()
+
+let private get (context: nativeint) (index: int) : nativeint =
+    NativePtr.get (NativePtr.ofNativeInt<nativeint> context) index
+let private put (context: nativeint) (index: int) (value: nativeint) : unit =
+    NativePtr.set (NativePtr.ofNativeInt<nativeint> context) index value
+
+// The array map is independent of any display/renderer. Every index must be
+// visited once, including irregular tails and domains smaller than the pool.
+let private map (context: nativeint) (lo: int) (hi: int) : int =
+    let output = NativePtr.ofNativeInt<nativeint> (get context 0)
+    let mutable index = lo
+    while index < hi do
+        NativePtr.set output index (NativePtr.get output index + 1n)
+        index <- index + 1
+    0
+
+let private rejectNested (context: nativeint) (lo: int) (hi: int) : int =
+    let pool = get context 1
+    let nested = run pool 0 1 (FnPtr.ofFunction map) context
+    let shutdown = stop pool
+    if nested <> Busy || shutdown <> Busy then 91 else map context lo hi
+
+let private failedWork (_context: nativeint) (_lo: int) (_hi: int) : int = 77
+
+// Each worker accesses bookkeeping after output completion. Calling carrier
+// finishes immediately; POSIX workers delay, exposing an early-return bug.
+let private delayedRetirement (context: nativeint) : unit =
+    let caller = uint64 (get context 3)
+    let current = Fidelity.Pthread.Thread.pthread_self ()
+    if int (Fidelity.Pthread.Thread.pthread_equal caller current) = 0 then
+        usleep (uint32 30000) |> ignore
+    else ()
+    let guard = get context 4
+    Fidelity.Pthread.Mutex.pthread_mutex_lock guard |> ignore
+    put context 2 (get context 2 + 1n)
+    Fidelity.Pthread.Mutex.pthread_mutex_unlock guard |> ignore
+
+let private clear (output: nativeptr<nativeint>) (count: int) : unit =
+    let mutable index = 0
+    while index < count do
+        NativePtr.set output index 0n
+        index <- index + 1
+
+let private exact (output: nativeptr<nativeint>) (count: int) : bool =
+    let mutable index = 0
+    let mutable valid = true
+    while index < count do
+        if NativePtr.get output index <> 1n then valid <- false else ()
+        index <- index + 1
+    valid
+
+let private exercise (carriers: int) (context: nativeint) : int =
+    match start carriers with
+    | Error error -> error
+    | Ok pool ->
+        put context 1 pool
+        let output = NativePtr.ofNativeInt<nativeint> (get context 0)
+        let mutable failure = 0
+        let mutable iteration = 0
+        while iteration < 100 && failure = 0 do
+            let count = (iteration * 37) % 258
+            let chunk = 1 + iteration % 23
+            clear output 258
+            let status = run pool count chunk (FnPtr.ofFunction map) context
+            if status <> 0 || not (exact output count) then failure <- 92 else ()
+            // The first element outside the domain remains untouched.
+            if count < 258 && NativePtr.get output count <> 0n then failure <- 93 else ()
+            iteration <- iteration + 1
+        if run pool -1 1 (FnPtr.ofFunction map) context <> Invalid then failure <- 94 else ()
+        if run pool 1 0 (FnPtr.ofFunction map) context <> Invalid then failure <- 95 else ()
+        clear output 258
+        if run pool 257 13 (FnPtr.ofFunction rejectNested) context <> 0 then failure <- 96 else ()
+        if not (exact output 257) then failure <- 97 else ()
+        if run pool 257 13 (FnPtr.ofFunction failedWork) context <> 77 then failure <- 98 else ()
+        // Reuse after failure must see a clean generation and assignment state.
+        clear output 258
+        if run pool 257 13 (FnPtr.ofFunction map) context <> 0 then failure <- 99 else ()
+        if not (exact output 257) then failure <- 100 else ()
+        put context 2 0n
+        put context 3 (nativeint (Fidelity.Pthread.Thread.pthread_self ()))
+        // Zero work is already complete at publication, but all participants
+        // must still relinquish their environment and bookkeeping references.
+        let retired = runWithRetirement pool 0 7 (FnPtr.ofFunction map) context (FnPtr.ofFunction delayedRetirement)
+        if retired <> 0 || int (get context 2) <> carriers then failure <- 101 else ()
+        let stopped = stop pool
+        if stopped <> 0 then failure <- stopped else ()
+        failure
+
+[<EntryPoint>]
+let main _ =
+    let mutable failure = 0
+    let mutable attempt = 0
+    while attempt < 3 do
+        match startWithLimit 4 attempt with
+        | Error code -> if code <> 11 then failure <- 102 else ()
+        | Ok pool -> stop pool |> ignore; failure <- 103
+        attempt <- attempt + 1
+    match start 0 with
+    | Error code -> if code <> Invalid then failure <- 104 else ()
+    | Ok pool -> stop pool |> ignore; failure <- 105
+    let outputBytes = NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<nativeint> 0n) 258)
+    let contextBytes = NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<nativeint> 0n) 5)
+    match Fidelity.Libc.Memory.malloc (unativeint outputBytes) with
+    | None -> 12
+    | Some allocation ->
+        match Fidelity.Libc.Memory.malloc (unativeint contextBytes) with
+        | None -> Fidelity.Libc.Memory.free (Some allocation); 12
+        | Some context ->
+            match Fidelity.Libc.Memory.malloc (unativeint Fidelity.Pthread.Types.pthread_mutex_t.Size) with
+            | None ->
+                Fidelity.Libc.Memory.free (Some context)
+                Fidelity.Libc.Memory.free (Some allocation)
+                12
+            | Some guard ->
+                let initialized = Fidelity.Pthread.Mutex.pthread_mutex_init guard 0n
+                if int initialized <> 0 then 106
+                else
+                    put context 0 allocation
+                    put context 4 guard
+                    let mutable carriers = 1
+                    while carriers <= 4 && failure = 0 do
+                        failure <- exercise carriers context
+                        carriers <- carriers * 2
+                    Fidelity.Pthread.Mutex.pthread_mutex_destroy guard |> ignore
+                    Fidelity.Libc.Memory.free (Some guard)
+                    Fidelity.Libc.Memory.free (Some context)
+                    Fidelity.Libc.Memory.free (Some allocation)
+                    if failure = 0 then Console.writeln "Ariel native lifecycle: PASS"
+                    else Console.writeln ("Ariel native lifecycle: FAIL " + Format.int failure)
+                    failure

@@ -1,0 +1,15 @@
+[package]
+name = "ArielEmptyOutputProbe"
+version = "0.1.0"
+
+[compilation]
+target = "cpu"
+
+[dependencies]
+platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+pthread = { path = "../../../CPU/Linux/x86_64/Fidelity.Pthread.fidproj" }
+
+[build]
+sources = ["EmptyOutput.clef"]
+output = "ariel-empty-output"
+output_kind = "console"

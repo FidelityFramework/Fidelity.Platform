@@ -1,0 +1,46 @@
+[library]
+# Installed resvg 0.48.1 ABI; unversioned linker name follows the installed soname.
+name = "resvg"
+headers = ["/usr/include/resvg/resvg.h"]
+include_paths = ["/usr/include"]
+[output]
+mode = "fidelity"
+directory = "../Bindings/ResvgNative"
+[options]
+c_header_mode = true
+descriptor_only_dependencies = true
+link_libraries = true
+abi_critical_structs = ["typedef resvg_transform"]
+value_structs = ["resvg_transform"]
+[[options.bindings]]
+name = "resvg_parse_tree_from_file"
+string_parameters = [0]
+reference_parameters = [2]
+[[options.bindings]]
+name = "resvg_options_set_stylesheet"
+string_parameters = [1]
+[[options.bindings]]
+name = "resvg_render"
+reference_parameters = [4]
+reference_elements = ["", "", "", "", "uint8_t"]
+[[options.bindings]]
+name = "resvg_options_create"
+ownership = "caller_owns"
+[[options.bindings]]
+name = "resvg_options_destroy"
+ownership = "callee_owns"
+[[options.bindings]]
+name = "resvg_tree_destroy"
+ownership = "callee_owns"
+[annotations.nonnull]
+resvg_options_load_system_fonts = [0]
+resvg_options_set_stylesheet = [0, 1]
+resvg_options_destroy = [0]
+resvg_parse_tree_from_file = [0, 1, 2]
+resvg_render = [0, 4]
+resvg_tree_destroy = [0]
+[[namespace]]
+description = "Typed live display boundary from installed headers"
+name = "Fidelity.Image.Resvg.Native"
+library = "resvg"
+functions = ["resvg_options_create", "resvg_options_load_system_fonts", "resvg_options_set_stylesheet", "resvg_options_destroy", "resvg_parse_tree_from_file", "resvg_render", "resvg_tree_destroy"]

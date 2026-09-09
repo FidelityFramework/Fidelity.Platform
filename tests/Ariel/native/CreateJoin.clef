@@ -1,0 +1,24 @@
+module ArielCreateJoinProbe
+
+let mutable private called: bool = false
+
+let private worker (context: CHandle<unit>) : CHandle<unit> =
+    called <- true
+    context
+
+[<EntryPoint>]
+let main _ =
+    let output: int array = Array.zeroCreate 1
+    match Fidelity.Pthread.Storage.mallocContext 1 with
+    | None -> 12
+    | Some context ->
+        let created = Fidelity.Pthread.Thread.pthread_create output None (FnPtr.ofFunction worker) context
+        if created <> 0 then
+            Fidelity.Pthread.Storage.freeContext context
+            created
+        else
+            let joined = Fidelity.Pthread.Thread.pthread_join (Array.get output 0) None
+            if joined <> 0 then joined
+            else
+                Fidelity.Pthread.Storage.freeContext context
+                if called then 0 else 91

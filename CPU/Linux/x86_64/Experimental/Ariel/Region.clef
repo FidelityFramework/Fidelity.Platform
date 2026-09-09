@@ -1,0 +1,324 @@
+/// EXPERIMENTAL, UNCOMPILED: a legacy-pointer candidate for one bounded region.
+/// Current Clef intentionally rejects its NativePtr/raw-pointer surface. This is
+/// isolated design evidence, not supported carrier realization; see STATUS.md.
+/// All shared state is protected by the pool mutex. OS carrier progress and
+/// successful operations on initialized POSIX synchronization objects are premises.
+/// See README.md for ownership, failure and retirement rules.
+module Fidelity.Ariel.Region
+
+open Fidelity.Pthread.Thread
+open Fidelity.Pthread.Mutex
+open Fidelity.Pthread.Cond
+
+let MaximumCarriers = Fidelity.Platform.Linux_x86_64.Capabilities.ariel_carrier_budget
+
+[<Literal>]
+let Busy = 16
+
+[<Literal>]
+let Invalid = 22
+
+[<Literal>]
+let Stopped = 125
+
+// Sixteen native words, followed by generated pthread storage and handles.
+// The compiler supplies pointer strides; generated target ABI metadata supplies
+// POSIX sizes/alignments. There are no assumed byte offsets for the header.
+// Environment and entry are operational values, never proof metadata.
+// Slots: 0 stop, 1 active, 2 generation, 3 next, 4 count, 5 chunk,
+// 6 participants still holding captures, 7 failure, 8 environment,
+// 9 typed work entry, 10 typed retirement entry, 11 worker count,
+// 12 started-and-ready count, 13 completed participants, 14 unfinished elements,
+// 15 successfully created pthread handles.
+let private get (pool: nativeint) (slot: int) : nativeint =
+    NativePtr.get (NativePtr.ofNativeInt<nativeint> pool) slot
+
+let private put (pool: nativeint) (slot: int) (value: nativeint) : unit =
+    NativePtr.set (NativePtr.ofNativeInt<nativeint> pool) slot value
+
+let private wordAddress (pool: nativeint) (slot: int) : nativeint =
+    NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<nativeint> pool) slot)
+let private align (address: nativeint) (alignment: int) : nativeint =
+    let width = nativeint alignment
+    let remainder = address % width
+    if remainder = 0n then address else address + width - remainder
+let private mutex (pool: nativeint) : nativeint =
+    align (wordAddress pool 16) Fidelity.Pthread.Types.pthread_mutex_t.Alignment
+let private wake (pool: nativeint) : nativeint =
+    align (mutex pool + nativeint Fidelity.Pthread.Types.pthread_mutex_t.Size)
+          Fidelity.Pthread.Types.pthread_cond_t.Alignment
+let private doneCondition (pool: nativeint) : nativeint =
+    align (wake pool + nativeint Fidelity.Pthread.Types.pthread_cond_t.Size)
+          Fidelity.Pthread.Types.pthread_cond_t.Alignment
+let private handles (pool: nativeint) : nativeint =
+    align (doneCondition pool + nativeint Fidelity.Pthread.Types.pthread_cond_t.Size)
+          Fidelity.Pthread.Types.pthread_t.Alignment
+let private handleAddress (pool: nativeint) (index: int) : nativeint =
+    NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<uint64> (handles pool)) index)
+
+let private layoutMatches () : bool =
+    let word = wordAddress 0n 1
+    let entry = NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<FnPtr<nativeint -> int -> int -> int>> 0n) 1)
+    let retirement = NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<FnPtr<nativeint -> unit>> 0n) 1)
+    let handle = NativePtr.toNativeInt (NativePtr.add (NativePtr.ofNativeInt<uint64> 0n) 1)
+    entry = word && retirement = word && handle = nativeint Fidelity.Pthread.Types.pthread_t.Size
+
+// A failed lock/unlock/wait is a violated substrate premise. Continuing could
+// publish incomplete output or free live captures; terminate instead.
+let private requireSync (status: int32) : unit =
+    if int status <> 0 then Fidelity.Libc.Process._exit 126 else ()
+
+let private lock (pool: nativeint) : unit =
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_lock (mutex pool))
+let private unlock (pool: nativeint) : unit =
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_unlock (mutex pool))
+let private notify (condition: nativeint) : unit =
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_broadcast condition)
+
+/// Execute exactly one participant's use of the currently published generation.
+/// Completion precedes the retirement callback; release is acknowledged afterward.
+let private participate (pool: nativeint) : unit =
+    lock pool
+    let environment = get pool 8
+    let work = NativePtr.read (NativePtr.ofNativeInt<FnPtr<nativeint -> int -> int -> int>> (wordAddress pool 9))
+    let retire = NativePtr.read (NativePtr.ofNativeInt<FnPtr<nativeint -> unit>> (wordAddress pool 10))
+    unlock pool
+    let mutable executing = true
+    while executing do
+        lock pool
+        let lo = int (get pool 3)
+        let count = int (get pool 4)
+        if get pool 7 = 0n && lo < count then
+            let available = count - lo
+            let chunk = int (get pool 5)
+            let length = if chunk < available then chunk else available
+            let hi = lo + length
+            put pool 3 (nativeint hi)
+            unlock pool
+            let status = FnPtr.invoke work environment lo hi
+            lock pool
+            put pool 14 (get pool 14 - nativeint length)
+            if status <> 0 && get pool 7 = 0n then put pool 7 (nativeint status) else ()
+            unlock pool
+        else
+            put pool 13 (get pool 13 + 1n)
+            unlock pool
+            executing <- false
+    // The output may already be complete, but the environment is still live.
+    FnPtr.invoke retire environment
+    lock pool
+    put pool 6 (get pool 6 - 1n)
+    notify (doneCondition pool)
+    unlock pool
+    // No region/environment access is permitted after this unlock.
+
+/// Native POSIX entry. FnPtr.ofFunction retains this compiler-owned function.
+let private workerEntry (pool: nativeint) : nativeint =
+    let mutable generation = 0n
+    let mutable running = true
+    lock pool
+    put pool 12 (get pool 12 + 1n)
+    notify (doneCondition pool)
+    unlock pool
+    while running do
+        lock pool
+        while get pool 0 = 0n && get pool 2 = generation do
+            requireSync (Fidelity.Pthread.Cond.pthread_cond_wait (wake pool) (mutex pool))
+        if get pool 0 <> 0n then
+            unlock pool
+            running <- false
+        else
+            generation <- get pool 2
+            unlock pool
+            participate pool
+    0n
+
+let private joinStarted (pool: nativeint) : int =
+    let mutable firstError = 0
+    let mutable index = 0
+    let count = int (get pool 15)
+    while index < count do
+        let handle = NativePtr.get (NativePtr.ofNativeInt<uint64> (handles pool)) index
+        let status = int (Fidelity.Pthread.Thread.pthread_join handle 0n)
+        if status <> 0 && firstError = 0 then firstError <- status else ()
+        index <- index + 1
+    firstError
+
+let private disposeStorage (pool: nativeint) : unit =
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy (doneCondition pool))
+    requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy (wake pool))
+    requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy (mutex pool))
+    Fidelity.Libc.Memory.free (Some pool)
+
+/// Deterministic startup-failure seam: fail before creating worker failAfter.
+/// -1 disables injection. All successfully created workers are joined on failure.
+let startWithLimit (carrierCount: int) (failAfter: int) : Result<nativeint, int> =
+    if carrierCount < 1 || carrierCount > MaximumCarriers || failAfter < -1 || not (layoutMatches ()) then
+        Error Invalid
+    else
+        let workerCount = carrierCount - 1
+        let bytes = int64 (handleAddress 0n workerCount)
+        let storage = Fidelity.Platform.Linux_x86_64.Capabilities.ariel_pool_storage
+        let capacity = storage.Capacity
+        if not (BAREWire.Platform.DispatchRegions.fitsByteLength capacity bytes 1L) then
+            Error Invalid
+        else
+            match Fidelity.Libc.Memory.malloc (unativeint bytes) with
+            | None -> Error 12
+            | Some pool ->
+                let mutable slot = 0
+                while slot < 16 do
+                    put pool slot 0n
+                    slot <- slot + 1
+                put pool 11 (nativeint workerCount)
+                let mutexStatus = int (Fidelity.Pthread.Mutex.pthread_mutex_init (mutex pool) 0n)
+                if mutexStatus <> 0 then
+                    Fidelity.Libc.Memory.free (Some pool)
+                    Error mutexStatus
+                else
+                    let wakeStatus = int (Fidelity.Pthread.Cond.pthread_cond_init (wake pool) 0n)
+                    if wakeStatus <> 0 then
+                        requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy (mutex pool))
+                        Fidelity.Libc.Memory.free (Some pool)
+                        Error wakeStatus
+                    else
+                        let doneStatus = int (Fidelity.Pthread.Cond.pthread_cond_init (doneCondition pool) 0n)
+                        if doneStatus <> 0 then
+                            requireSync (Fidelity.Pthread.Cond.pthread_cond_destroy (wake pool))
+                            requireSync (Fidelity.Pthread.Mutex.pthread_mutex_destroy (mutex pool))
+                            Fidelity.Libc.Memory.free (Some pool)
+                            Error doneStatus
+                        else
+                            let mutable index = 0
+                            let mutable failure = 0
+                            let entry = FnPtr.ofFunction workerEntry
+                            while index < workerCount && failure = 0 do
+                                let status =
+                                    if failAfter >= 0 && index = failAfter then 11
+                                    else int (Fidelity.Pthread.Thread.pthread_create (handleAddress pool index) 0n entry pool)
+                                if status <> 0 then failure <- status
+                                else
+                                    index <- index + 1
+                                    put pool 15 (nativeint index)
+                            if failure <> 0 then
+                                lock pool
+                                put pool 0 1n
+                                notify (wake pool)
+                                unlock pool
+                                let joinStatus = joinStarted pool
+                                if joinStatus <> 0 then
+                                    // Failed join cannot authorize freeing worker-owned state.
+                                    Fidelity.Libc.Process._exit 126
+                                else ()
+                                disposeStorage pool
+                                Error failure
+                            else
+                                lock pool
+                                while int (get pool 12) <> workerCount do
+                                    requireSync (Fidelity.Pthread.Cond.pthread_cond_wait (doneCondition pool) (mutex pool))
+                                unlock pool
+                                Ok pool
+
+/// carrierCount includes the calling thread. Policy is caller-supplied and bounded;
+/// do not derive it from online CPU count alone (affinity/deployment matter).
+let start (carrierCount: int) : Result<nativeint, int> =
+    startWithLimit carrierCount -1
+
+/// Runtime resource discovery, deliberately not a platform predicate. Respect
+/// the calling thread's allowed CPU mask and the deployment's storage ceiling.
+/// Failed discovery (including a mask larger than this ABI's cpu_set_t) uses
+/// one carrier; it does not substitute the machine's online processor count.
+let allowedCarrierCount () : int =
+    let maskSize = Fidelity.Pthread.Types.cpu_set_t.Size
+    match Fidelity.Libc.Memory.malloc (unativeint maskSize) with
+    | None -> 1
+    | Some mask ->
+        let status = Fidelity.Pthread.Affinity.sched_getaffinity (int32 0) (uint64 maskSize) mask
+        let mutable allowed = 0
+        if int status = 0 then
+            let bytes = NativePtr.ofNativeInt<byte> mask
+            let mutable index = 0
+            while index < maskSize && allowed < MaximumCarriers do
+                let mutable bits = int (NativePtr.get bytes index)
+                while bits <> 0 && allowed < MaximumCarriers do
+                    if bits % 2 = 1 then allowed <- allowed + 1 else ()
+                    bits <- bits / 2
+                index <- index + 1
+        else ()
+        Fidelity.Libc.Memory.free (Some mask)
+        if allowed < 1 then 1 else allowed
+
+let startAllowed () : Result<nativeint, int> =
+    start (allowedCarrierCount ())
+
+/// Submit one region. Nonzero callback status fails output and stops new claims;
+/// every participant still retires. The hook runs once per participant, including
+/// participants receiving no chunk. It must obey the same capture lifetime.
+let runWithRetirement (pool: nativeint) (count: int) (chunkSize: int)
+                      (work: FnPtr<nativeint -> int -> int -> int>)
+                      (environment: nativeint) (retire: FnPtr<nativeint -> unit>) : int =
+    if pool = 0n || count < 0 || chunkSize <= 0 then Invalid
+    else
+        lock pool
+        if get pool 0 <> 0n then
+            unlock pool
+            Stopped
+        elif get pool 1 <> 0n then
+            unlock pool
+            Busy
+        else
+            put pool 1 1n
+            // Reuse is safe even at wrap: all preceding participants released.
+            let generation = get pool 2
+            put pool 2 (if generation = 2147483647n then 1n else generation + 1n)
+            put pool 3 0n
+            put pool 4 (nativeint count)
+            put pool 5 (nativeint chunkSize)
+            put pool 6 (get pool 11 + 1n)
+            put pool 7 0n
+            put pool 8 environment
+            NativePtr.write (NativePtr.ofNativeInt<FnPtr<nativeint -> int -> int -> int>> (wordAddress pool 9)) work
+            NativePtr.write (NativePtr.ofNativeInt<FnPtr<nativeint -> unit>> (wordAddress pool 10)) retire
+            put pool 13 0n
+            put pool 14 (nativeint count)
+            notify (wake pool)
+            unlock pool
+            participate pool
+            lock pool
+            while get pool 6 <> 0n do
+                requireSync (Fidelity.Pthread.Cond.pthread_cond_wait (doneCondition pool) (mutex pool))
+            let result = int (get pool 7)
+            put pool 8 0n
+            put pool 9 0n
+            put pool 10 0n
+            put pool 1 0n
+            unlock pool
+            result
+
+let private releaseCapture (_environment: nativeint) : unit = ()
+
+let run (pool: nativeint) (count: int) (chunkSize: int)
+        (work: FnPtr<nativeint -> int -> int -> int>) (environment: nativeint) : int =
+    runWithRetirement pool count chunkSize work environment (FnPtr.ofFunction releaseCapture)
+
+/// Requires exclusive ownership of the pool handle, as destruction does for a
+/// POSIX mutex. Active work returns Busy; a successful stop joins before free.
+let stop (pool: nativeint) : int =
+    if pool = 0n then Invalid
+    else
+        lock pool
+        if get pool 0 <> 0n then
+            // A prior failed shutdown may have joined some carriers already.
+            // Their handles must never be passed to pthread_join a second time.
+            unlock pool
+            Stopped
+        elif get pool 1 <> 0n then
+            unlock pool
+            Busy
+        else
+            put pool 0 1n
+            notify (wake pool)
+            unlock pool
+            let status = joinStarted pool
+            if status = 0 then disposeStorage pool else ()
+            status

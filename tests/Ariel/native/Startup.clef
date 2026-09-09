@@ -1,0 +1,10 @@
+module ArielStartupProbe
+
+[<EntryPoint>]
+let main _ =
+    let partial = Fidelity.Ariel.Region.startWithLimit 4 1
+    if partial <> 11 then 90
+    else
+        let started = Fidelity.Ariel.Region.start 4
+        if started <> 0 then started
+        else Fidelity.Ariel.Region.stop ()

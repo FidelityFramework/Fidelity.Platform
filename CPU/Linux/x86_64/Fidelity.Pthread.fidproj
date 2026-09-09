@@ -10,23 +10,18 @@ target = "cpu"
 output_kind = "library"
 sources = [
     "Bindings/Pthread/Types.clef",
-    "Bindings/Pthread/Errno.clef",
-    "Bindings/Pthread/Thread/Types.clef",
     "Bindings/Pthread/Thread/Thread.clef",
-    "Bindings/Pthread/Thread/ThreadApi.clef",
     "Bindings/Pthread/Mutex/Mutex.clef",
-    "Bindings/Pthread/Mutex/MutexApi.clef",
-    "Bindings/Pthread/Cond/Types.clef",
     "Bindings/Pthread/Cond/Cond.clef",
-    "Bindings/Pthread/Cond/CondApi.clef",
-    "Bindings/Pthread/Attr/Attr.clef",
-    "Bindings/Pthread/Attr/AttrApi.clef",
+    "Bindings/Pthread/Storage/Storage.clef",
+    "Bindings/Pthread/Affinity/Affinity.clef",
 ]
 
 [platform]
 runtime_model = "libc"
 os = "linux"
 arch = "x86_64"
+word_size = 64
 
 [dependencies]
-Fidelity.Platform = { path = "Fidelity.Platform.fidproj" }
+BAREWire = { path = "../../../../BAREWire/src/BAREWire.BindingMetadata.fidproj" }

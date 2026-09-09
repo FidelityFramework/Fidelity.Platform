@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Ariel"
+version = "0.1.0"
+description = "Typed bounded synchronous CPU region realization."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = ["Ariel/Capabilities.clef", "Ariel/Region.clef"]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+pthread = { path = "Fidelity.Pthread.fidproj" }

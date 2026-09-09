@@ -1,0 +1,55 @@
+[library]
+name = "gbm"
+headers = ["/usr/include/gbm.h"]
+include_paths = ["/usr/include"]
+macro_prefixes = ["GBM_"]
+[output]
+mode = "fidelity"
+directory = "../Bindings/GBMNative"
+[options]
+c_header_mode = true
+descriptor_only_dependencies = true
+link_libraries = true
+[[options.mapped_returns]]
+name = "withMappedPixels"
+acquire = "gbm_bo_map"
+release = "gbm_bo_unmap"
+schema = "Abgr8888"
+element = "u32"
+alignment = 4
+access = "wo"
+owner_parameter = "bo"
+stride_parameter = "stride"
+rows_parameter = "height"
+width_parameter = "width"
+cookie_parameter = "map_data"
+failure_status = -1
+[[options.bindings]]
+name = "gbm_bo_map"
+reference_parameters = [6, 7]
+[[options.bindings]]
+name = "gbm_create_device"
+ownership = "caller_owns"
+[[options.bindings]]
+name = "gbm_bo_create"
+ownership = "caller_owns"
+[[options.bindings]]
+name = "gbm_device_destroy"
+ownership = "callee_owns"
+[[options.bindings]]
+name = "gbm_bo_destroy"
+ownership = "callee_owns"
+[annotations.nonnull]
+gbm_device_destroy = [0]
+gbm_bo_create = [0]
+gbm_bo_map = [0, 6, 7]
+gbm_bo_unmap = [0]
+gbm_bo_get_stride = [0]
+gbm_bo_get_format = [0]
+gbm_bo_get_fd = [0]
+gbm_bo_destroy = [0]
+[[namespace]]
+description = "Typed live display boundary from installed headers"
+name = "Fidelity.GBM.Native"
+library = "gbm"
+functions = ["gbm_create_device", "gbm_device_destroy", "gbm_bo_create", "gbm_bo_map", "gbm_bo_unmap", "gbm_bo_get_stride", "gbm_bo_get_format", "gbm_bo_get_fd", "gbm_bo_destroy"]

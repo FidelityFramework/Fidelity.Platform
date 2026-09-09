@@ -1,0 +1,45 @@
+[library]
+name = "c"
+headers = ["/usr/include/fcntl.h", "/usr/include/unistd.h", "/usr/include/string.h"]
+include_paths = ["/usr/include"]
+defines = ["_GNU_SOURCE"]
+[output]
+mode = "fidelity"
+directory = "../Bindings/DisplayNative"
+[options]
+c_header_mode = true
+descriptor_only_dependencies = true
+[[options.bindings]]
+name = "openRenderNode"
+symbol = "open"
+string_parameters = [0]
+constant_parameters = ["", "2"]
+[[options.bindings]]
+name = "strcmp"
+parameter_handles = ["unit", ""]
+string_parameters = [1]
+[[options.bindings]]
+name = "memcpyPixels"
+symbol = "memcpy"
+parameter_handles = ["unit"]
+return_handle = "unit"
+reference_parameters = [1]
+reference_elements = ["", "uint32_t"]
+[[options.bindings]]
+name = "mempcpyPixels"
+symbol = "mempcpy"
+ownership = "borrowed"
+parameter_handles = ["unit"]
+return_handle = "unit"
+reference_parameters = [1]
+reference_elements = ["", "uint32_t"]
+[annotations.nonnull]
+openRenderNode = [0]
+strcmp = [0, 1]
+memcpyPixels = [0, 1]
+mempcpyPixels = [0, 1]
+[[namespace]]
+name = "Fidelity.Display.Native"
+library = "c"
+description = "Typed display file and pixel buffer boundary"
+functions = ["openRenderNode", "close", "strcmp", "memcpyPixels", "mempcpyPixels"]

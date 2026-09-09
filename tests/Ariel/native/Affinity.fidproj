@@ -1,0 +1,15 @@
+[package]
+name = "ArielAffinityProbe"
+version = "0.1.0"
+
+[compilation]
+target = "cpu"
+
+[dependencies]
+platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+ariel = { path = "../../../CPU/Linux/x86_64/Fidelity.Ariel.fidproj" }
+
+[build]
+sources = ["Affinity.clef"]
+output = "ariel-affinity"
+output_kind = "console"

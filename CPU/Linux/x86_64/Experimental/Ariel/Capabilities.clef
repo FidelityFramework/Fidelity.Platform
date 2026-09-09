@@ -1,0 +1,38 @@
+/// Literal target facts, following platform-predicates.md §5.2. This source is
+/// selected only by the experimental Ariel candidate; dynamic affinity is separate.
+module Fidelity.Platform.Linux_x86_64.Capabilities
+
+let has_shared_memory: Expr<bool> = <@ true @>
+let has_posix_threads: Expr<bool> = <@ true @>
+
+/// Deployment ceiling for this hosted realization, including its caller.
+/// This is a bounded storage policy, never an assertion that 64 CPUs are allowed.
+[<Literal>]
+let ariel_carrier_budget = 64
+
+/// Exact nonnegative byte arithmetic supported by this profile's signed
+/// nativeint/int64 representation. This is not allocatable memory or a claim
+/// that every representable integer is a canonical userspace address.
+[<Literal>]
+let ariel_max_byte_extent: int64 = 9223372036854775807L
+
+/// The selected platform description declares the lower userspace address
+/// ceiling as TASK_SIZE_MAX for its four-level-paging model. Reuse that declared
+/// fact for base-plus-extent admission; do not infer it from pointer width.
+/// A platform admitting another address model must update its declaration.
+let ariel_address_space_limit: int64 =
+    let heap = Fidelity.Platform.Linux_x86_64.Description.heap
+    heap.Capacity
+
+let ariel_pool_storage: BAREWire.Platform.BufferSchema = {
+    Name = "ariel-pool"
+    Schema = "Ariel bounded region control state and pthread handles"
+    Capacity = 4096L
+    Framing = BAREWire.Platform.Framing.Fixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "heap"
+    Lifetime = BAREWire.Platform.Lifetime.Session
+    Access = BAREWire.Platform.Access.ReadWrite
+    Slot = 0
+}

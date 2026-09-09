@@ -1,0 +1,20 @@
+[package]
+name = "Fidelity.Ariel.Experimental"
+version = "0.1.0"
+description = "Experimental legacy-pointer candidate; not supported by current Clef."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = ["Capabilities.clef", "Region.clef"]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+pthread = { path = "../Pthread/Fidelity.Pthread.fidproj" }
+libc = { path = "Fidelity.Libc.Runtime.Experimental.fidproj" }

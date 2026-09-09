@@ -1,0 +1,109 @@
+module ArielTypedLifecycle
+
+open Fidelity.Ariel.Region
+
+let private synchronize (status: int) : unit =
+    if status <> 0 then Fidelity.Pthread.Storage.exitProcess 89 else ()
+
+let private exact (output: int array) (count: int) : bool =
+    let mutable index: int = 0
+    let mutable valid: bool = true
+    while index < count do
+        if Array.get output index <> 1 then valid <- false else ()
+        index <- index + 1
+    valid
+
+let private clear (output: int array) : unit =
+    let mutable index: int = 0
+    while index < Array.length output do
+        Array.set output index 0
+        index <- index + 1
+
+let private exercise (carriers: int) : int =
+    let startup = start carriers
+    if startup <> 0 then startup
+    else
+        let output: int array = Array.zeroCreate 258
+        if start carriers <> Busy then Fidelity.Pthread.Storage.exitProcess 88 else ()
+        let work: int -> int -> int = fun lo hi ->
+            let mutable index = lo
+            while index < hi do
+                Array.set output index (Array.get output index + 1)
+                index <- index + 1
+            0
+        let mutable failure: int = 0
+        let mutable iteration: int = 0
+        while iteration < 100 && failure = 0 do
+            let count = (iteration * 37) % 258
+            let chunk = 1 + iteration % 23
+            clear output
+            let result = run count chunk work
+            if result <> 0 || not (exact output count) then failure <- 92 else ()
+            if count < 258 && Array.get output count <> 0 then failure <- 93 else ()
+            iteration <- iteration + 1
+        if failure <> 0 then Fidelity.Pthread.Storage.exitProcess failure else ()
+        if run -1 1 work <> Invalid then failure <- 94 else ()
+        if run 1 0 work <> Invalid then failure <- 95 else ()
+        clear output
+        let nested: int -> int -> int = fun lo hi ->
+            let admission = run 0 1 work
+            let shutdown = stop ()
+            if admission <> Busy || shutdown <> Busy then 91 else work lo hi
+        if run 257 13 nested <> 0 then failure <- 96 else ()
+        if not (exact output 257) then failure <- 97 else ()
+        let failWork: int -> int -> int = fun _lo _hi -> 77
+        if run 257 13 failWork <> 77 then failure <- 98 else ()
+        clear output
+        if run 257 13 work <> 0 then failure <- 99 else ()
+        if not (exact output 257) then failure <- 100 else ()
+
+        // All output is complete at publication for zero work. Workers hold the
+        // captured array/guard until after their delayed retirement bookkeeping.
+        match Fidelity.Pthread.Storage.mallocMutex Fidelity.Pthread.Types.pthread_mutex_t.Size with
+        | None -> failure <- 12
+        | Some guard ->
+            let initialized = Fidelity.Pthread.Mutex.pthread_mutex_init guard None
+            if initialized <> 0 then
+                Fidelity.Pthread.Storage.freeMutex guard
+                failure <- initialized
+            else
+                let retired: int array = Array.zeroCreate 1
+                let caller = Fidelity.Pthread.Thread.pthread_self ()
+                let retirement: unit -> unit = fun () ->
+                    let current = Fidelity.Pthread.Thread.pthread_self ()
+                    if Fidelity.Pthread.Thread.pthread_equal caller current = 0 then
+                        synchronize (Fidelity.Pthread.Storage.usleep 30000)
+                    else ()
+                    synchronize (Fidelity.Pthread.Mutex.pthread_mutex_lock guard)
+                    Array.set retired 0 (Array.get retired 0 + 1)
+                    synchronize (Fidelity.Pthread.Mutex.pthread_mutex_unlock guard)
+                let status = runWithRetirement 0 7 work retirement
+                if status <> 0 || Array.get retired 0 <> carriers then failure <- 101 else ()
+                let failed = runWithRetirement 257 7 failWork retirement
+                if failed <> 77 || Array.get retired 0 <> 2 * carriers then failure <- 107 else ()
+                synchronize (Fidelity.Pthread.Mutex.pthread_mutex_destroy guard)
+                Fidelity.Pthread.Storage.freeMutex guard
+        let shutdown = stop ()
+        if shutdown <> 0 then failure <- shutdown else ()
+        if stop () <> Stopped then failure <- 105 else ()
+        if run 0 1 work <> Stopped then failure <- 106 else ()
+        failure
+
+[<EntryPoint>]
+let main _ =
+    let mutable result: int = 0
+    let mutable failedAfter: int = 0
+    while failedAfter < 3 && result = 0 do
+        let status = startWithLimit 4 failedAfter
+        if status = 0 then
+            synchronize (stop ())
+            result <- 103
+        elif status <> 11 then result <- 102
+        else ()
+        failedAfter <- failedAfter + 1
+    if start 0 <> Invalid then result <- 104 else ()
+    let mutable carriers: int = 1
+    while carriers <= 4 && result = 0 do
+        result <- exercise carriers
+        carriers <- carriers * 2
+    result

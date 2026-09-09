@@ -1,0 +1,34 @@
+[package]
+name = "Fidelity.Pthread"
+version = "0.1.0"
+description = "Experimental legacy pthread ABI surface; not current Clef source."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Pthread/Types.clef",
+    "Bindings/Pthread/ReturnCode.clef",
+    "Bindings/Pthread/Thread/Thread.clef",
+    "Bindings/Pthread/Thread/ThreadApi.clef",
+    "Bindings/Pthread/Mutex/Mutex.clef",
+    "Bindings/Pthread/Mutex/MutexApi.clef",
+    "Bindings/Pthread/Cond/Cond.clef",
+    "Bindings/Pthread/Cond/CondApi.clef",
+    "Bindings/Pthread/Attr/Attr.clef",
+    "Bindings/Pthread/Attr/AttrApi.clef",
+    "Bindings/Pthread/Affinity/Affinity.clef",
+    "Bindings/Pthread/Affinity/AffinityApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+Fidelity.Platform = { path = "../../Fidelity.Platform.fidproj" }
+BAREWire = { path = "../../../../../../BAREWire/src/BAREWire.fidproj" }

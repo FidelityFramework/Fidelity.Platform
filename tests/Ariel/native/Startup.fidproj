@@ -1,0 +1,15 @@
+[package]
+name = "ArielStartupProbe"
+version = "0.1.0"
+
+[compilation]
+target = "cpu"
+
+[dependencies]
+platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+ariel = { path = "../../../CPU/Linux/x86_64/Fidelity.Ariel.fidproj" }
+
+[build]
+sources = ["Startup.clef"]
+output = "ariel-startup"
+output_kind = "console"

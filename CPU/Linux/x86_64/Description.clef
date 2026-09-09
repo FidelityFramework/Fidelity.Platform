@@ -19,6 +19,14 @@ module Fidelity.Platform.Linux_x86_64.Description
 
 open BAREWire.Platform
 
+/// AMD64 psABI §3.2.3: scalar aggregates exceeding two eightbytes are MEMORY.
+/// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/low-level-sys-info.tex
+let cAbi: CAbiDescriptor = {
+    Name = "sysv-amd64"
+    PointerBits = 64
+    ScalarAggregateRegisterBytes = 16
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Memory spaces: the process image the loader maps, then the three the
 // program consumes. The linker and the kernel place them (no declared base);
@@ -31,7 +39,7 @@ open BAREWire.Platform
 let text: MemorySpace = {
     Name = "text"
     Kind = MemoryKind.Text
-    Capacity = 4096L
+    Capacity = 4096
     Alignment = 4096
     Granularity = 4096
     Growth = Growth.Fixed
@@ -50,7 +58,7 @@ let text: MemorySpace = {
 let rodata: MemorySpace = {
     Name = "rodata"
     Kind = MemoryKind.Rodata
-    Capacity = 4096L
+    Capacity = 4096
     Alignment = 4096
     Granularity = 4096
     Growth = Growth.Fixed
@@ -67,7 +75,7 @@ let rodata: MemorySpace = {
 let data: MemorySpace = {
     Name = "data"
     Kind = MemoryKind.Data
-    Capacity = 4096L
+    Capacity = 4096
     Alignment = 4096
     Granularity = 4096
     Growth = Growth.Fixed
@@ -84,7 +92,7 @@ let data: MemorySpace = {
 let bss: MemorySpace = {
     Name = "bss"
     Kind = MemoryKind.Bss
-    Capacity = 4096L
+    Capacity = 4096
     Alignment = 4096
     Granularity = 4096
     Growth = Growth.Fixed
@@ -103,7 +111,7 @@ let bss: MemorySpace = {
 let stack: MemorySpace = {
     Name = "stack"
     Kind = MemoryKind.Stack
-    Capacity = 8388608L
+    Capacity = 8388608
     Alignment = 16
     Granularity = 1
     Growth = Growth.Down
@@ -122,7 +130,7 @@ let stack: MemorySpace = {
 let arena: MemorySpace = {
     Name = "arena"
     Kind = MemoryKind.Arena
-    Capacity = 4096L
+    Capacity = 4096
     Alignment = 16
     Granularity = 1
     Growth = Growth.Up
@@ -143,7 +151,7 @@ let arena: MemorySpace = {
 let heap: MemorySpace = {
     Name = "heap"
     Kind = MemoryKind.Heap
-    Capacity = 140737488351232L
+    Capacity = 140737488351232
     Alignment = 16
     Granularity = 1
     Growth = Growth.Up
@@ -173,7 +181,7 @@ let readBound: Contract = {
     Statement = "writes at most count bytes into buf and returns n with 0 <= n <= count; n = 0 is end of input; a negative return is an errno"
     Logic = Logic.Assumed
     Refs = [| "CWE-120" |]
-    Floor = -4095L
+    Floor = -4095
     AtMost = "count"
 }
 
@@ -184,7 +192,7 @@ let writeBound: Contract = {
     Statement = "writes at most count bytes from buf and returns the number written or a negative errno"
     Logic = Logic.Assumed
     Refs = [| "CWE-125" |]
-    Floor = -4095L
+    Floor = -4095
     AtMost = "count"
 }
 
@@ -282,7 +290,7 @@ let syscalls: BoundarySurface = {
 let consoleReadln: BufferSchema = {
     Name = "consoleReadln"
     Schema = "str"
-    Capacity = int64 Console.READLINE_CAPACITY
+    Capacity = Console.READLINE_CAPACITY
     Framing = Framing.Delimited
     Delimiter = 10
     TrimDelimiter = true
@@ -299,7 +307,7 @@ let consoleReadln: BufferSchema = {
 let consoleWrite: BufferSchema = {
     Name = "consoleWrite"
     Schema = "str"
-    Capacity = 4096L
+    Capacity = 4096
     Framing = Framing.Fixed
     Delimiter = -1
     TrimDelimiter = false
@@ -320,8 +328,8 @@ let websocket: Transport = {
     Name = "websocket"
     Kind = TransportKind.WebSocket
     Endpoints = [||]
-    RateHz = 0L
-    MaxUnit = 65536L
+    RateHz = 0
+    MaxUnit = 65536
     Ordered = true
     Schema = ""
     Since = ""
@@ -334,8 +342,8 @@ let wayland: Transport = {
     Name = "wayland"
     Kind = TransportKind.Wayland
     Endpoints = [||]
-    RateHz = 0L
-    MaxUnit = 0L
+    RateHz = 0
+    MaxUnit = 0
     Ordered = true
     Schema = ""
     Since = ""

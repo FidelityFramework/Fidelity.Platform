@@ -1,0 +1,8 @@
+module ArielAffinityProbe
+
+[<EntryPoint>]
+let main _ =
+    let allowed = Fidelity.Ariel.Region.allowedCarrierCount ()
+    if allowed < 1 then 90
+    elif allowed > Fidelity.Platform.Linux_x86_64.ArielCapabilities.carrier_budget then 91
+    else allowed

@@ -97,7 +97,7 @@ open Fidelity.Libc.Types
 
     /// C signature: int open(const char * __file, int __oflag)
     [<FidelityExtern("c", "open")>]
-    let open (file: option<nativeptr<byte>>) (oflag: int) : int =
+    let ``open`` (file: option<nativeptr<byte>>) (oflag: int) : int =
         NativeDefault.zeroed ()
 
     /// C signature: int openat(int __fd, const char * __file, int __oflag)

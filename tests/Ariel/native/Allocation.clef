@@ -1,0 +1,9 @@
+module ArielAllocationProbe
+
+[<EntryPoint>]
+let main _ =
+    match Fidelity.Pthread.Storage.mallocContext 32 with
+    | None -> 12
+    | Some context ->
+        Fidelity.Pthread.Storage.freeContext context
+        0

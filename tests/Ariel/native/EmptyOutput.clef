@@ -1,0 +1,15 @@
+module ArielEmptyOutputProbe
+
+let private worker (context: CHandle<unit>) : CHandle<unit> = context
+
+[<EntryPoint>]
+let main _ =
+    let output: int array = Array.zeroCreate 0
+    match Fidelity.Pthread.Storage.mallocContext 1 with
+    | None -> 12
+    | Some context ->
+        // Compiler-derived array admission must abort before pthread sees this
+        // undersized output. Reaching normal cleanup is a failed negative test.
+        let status = Fidelity.Pthread.Thread.pthread_create output None (FnPtr.ofFunction worker) context
+        Fidelity.Pthread.Storage.freeContext context
+        if status = 0 then 90 else status

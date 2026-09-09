@@ -1,0 +1,13 @@
+/// Literal hosted-platform facts. Allowed affinity remains runtime information.
+module Fidelity.Platform.Linux_x86_64.ArielCapabilities
+
+let has_shared_memory: Expr<bool> = <@ true @>
+let has_posix_threads: Expr<bool> = <@ true @>
+
+/// Selected deployment storage ceiling, including the calling carrier.
+[<Literal>]
+let carrier_budget: int = 64
+
+/// Per-object storage ceiling; actual POSIX sizes come from generated metadata.
+[<Literal>]
+let synchronization_storage_budget: int = 4096

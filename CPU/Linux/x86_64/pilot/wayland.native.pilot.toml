@@ -1,0 +1,67 @@
+[library]
+name = "wayland-client"
+headers = ["/usr/include/wayland-client-core.h", "/usr/include/stdlib.h", "/usr/include/string.h"]
+include_paths = ["/usr/include"]
+transitive_headers = ["wayland-util.h"]
+defines = ["_GNU_SOURCE"]
+xml_protocols = ["/usr/share/wayland/wayland.xml", "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml", "/usr/share/wayland-protocols/stable/linux-dmabuf/linux-dmabuf-v1.xml"]
+[output]
+mode = "fidelity"
+directory = "../Bindings/WaylandNative"
+[options]
+c_header_mode = true
+descriptor_only_dependencies = true
+link_libraries = true
+typed_protocol = true
+abi_critical_structs = ["union wl_argument", "struct wl_message", "struct wl_interface"]
+[[options.bindings]]
+name = "wl_display_connect"
+ownership = "caller_owns"
+string_parameters = [0]
+return_handle = "unit"
+[[options.bindings]]
+name = "wl_display_disconnect"
+ownership = "callee_owns"
+parameter_handles = ["unit"]
+[[options.bindings]]
+name = "wl_display_roundtrip"
+parameter_handles = ["unit"]
+[[options.bindings]]
+name = "wl_display_dispatch"
+parameter_handles = ["unit"]
+[[options.bindings]]
+name = "wl_proxy_destroy"
+ownership = "callee_owns"
+parameter_handles = ["unit"]
+[[options.bindings]]
+name = "wl_proxy_get_version"
+parameter_handles = ["unit"]
+[annotations.nonnull]
+wl_display_disconnect = [0]
+wl_display_roundtrip = [0]
+wl_display_dispatch = [0]
+wl_proxy_destroy = [0]
+wl_proxy_get_version = [0]
+[[namespace]]
+name = "Fidelity.Wayland.Core"
+library = "wayland-client"
+description = "Typed connection and event dispatch"
+functions = ["wl_display_connect", "wl_display_disconnect", "wl_display_roundtrip", "wl_display_dispatch", "wl_proxy_destroy", "wl_proxy_get_version"]
+[[namespace]]
+name = "Fidelity.Wayland.Protocol"
+library = "wayland-client"
+description = "Core protocol requests"
+xml_interfaces = ["wl_display", "wl_registry", "wl_compositor", "wl_surface", "wl_callback", "wl_buffer"]
+functions = ["wl_display_get_registry", "wl_compositor_create_surface", "wl_surface_attach", "wl_surface_damage_buffer", "wl_surface_frame", "wl_surface_commit", "wl_surface_destroy", "wl_buffer_destroy"]
+[[namespace]]
+name = "Fidelity.Wayland.XdgShell"
+library = "wayland-client"
+description = "XDG shell requests"
+xml_interfaces = ["xdg_wm_base", "xdg_surface", "xdg_toplevel"]
+functions = ["xdg_wm_base_destroy", "xdg_wm_base_pong", "xdg_wm_base_get_xdg_surface", "xdg_surface_get_toplevel", "xdg_surface_ack_configure", "xdg_surface_destroy", "xdg_toplevel_set_title", "xdg_toplevel_set_app_id", "xdg_toplevel_destroy"]
+[[namespace]]
+name = "Fidelity.Wayland.DmaBuf"
+library = "wayland-client"
+description = "Linux DMA-BUF requests"
+xml_interfaces = ["zwp_linux_dmabuf_v1", "zwp_linux_buffer_params_v1"]
+functions = ["zwp_linux_dmabuf_v1_create_params", "zwp_linux_dmabuf_v1_destroy", "zwp_linux_buffer_params_v1_add", "zwp_linux_buffer_params_v1_create_immed", "zwp_linux_buffer_params_v1_destroy"]

@@ -1,0 +1,26 @@
+[package]
+name = "Fidelity.GBM.Native"
+version = "0.1.0"
+description = "Generated bindings for gbm."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/GBMNative/Types.clef",
+    "Bindings/GBMNative/Native/Native.clef",
+]
+
+[link]
+libraries = ["gbm"]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+word_size = 64
+
+[dependencies]
+BAREWire = { path = "../../../../BAREWire/src/BAREWire.BindingMetadata.fidproj" }

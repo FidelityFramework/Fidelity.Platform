@@ -117,8 +117,8 @@ open Fidelity.Libc.Errno.Errno
         else Error (captureErrno ())
 
     /// C signature: int open(const char * __file, int __oflag)
-    let open (file: option<nativeptr<byte>>) (oflag: int) : Result<int, string> =
-        let result = Fidelity.Libc.IO.open file oflag
+    let ``open`` (file: option<nativeptr<byte>>) (oflag: int) : Result<int, string> =
+        let result = Fidelity.Libc.IO.``open`` file oflag
         if result >= 0 then Ok result
         else Error (captureErrno ())
 
