@@ -1,5 +1,12 @@
 # Layer 2 Marshaling Report: Fidelity.Wayland.Bridge
 
+Historical generator output for the legacy `Bindings/WaylandBridge` surface.
+Its raw-pointer marshaling remains in that source generation; it is not the
+typed [Fidelity.Wayland.Native](Fidelity.Wayland.Native.fidproj) path or evidence
+of a current native build. Counts below are the generator's original report,
+not a fresh audit. Retain for regeneration comparison; use manifests and source
+for the actual API. NativePtr usage is not sanctioned by current Clef.
+
 ## Generated
 
 ### Protocol Dispatch (226 requests)

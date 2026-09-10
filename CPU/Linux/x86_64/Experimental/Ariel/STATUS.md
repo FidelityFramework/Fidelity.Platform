@@ -1,5 +1,11 @@
 # Build status and boundary handoff
 
+Historical status of this raw-pointer candidate. The later
+[typed implementation](../../Ariel/README.md) and
+[native acceptance](../../../../../tests/Ariel/native/STATUS.md) supersede the
+candidate as the supported path. Failure counts below belong to the recorded
+candidate build, not the current production package or a new audit run.
+
 The bounded lifecycle model passes **1,747 distinct states** across counts 0–4,
 one through three participants and chunk sizes one through three. It checks exact
 assignment and that complete output does not imply released captures:
@@ -58,7 +64,7 @@ acknowledging release, and the caller waits for release rather than merely zero
 unfinished work. Partial startup joins the exact successful creations. A failed
 shutdown is terminal and cannot retry already-completed joins.
 
-None of the native lifecycle scenarios above has passed. Separate generated
+None of the native lifecycle scenarios above passed for this candidate. Separate generated
 pthread ABI probes exercise the host library via ctypes; they do not execute this
 candidate and do not establish Ariel scheduling correctness. The independently
 implemented compiler FnPtr lowering has its own native probe evidence, also

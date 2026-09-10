@@ -10,7 +10,7 @@ This subtree contains microcontroller platform packages.
 Each board leaf should include:
 
 - `Fidelity.Platform.fidproj`
-- `Platform.fs`
+- Typed declaration sources selected explicitly by the manifest (`.clef` or `.fs`)
 - `docs/` source pack with authoritative vendor artifacts
 - `docs/SOURCE_MANIFEST.md` mapping each exposed endpoint category to source files
 
@@ -23,4 +23,11 @@ Use a flat `docs/` layout by default.
 
 ## Rule
 
-Do not guess pin mappings. Leave endpoint lists empty until board documentation is present in `docs/`.
+Do not guess pin mappings. Add a mapping only with a cited source and variant.
+Sources may be staged here or pinned by path/hash in a sibling reference pack;
+their local availability must be explicit. Distinguish wiring coverage from
+implemented register/driver support and physical acceptance.
+
+The [EK-RA6M5](Renesas/RA6M5/EK_RA6M5/docs/README.md) has accepted bare startup,
+GPIO/interrupt/SysTick behavior and a complete board wiring inventory. The
+[Meadow F7](ST/STM32F7/MeadowF7/docs/README.md) remains a declaration scaffold.

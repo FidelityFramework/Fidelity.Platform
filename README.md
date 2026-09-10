@@ -11,8 +11,7 @@ Fidelity.Platform/
 ├── Contracts/                           # Shared substrate-neutral contracts
 ├── CPU/
 │   └── Linux/
-│       └── X86_64/
-│           └── StrixHalo/
+│       └── x86_64/
 ├── MCU/
 │   ├── ST/
 │   │   └── STM32F7/
@@ -37,7 +36,10 @@ Fidelity.Platform/
 │   └── StrixHalo_ArtyLab/
 ```
 
-For additional details, see `PLATFORM_STRUCTURE.md`.
+For package boundaries and support status, see [PLATFORM_STRUCTURE.md](PLATFORM_STRUCTURE.md).
+The [documentation index](docs/README.md) links the current compiler integration,
+BAREWire migration status, and engineering audit. `Contracts/` already exists;
+it currently overlaps with BAREWire and is not yet a unified resource-grant API.
 
 ## Usage in fidproj
 

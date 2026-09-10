@@ -2,8 +2,10 @@
 
 **Status: uncompiled candidate, not supported current-Clef carrier realization.** The
 current compiler intentionally rejects this candidate's `NativePtr` operations,
-raw pointer integers and width-named source types. No native Ariel pool or native
-lifecycle harness has passed. `Fidelity.Ariel.Experimental.fidproj` is isolated
+raw pointer integers and width-named source types. No native pool or lifecycle
+harness for this legacy candidate has passed. The later
+[typed Ariel implementation](../../Ariel/README.md) has its own recorded native
+acceptance. `Fidelity.Ariel.Experimental.fidproj` is isolated
 from production packages. [STATUS.md](STATUS.md) records the failed build and the
 missing legitimate boundary projection.
 

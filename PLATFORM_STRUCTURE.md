@@ -5,7 +5,7 @@ This repository is organized substrate-first so platform bindings do not collaps
 ## Canonical Layout
 
 - `Contracts/` - shared substrate-neutral contract types used by leaf packages
-- `CPU/<OS>/<ISA>/<Device>/` - CPU substrate packages
+- `CPU/<OS>/<ISA>/` - hosted CPU packages; the current leaf is `CPU/Linux/x86_64`
 - `MCU/<Vendor>/<Family>/<Board>/` - microcontroller substrate packages
 - `GPU/<Vendor>/<Family>/<Device>/` - GPU substrate packages
 - `NPU/<Vendor>/<Family>/<Device>/` - NPU substrate packages
@@ -27,3 +27,22 @@ This repository is organized substrate-first so platform bindings do not collaps
 
 - New packages use `.fidproj` as the dependency boundary expected by CCS/Composer source resolution.
 - External application projects (e.g., `HelloArty`) can point their `platform` dependency at one leaf package.
+
+## Package status
+
+Directory presence is not a claim of working hardware support. Linux x86_64 has
+separate compiler-surface, native binding, display and Ariel manifests. Arty has
+both Contracts pin bindings and an additive BAREWire description. EK-RA6M5 has
+the accepted HelloBlinky path and a complete physical wiring inventory, with an
+initial subset of peripheral registers implemented.
+
+Meadow, GPU and NPU leaf descriptors remain scaffolds; the latter two also have
+generated hosted library bindings. Their manifests do not establish working
+device kernels or complete topology/memory models. CGRA is reserved.
+`Profiles/StrixHalo_ArtyLab` lists dependencies; it is not an implemented general
+multi-platform resource resolver. [The audit](docs/DOCUMENTATION_AUDIT.md) records
+specific gaps, including incomplete scaffold records.
+
+`CPU/Linux/x86_64/Experimental/` preserves explicitly selected legacy candidates.
+It is separate from the typed production packages. Source filenames and package
+dependencies come from each `.fidproj`; no universal `Platform.fs` file is required.

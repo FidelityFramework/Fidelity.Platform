@@ -1,5 +1,10 @@
 # Bounded synchronous regions
 
+Current implementation: [Region.clef](Region.clef), selected by
+[Fidelity.Ariel.fidproj](../Fidelity.Ariel.fidproj). The
+[native status](../../../../tests/Ariel/native/STATUS.md) records dated evidence
+and limitations; those results are not a fresh run by the documentation audit.
+
 The Ariel scheduling layer's `Fidelity.Ariel.fidproj` selects one process-wide pool of persistent pthread
 carriers. The requested count includes the calling thread. `start 1` therefore
 supports the full protocol without creating an OS thread. `startAllowed ()`

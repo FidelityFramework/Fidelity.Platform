@@ -45,7 +45,10 @@ cecdf253b68fbc0811b5fb3a85c739b369e8b326e00095cd2c04b384aaad5e43  SCACHE-1.40
   `Reset_Handler → SystemInit → main`. This project includes FreeRTOS.
 - Separate `~/repos/fsp` checkout: `a409855a` at review. Do not conflate its source
   line numbers or configuration with the installed generated project.
-- Composer baseline: `cf48225a`; Clef baseline: `534429798`. The subsequent working-tree changes implement the MMIO boundary, early MCU layout and first board execution; see [hardware acceptance](HELLOBLINKY_HARDWARE.md).
+- Initial bring-up used Composer baseline `cf48225a` and Clef baseline `534429798`
+  plus then-uncommitted changes. The implemented path is now committed in Composer
+  `7bf2c83`, clef `3b74dd020`, BAREWire `98be0f9` and Fidelity.Platform `6164b87`.
+  See [hardware acceptance](HELLOBLINKY_HARDWARE.md) for the dated board evidence.
 
 ## Local design package acquired
 
@@ -78,15 +81,15 @@ source verification.
 
 | Family | Source review | Implemented board endpoints |
 | --- | --- | --- |
-| Core, reset, memory | Initial scope reconciled; device configuration open | Core descriptor exists; startup/layout gates open |
-| User LEDs/buttons | Pins and IRQ events verified; polarity/circuit open | Not yet populated |
-| Interrupts | Initial routing/width/security rules verified | Not yet populated |
-| Clocks/timers | Reset clock and SysTick plan; full clock tree later | Not yet populated |
-| GPIO/alternate functions | Initial PFS subset | Not yet populated |
-| UART, I2C, SPI, PWM | Source material staged; complete endpoint review pending | Not yet populated |
-| ADC/DAC, ELC, DMAC/DTC | Earlier entropy catalog; corrections and open gates recorded there | Not yet populated |
-| USB/debug/connectors | J10 debug connection documented; other interfaces pending | Not yet populated |
-| Cache, MPU, security | Important distinctions reconciled; provisioning policy separate | Not yet populated |
+| Core, reset, memory | BH3CFC silicon identified; initial map/vector contract reconciled | Composer-owned layout/reset/image path accepted; general stack/security proof remains open |
+| User LEDs/buttons | Schematic, netlist, polarity and initial IRQ events verified | Three colors, two buttons and 10% software PWM accepted |
+| Interrupts | Initial routing/width/security rules verified | Two external adapters and SysTick exercised; full controller coverage not claimed |
+| Clocks/timers | MOCO/reset divider and SysTick subset reviewed | Selected divider and timer run; full clock/GPT drivers remain open |
+| GPIO/alternate functions | All 176 package pins and complete MP connectivity recorded | Initial PFS/port handles only; alternate-function inventory is not driver initialization |
+| UART, I2C, SPI, PWM | Board routes, shared pins and trace-link defaults mapped | Peripheral drivers unimplemented by this work |
+| ADC/DAC, ELC, DMAC/DTC | Package/board routes mapped; earlier entropy timing assumptions remain separate | No sampling or DMA pipeline accepted |
+| USB/debug/connectors | All 355 connector contacts mapped; J10 separated from target USB | SWD deployment accepted; target USB drivers remain open |
+| Cache, MPU, security | Manual distinctions recorded; provisioning policy separate | Initial secure entry/interrupt setup only; no general protection or DMA coherency guarantee |
 
 When adding an endpoint, record source ID plus section/table, device/package variant,
 access width and effects, applicable permissions, and acceptance evidence. Keep a

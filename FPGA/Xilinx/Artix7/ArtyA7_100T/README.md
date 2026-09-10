@@ -29,7 +29,7 @@ Practical precedence used here:
 
 ## Current Binding Scope
 
-`ArtyA7_100T.Bindings.fs` currently models and reconciles:
+[`ArtyA7_100T.Bindings.clef`](ArtyA7_100T.Bindings.clef) currently models:
 
 - 100 MHz system clock (`E3`)
 - Green LEDs (`led[0..3]`)
@@ -66,7 +66,7 @@ For HelloArty ("blinky" with button/switch control), this package already has th
 
 This package is the raw authoritative layer.
 
-Planned pattern:
+Current layering:
 
 1. Raw binding layer
    - exact endpoint definitions, pin/package mappings, polarity/behavior notes
@@ -75,10 +75,17 @@ Planned pattern:
 
 Current files:
 
-- `ArtyA7_100T.Bindings.fs` (raw canonical endpoint model)
-- `ArtyA7_100T.Prelude.fs` (application-facing conveniences)
+- [ArtyA7_100T.Bindings.clef](ArtyA7_100T.Bindings.clef) (Contracts endpoints and device part)
+- [ArtyA7_100T.Prelude.clef](ArtyA7_100T.Prelude.clef) (application-facing conveniences)
+- [ArtyA7_100T.Description.clef](ArtyA7_100T.Description.clef) (additive BAREWire memory/buffer/transport description)
 
-Applications should depend on Prelude, which in turn depends on Bindings.
+The [manifest](Fidelity.Platform.fidproj) includes all three. Application pin
+attributes are resolved by CCS into `Codata.Pins`; Composer serializes XDC from
+that result. The BAREWire description has only three surface endpoints and does
+not yet replace the full pin map. [Migration status](../../../../docs/BAREWire_Rebase_Plan.md)
+records the remaining gates, including the unresolved `Prelude.Package`
+reference to `Platform.xdcConstraints`. This README is a declaration inventory,
+not fresh acceptance of every Prelude export or a new synthesis run.
 
 ## Notes
 

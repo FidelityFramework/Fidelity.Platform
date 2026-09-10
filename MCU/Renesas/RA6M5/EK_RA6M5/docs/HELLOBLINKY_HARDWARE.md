@@ -15,7 +15,7 @@ The application owns behavior; this package owns reusable board and MCU facts.
 | S2 | P004 | E32 | IRQ9-DS / PORT_IRQ9 `0x00A` | Same |
 
 These are three separate LEDs. An open trace-cut jumper disconnects its control.
-The user has confirmed active-high LED operation and active-low button behavior on the connected board through HelloBlinky. Schematic acquisition and the board PCB revision remain provenance work. HW table 19.5 gives these LED pins no GPT alternate function; dimming uses software PWM.
+The user has confirmed active-high LED operation and active-low button behavior on the connected board through HelloBlinky. The acquired MP schematic and netlist corroborate the circuitry; the physical PCB revision remains to be inspected. HW table 19.5 gives these LED pins no GPT alternate function; dimming uses software PWM.
 
 J10 is the debug USB connector; the onboard S124 provides J-Link over SWD
 (BOARD-1.01 §5.2). USB enumeration as `1366:0101` identifies the probe transport,

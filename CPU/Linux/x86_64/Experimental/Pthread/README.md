@@ -6,7 +6,8 @@ nativeint-as-pointer and NativePtr operations. The production pthread pilot and
 bindings live two directories above and use the default typed surface.
 
 The experimental Ariel prototype selects this manifest explicitly. Its intended
-replacement requires CHandle plus bounded-array/capture projection in the compiler.
+replacement is the later [typed Ariel package](../../Ariel/README.md), using
+CHandle plus bounded-array/capture projection in the compiler.
 Passing Python ABI probes or the runtime-neutral lifecycle model does not supply
 that missing native integration.
 
