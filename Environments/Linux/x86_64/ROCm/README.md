@@ -9,3 +9,8 @@ longer includes them as accelerator source files.
 The [RDNA 3.5 inventory](../../../../Hardware/Silicon/GPU/AMD/RDNA3_5/StrixHalo_iGPU/README.md)
 remains a scaffold. Moving these bindings does not establish a tested GPU
 kernel backend, device allocation policy or shared-memory composition.
+
+[MemoryContract.clef](MemoryContract.clef) now records shared-allocation and
+coherence obligations for the Strix Halo/Arty reference design. Its independent
+[manifest](Fidelity.ROCm.MemoryContract.fidproj) imports metadata only. It does
+not establish an allocation or validate the generated bindings.

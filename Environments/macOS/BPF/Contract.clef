@@ -1,0 +1,32 @@
+namespace Fidelity.Platform.Environments.macOS.BPF
+open Fidelity.Platform.Contracts.Admission
+module Contract =
+    /// Reference subset only. Required facts and budgets must be resolved.
+    let description: HostContract = {
+        Id = "macos-cbpf-ethernet-reference"
+        Machine = Fidelity.Platform.AbstractMachines.CBPF.Machine.description
+        Surface = {
+            Name = "macos-cbpf-ethernet-reference"; Kind = "host-api"
+            Endpoints = [|
+                { Name = "capture-filter"; Location = "symbol"; Address = "BIOCSETF"
+                  Signature = "packet -> capture length (zero ignores for this descriptor)"; Contracts = [||]; Since = ""; Until = "" }
+                { Name = "receive"; Location = "symbol"; Address = "read(/dev/bpfN)"
+                  Signature = "buffer -> grouped BPF records"; Contracts = [||]; Since = ""; Until = "" }
+                { Name = "transmit"; Location = "symbol"; Address = "write(/dev/bpfN)"
+                  Signature = "Ethernet frame -> write result"; Contracts = [||]; Since = ""; Until = "" }
+            |]
+            Defaults = [||]; Contracts = [||]
+        }
+        Artifact = "bpf_insn array installed with BIOCSETF"
+        AdmissionGate = "XNU bpf_validate plus BPF descriptor/interface configuration"
+        RequiredFacts = [| "macos-build-and-xnu-source"; "host-architecture-and-abi"; "biocversion"; "bpf-descriptor-access"; "interface-and-datalink-type"; "bpf-buffer-and-capture-policy"; "compiler-and-filter-encoding"; "validator-limit-policy" |]
+        Features = [| "integer-arithmetic"; "packet-read"; "forward-branches"; "capture-length-verdict" |]
+        Obligations = [| "valid-opcodes-and-forward-targets"; "scratch-initialization-and-bounds"; "terminal-return"; "packet-read-failure-semantics"; "capture-length-convention" |]
+        Budgets = [|
+            { Metric = "program-size"; Unit = "instruction-slots"; Scope = "one-filter"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+            { Metric = "execution-work"; Unit = "instructions"; Scope = "one-invocation"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+        |]
+        Sources = [| "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/man/man4/bpf.4"; "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/net/bpf_filter.c"; "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/net/bpf.h" |]
+    }

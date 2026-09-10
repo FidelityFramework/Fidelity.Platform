@@ -1,0 +1,30 @@
+namespace Fidelity.Platform.Environments.Linux.EBPF
+open Fidelity.Platform.Contracts.Admission
+module Contract =
+    /// Reference subset only. Required facts and budgets must be resolved.
+    let description: HostContract = {
+        Id = "linux-ebpf-xdp-reference"
+        Machine = Fidelity.Platform.AbstractMachines.EBPF.Machine.description
+        Surface = {
+            Name = "linux-ebpf-xdp-reference"; Kind = "host-api"
+            Endpoints = [|
+                { Name = "xdp"; Location = "symbol"; Address = "XDP ingress hook"
+                  Signature = "xdp_md -> xdp_action"; Contracts = [||]; Since = ""; Until = "" }
+            |]
+            Defaults = [||]; Contracts = [||]
+        }
+        Artifact = "bpf-elf-object"
+        AdmissionGate = "Linux BPF_PROG_LOAD verifier; XDP attachment is a separate gate"
+        RequiredFacts = [| "kernel-build-and-config"; "host-architecture-and-abi"; "bpf-isa-features"; "program-type-and-attach-mode"; "privilege-and-license"; "helper-map-btf-inventory"; "loader-and-lowering-toolchain"; "verifier-limit-policy"; "nic-and-driver" |]
+        Features = [| "integer-arithmetic"; "packet-read"; "bounded-control-flow"; "xdp-verdict" |]
+        Obligations = [| "termination"; "register-initialization"; "pointer-provenance-and-bounds"; "stack-initialization-and-call-chain"; "context-and-return-convention"; "helper-and-map-permissions"; "reference-lifetime-and-pointer-leaks"; "final-bytecode-legibility" |]
+        Budgets = [|
+            { Metric = "stack"; Unit = "bytes"; Scope = "combined-call-chain"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+            { Metric = "verifier-work"; Unit = "instruction-visits"; Scope = "one-load"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+            { Metric = "execution-work"; Unit = "instructions"; Scope = "one-invocation"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+        |]
+        Sources = [| "https://docs.kernel.org/bpf/verifier.html"; "https://docs.kernel.org/bpf/standardization/instruction-set.html"; "https://docs.kernel.org/bpf/bpf_design_QA.html" |]
+    }

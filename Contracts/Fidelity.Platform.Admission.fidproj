@@ -1,0 +1,11 @@
+[package]
+name = "Fidelity.Platform.Admission"
+version = "0.1.0"
+description = "Reference admission evidence and BAREWire sidecar contracts; no backend or loader."
+[compilation]
+target = "library"
+[build]
+sources = ["Admission.clef", "Sidecar.clef"]
+output_kind = "library"
+[dependencies]
+BAREWire = { path = "../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }

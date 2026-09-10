@@ -1,0 +1,43 @@
+namespace Fidelity.Platform.Contracts.Sidecar
+
+open BAREWire.Platform
+
+/// The producer and consumer reference BAREWire layouts. Shared physical RAM
+/// does not itself establish aliasing, ownership, visibility or DMA reachability.
+type Handoff = {
+    Name: string
+    Producer: string
+    Consumer: string
+    Source: BufferSchema
+    Destination: BufferSchema
+    Transport: Transport
+    /// shared-backing | copy | dma
+    Mechanism: string
+    /// Established externally by allocation/import or by DMA mapping evidence.
+    MappingEvidence: string option
+    /// Names the producer completion and the consumer release obligations.
+    ProducerCompletion: string
+    ConsumerRelease: string
+}
+
+module Check =
+    /// Structural findings only. Completion names do not prove synchronization.
+    let run (handoff: Handoff) : string array =
+        Array.concat [|
+            if handoff.Source.Schema = "" || handoff.Source.Schema <> handoff.Destination.Schema
+                || handoff.Source.Schema <> handoff.Transport.Schema then
+                [| "BAREWire payload schema identities must agree." |] else [||]
+            if handoff.Source.Capacity <= 0L || handoff.Destination.Capacity < handoff.Source.Capacity then
+                [| "Destination must accommodate the positive source payload capacity." |] else [||]
+            if handoff.ProducerCompletion = "" || handoff.ConsumerRelease = "" then
+                [| "Both completion and release obligations are required." |] else [||]
+            if handoff.Mechanism <> "shared-backing" && handoff.Mechanism <> "copy" && handoff.Mechanism <> "dma" then
+                [| "Unknown handoff mechanism." |] else [||]
+            if handoff.Mechanism = "shared-backing" && handoff.Transport.Kind <> TransportKind.SharedMemory then
+                [| "Shared backing requires a shared-memory transport." |] else [||]
+            if handoff.Mechanism = "shared-backing" || handoff.Mechanism = "dma" then
+                match handoff.MappingEvidence with
+                | Some evidence when evidence <> "" -> [||]
+                | _ -> [| "Aliasing or DMA mapping evidence is unresolved." |]
+            else [||]
+        |]

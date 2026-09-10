@@ -1,0 +1,10 @@
+[package]
+name = "Fidelity.Platform.Environments.Linux.ROCm.MemoryContract"
+version = "0.1.0"
+[compilation]
+target = "library"
+[build]
+sources = ["MemoryContract.clef"]
+output_kind = "library"
+[dependencies]
+BAREWire = { path = "../../../../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }

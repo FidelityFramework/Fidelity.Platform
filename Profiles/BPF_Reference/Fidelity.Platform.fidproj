@@ -1,0 +1,13 @@
+[package]
+name = "Fidelity.Platform.Profiles.BPF.Reference"
+version = "0.1.0"
+description = "Admission reference data, not a deployable platform selection."
+[compilation]
+target = "library"
+[build]
+sources = ["Profile.clef"]
+output_kind = "library"
+[dependencies]
+linux = { path = "../../Environments/Linux/eBPF/Fidelity.Platform.fidproj" }
+windows = { path = "../../Environments/Windows/eBPF/Fidelity.Platform.fidproj" }
+macos = { path = "../../Environments/macOS/BPF/Fidelity.Platform.fidproj" }

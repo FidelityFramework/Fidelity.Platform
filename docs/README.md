@@ -13,6 +13,7 @@ boundaries. The historical filename is retained for source references.
 | [Platform facts and derived state](D4b_PLATFORM_CARRIER_LOCATION.md) | Declaration/context/graph responsibilities and deferred decisions | Current baseline plus explicitly open design questions |
 | [BAREWire integration](BAREWire_Rebase_Plan.md) | What migrated and the remaining pin/schema work | Migration status and acceptance criteria |
 | [MMIO contracts and predicates](MMIO_CONTRACTS.md) | Region inventory, mappings, workload grants, CCS evidence and executable limits | Implemented static MMIO slice |
+| [Admission and accelerator handoffs](ADMISSION_AND_SIDECARS.md) | BPF host distinctions, verifier/resource budgets, Strix Halo/Arty and Metal UMA boundaries | Executable reference checks and source packages; compiler/gate integration pending |
 
 Hardware sources and board acceptance belong with the corresponding product;
 see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md)

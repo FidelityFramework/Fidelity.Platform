@@ -1,0 +1,10 @@
+[package]
+name = "Fidelity.Platform.AbstractMachines.CBPF"
+version = "0.1.0"
+[compilation]
+target = "library"
+[build]
+sources = ["Machine.clef"]
+output_kind = "library"
+[dependencies]
+admission = { path = "../../Contracts/Fidelity.Platform.Admission.fidproj" }

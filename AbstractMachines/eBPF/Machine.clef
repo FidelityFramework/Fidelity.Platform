@@ -1,0 +1,14 @@
+namespace Fidelity.Platform.AbstractMachines.EBPF
+
+open Fidelity.Platform.Contracts.Admission
+
+module Machine =
+    let description: InstructionMachine = {
+        Id = "ebpf"
+        Widths = [|
+            { Name = "Register"; Bits = 64 }
+            { Name = "ALU32"; Bits = 32 }
+            { Name = "InstructionSlot"; Bits = 64 }
+        |]
+        Sources = [| "https://docs.kernel.org/bpf/standardization/instruction-set.html" |]
+    }

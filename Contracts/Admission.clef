@@ -1,0 +1,170 @@
+namespace Fidelity.Platform.Contracts.Admission
+
+open BAREWire.Platform
+
+/// Describes an instruction machine, independently of its host CPU and loader.
+/// These widths do not declare a host pointer width or a native calling ABI.
+type InstructionMachine = {
+    Id: string
+    Widths: WidthDeclaration array
+    Sources: string array
+}
+
+/// Exact host facts still needed before a reference becomes a deployment profile.
+/// A version floor alone cannot establish config, privilege or extension support.
+type HostFact = {
+    Name: string
+    Value: string option
+    Evidence: string
+}
+
+/// Names the quantity AND its accounting scope. No conversion from verifier
+/// visits or executed instructions to time is implicit. None means unresolved.
+type Budget = {
+    Metric: string
+    Unit: string
+    Scope: string
+    Maximum: int option
+    Source: string
+}
+
+type HostContract = {
+    Id: string
+    Machine: InstructionMachine
+    Surface: BoundarySurface
+    Artifact: string
+    AdmissionGate: string
+    RequiredFacts: string array
+    /// A deliberately bounded subset, not an exhaustive OS capability inventory.
+    Features: string array
+    Obligations: string array
+    Budgets: Budget array
+    Sources: string array
+}
+
+type AdmissionProfile = {
+    Id: string
+    Host: HostContract
+    Facts: HostFact array
+    /// Digest of the resolved contract, facts, ABI, toolchain and assumptions.
+    /// An external producer computes this; an arbitrary label is not a digest.
+    Digest: string option
+}
+
+type ResourceEvidence = {
+    Metric: string
+    Unit: string
+    Scope: string
+    Value: int
+    /// checked-upper-bound | estimate | measurement
+    Standing: string
+    Evidence: string
+}
+
+type ObligationEvidence = {
+    Name: string
+    /// discharged | pending | refuted
+    Standing: string
+    Evidence: string
+}
+
+/// A producer's report, not a proof object. Checking the evidence referenced by
+/// this record remains the responsibility of its analysis/verifier adapter.
+type AnalysisReport = {
+    ProfileDigest: string
+    ArtifactDigest: string
+    Machine: string
+    Features: string array
+    Resources: ResourceEvidence array
+    Obligations: ObligationEvidence array
+}
+
+type Finding = {
+    Subject: string
+    /// pending | violation | advisory
+    Standing: string
+    Message: string
+}
+
+/// Reference consistency checks. No bytecode analysis or admission is claimed.
+/// Integers stay abstract in Clef; the F# test adapter uses managed int values.
+module Check =
+    let private finding subject standing message =
+        { Subject = subject; Standing = standing; Message = message }
+
+    let private duplicates subject names =
+        names
+        |> Array.distinct
+        |> Array.filter (fun name -> Array.filter ((=) name) names |> Array.length |> fun n -> n > 1)
+        |> Array.map (fun name -> finding subject "violation" ("Duplicate identity: " + name))
+
+    let private budget (resources: ResourceEvidence array) (limit: Budget) =
+        let matches = resources |> Array.filter (fun value ->
+            value.Metric = limit.Metric && value.Unit = limit.Unit && value.Scope = limit.Scope)
+        match limit.Maximum with
+        | None -> [| finding limit.Metric "pending" "Target budget is unresolved." |]
+        | Some maximum when maximum < 0 -> [| finding limit.Metric "violation" "Negative target budget." |]
+        | Some maximum ->
+            if Array.length matches = 0 then
+                [| finding limit.Metric "pending" "No evidence with this metric, unit and scope." |]
+            elif Array.length matches > 1 then
+                [| finding limit.Metric "violation" "Ambiguous resource evidence." |]
+            else
+                let value = matches.[0]
+                if value.Standing <> "checked-upper-bound" then
+                    [| finding limit.Metric "pending" "An estimate or measurement cannot discharge a hard budget." |]
+                elif value.Value > maximum then
+                    [| finding limit.Metric "violation" "Checked upper bound exceeds the selected budget." |]
+                else [||]
+
+    let run (profile: AdmissionProfile) artifactDigest (report: AnalysisReport) : Finding array =
+        let facts = profile.Host.RequiredFacts |> Array.collect (fun name ->
+            let matches = profile.Facts |> Array.filter (fun fact -> fact.Name = name)
+            if Array.length matches <> 1 then
+                [| finding name "pending" "One evidenced host fact is required." |]
+            else
+                let fact = matches.[0]
+                match fact.Value with
+                | Some value when value <> "" && fact.Evidence <> "" -> [||]
+                | _ -> [| finding name "pending" "Host fact or its provenance is unresolved." |])
+        let identity =
+            match profile.Digest with
+            | None -> [| finding profile.Id "pending" "Resolved profile digest is missing." |]
+            | Some digest when digest = "" -> [| finding profile.Id "pending" "Resolved profile digest is empty." |]
+            | Some digest when digest <> report.ProfileDigest ->
+                [| finding profile.Id "violation" "Report belongs to another profile or configuration." |]
+            | _ -> [||]
+        let artifact =
+            if artifactDigest = "" then [| finding "artifact" "pending" "Final artifact digest is missing." |]
+            elif report.ArtifactDigest <> artifactDigest then
+                [| finding "artifact" "violation" "Report predates or differs from the final artifact." |]
+            else [||]
+        let machine =
+            if report.Machine = profile.Host.Machine.Id then [||]
+            else [| finding "machine" "violation" "Instruction machine does not match the host contract." |]
+        let features =
+            report.Features
+            |> Array.filter (fun feature -> not (Array.contains feature profile.Host.Features))
+            |> Array.map (fun feature -> finding feature "violation" "Feature is outside the selected host subset.")
+        let obligations = profile.Host.Obligations |> Array.collect (fun name ->
+            let matches = report.Obligations |> Array.filter (fun item -> item.Name = name)
+            if Array.length matches <> 1 then [| finding name "pending" "One obligation result is required." |]
+            else
+                let item = matches.[0]
+                if item.Standing = "refuted" then [| finding name "violation" "Obligation is refuted." |]
+                elif item.Standing = "discharged" && item.Evidence <> "" then [||]
+                else [| finding name "pending" "Obligation has no discharge evidence." |])
+        let resources = report.Resources |> Array.collect (fun value ->
+            if value.Value < 0 || value.Evidence = "" then
+                [| finding value.Metric "violation" "Resource evidence needs a nonnegative value and provenance." |]
+            elif value.Standing = "estimate" || value.Standing = "measurement" then
+                [| finding value.Metric "advisory" "Advisory result; does not establish a worst-case bound." |]
+            elif value.Standing <> "checked-upper-bound" then
+                [| finding value.Metric "violation" "Unknown evidence standing." |]
+            else [||])
+        Array.concat [|
+            duplicates "host facts" (profile.Facts |> Array.map (fun item -> item.Name))
+            duplicates "obligations" (report.Obligations |> Array.map (fun item -> item.Name))
+            facts; identity; artifact; machine; features; obligations; resources
+            profile.Host.Budgets |> Array.collect (budget report.Resources)
+        |]

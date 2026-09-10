@@ -9,4 +9,4 @@ module Profile =
     ]
 
     let description =
-        "Development profile combining local Strix Halo compute substrates with Arty A7 FPGA over USB."
+        "ThreeBody physical reference: Strix Halo plus Arty A7; USB bring-up and proposed Ethernet workload link are distinct."

@@ -1,0 +1,25 @@
+namespace Fidelity.Platform.Environments.Linux.X86_64.ROCm
+open BAREWire.Platform
+module MemoryContract =
+    /// Semantics to resolve against the installed HIP/driver pair. These names
+    /// refer to the existing binding family, not an additional Fidelity service.
+    let sharedStorage: BoundarySurface = {
+        Name = "hip-host-device-mapped-storage"; Kind = "host-api"
+        Endpoints = [|
+            { Name = "mapped-host-allocation"; Location = "symbol"; Address = "hipHostMalloc/hipHostGetDevicePointer"
+              Signature = "allocation + flags -> host and device mappings"
+              Contracts = [|
+                  { Name = "coherence-policy"; Statement = "Resolve allocation flags, HIP_HOST_COHERENT and the selected device's supported coherence mode."
+                    Logic = "assumed"; Refs = [||]; Floor = 0L; AtMost = "" }
+                  { Name = "ownership"; Statement = "Establish the required system visibility and completion before transferring ownership. Fine-grained coherence does not remove data-race obligations."
+                    Logic = "assumed"; Refs = [||]; Floor = 0L; AtMost = "" }
+              |]
+              Since = ""; Until = "" }
+        |]
+        Defaults = [||]; Contracts = [||]
+    }
+    let sources = [|
+        "https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html"
+        "https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/coherence_control.html"
+        "https://rocm.docs.amd.com/en/docs-7.2.0/how-to/system-optimization/strixhalo.html"
+    |]

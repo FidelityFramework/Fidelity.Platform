@@ -1,0 +1,14 @@
+namespace Fidelity.Platform.AbstractMachines.CBPF
+
+open Fidelity.Platform.Contracts.Admission
+
+module Machine =
+    let description: InstructionMachine = {
+        Id = "cbpf"
+        Widths = [|
+            { Name = "Accumulator"; Bits = 32 }
+            { Name = "Index"; Bits = 32 }
+            { Name = "InstructionSlot"; Bits = 64 }
+        |]
+        Sources = [| "https://github.com/apple-oss-distributions/xnu/blob/main/bsd/net/bpf.h" |]
+    }

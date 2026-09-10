@@ -1,0 +1,39 @@
+namespace Fidelity.Platform.Profiles.AppleSilicon_Metal_FPGA_Reference
+open BAREWire.Platform
+open Fidelity.Platform.Contracts.Sidecar
+module Handoffs =
+    // Synthetic 1024-byte payload capacity. This is not an allocated resource,
+    // a chosen Ethernet MTU, or an implemented wire protocol.
+    let payload: BufferSchema = {
+        Name = "payload"; Schema = "sidecar-payload-layout-pending"; Capacity = 1024L
+        Framing = "capped"; Delimiter = -1; TrimDelimiter = false
+        Space = "metal-shared-allocation-pending"; Lifetime = "request"; Access = "rw"; Slot = 0
+    }
+    let shared: Transport = {
+        Name = "cpu-gpu"; Kind = "shared-memory"; Endpoints = [| "cpu"; "metal-gpu" |]
+        RateHz = 0L; MaxUnit = 0L; Ordered = false; Schema = payload.Schema; Since = ""; Until = ""
+    }
+    let ethernet: Transport = {
+        Name = "host-fpga"; Kind = "ethernet"; Endpoints = [| "host-bpf"; "fpga-mac" |]
+        RateHz = 0L; MaxUnit = 0L; Ordered = false; Schema = payload.Schema; Since = ""; Until = ""
+    }
+    let cpuToGpu: Handoff = {
+        Name = "cpu-to-gpu"; Producer = "cpu"; Consumer = "metal-gpu"
+        Source = payload; Destination = payload; Transport = shared
+        Mechanism = "shared-backing"; MappingEvidence = None
+        ProducerCompletion = "cpu-writes-before-command-submission"
+        ConsumerRelease = "gpu-command-completion-before-cpu-reuse"
+    }
+    let hostToFpga: Handoff = {
+        Name = "host-to-fpga"; Producer = "host"; Consumer = "fpga"
+        Source = payload; Destination = { payload with Space = "fpga-buffer-pending" }
+        Transport = ethernet; Mechanism = "copy"; MappingEvidence = None
+        ProducerCompletion = "gpu-completion-before-host-transmit"
+        ConsumerRelease = "protocol-acknowledgment-before-request-buffer-reuse"
+    }
+    let requiredFacts = [|
+        "exact-mac-and-metal-device"; "macos-build-and-abi"; "fpga-product-and-image"
+        "ethernet-interface-and-driver"; "wire-schema-and-byte-order"; "frame-budget-and-vlan-policy"
+        "capture-length-and-truncation-policy"; "buffer-allocation-and-alignment"
+        "completion-and-release-implementation"; "loss-duplicate-reorder-timeout-policy"
+    |]

@@ -1,0 +1,45 @@
+namespace Fidelity.Platform.Profiles.StrixHalo_ArtyLab
+open BAREWire.Platform
+open Fidelity.Platform.Contracts.Sidecar
+module Handoffs =
+    // ThreeBody's physical reference is Strix Halo plus Arty A7. This fixture
+    // describes its intended handoffs; it does not allocate or run the demo.
+    let gpuMemory = Fidelity.Platform.Environments.Linux.X86_64.ROCm.MemoryContract.sharedStorage
+    let packetHost = Fidelity.Platform.Environments.Linux.EBPF.Contract.description
+    let payload: BufferSchema = {
+        Name = "threebody-payload"; Schema = "threebody-wire-layout-pending"; Capacity = 1024L
+        Framing = "capped"; Delimiter = -1; TrimDelimiter = false
+        Space = "strix-halo-shared-allocation-pending"; Lifetime = "request"; Access = "rw"; Slot = 0
+    }
+    let shared: Transport = {
+        Name = "strix-cpu-gpu"; Kind = "shared-memory"; Endpoints = [| "strix-cpu"; "strix-gpu" |]
+        RateHz = 0L; MaxUnit = 0L; Ordered = false; Schema = payload.Schema; Since = ""; Until = ""
+    }
+    let ethernet: Transport = {
+        Name = "strix-arty-l2"; Kind = "ethernet"; Endpoints = [| "host-af-xdp"; "arty-ethernet-mac" |]
+        RateHz = 0L; MaxUnit = 0L; Ordered = false; Schema = payload.Schema; Since = ""; Until = ""
+    }
+    let cpuToGpu: Handoff = {
+        Name = "strix-cpu-to-gpu"; Producer = "strix-cpu"; Consumer = "strix-gpu"
+        Source = payload; Destination = payload; Transport = shared
+        Mechanism = "shared-backing"; MappingEvidence = None
+        ProducerCompletion = "cpu-writes-visible-before-hip-submission"
+        ConsumerRelease = "hip-completion-and-system-visibility-before-cpu-reuse"
+    }
+    // Conservative host copy into the transmit path. AF_XDP zero-copy is an
+    // independent NIC/UMEM property and does not prove GPU/UMEM aliasing.
+    let hostToArty: Handoff = {
+        Name = "strix-host-to-arty"; Producer = "strix-host"; Consumer = "arty-fpga"
+        Source = payload; Destination = { payload with Space = "arty-payload-storage-pending" }
+        Transport = ethernet; Mechanism = "copy"; MappingEvidence = None
+        ProducerCompletion = "gpu-result-complete-before-af-xdp-tx"
+        ConsumerRelease = "correlated-fpga-reply-or-explicit-cancellation"
+    }
+    let requiredFacts = [|
+        "exact-strix-halo-system-and-installed-memory"; "single-shared-pool-accounting"
+        "gpuvm-gtt-ttm-and-bios-reservations"; "hip-driver-version-and-allocation-flags"
+        "host-device-mapping-and-coherence"; "npu-allocation-import-contract-if-selected"
+        "arty-board-revision-and-ethernet-mac-phy-image"; "host-nic-driver-xdp-mode"
+        "af-xdp-umem-registration-and-ring-ownership"; "wire-schema-and-framing-budget"
+        "reply-correlation-loss-reorder-duplicate-timeout-policy"; "latency-measurement-conditions"
+    |]

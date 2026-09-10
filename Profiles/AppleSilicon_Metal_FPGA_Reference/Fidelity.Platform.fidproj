@@ -1,0 +1,13 @@
+[package]
+name = "Fidelity.Platform.Profiles.AppleSilicon.MetalFPGA.Reference"
+version = "0.1.0"
+description = "Synthetic handoff descriptions; no macOS executable or FPGA protocol."
+[compilation]
+target = "library"
+[build]
+sources = ["Handoffs.clef"]
+output_kind = "library"
+[dependencies]
+admission = { path = "../../Contracts/Fidelity.Platform.Admission.fidproj" }
+metal = { path = "../../Environments/macOS/Metal/Fidelity.Platform.fidproj" }
+bpf = { path = "../../Environments/macOS/BPF/Fidelity.Platform.fidproj" }

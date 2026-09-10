@@ -8,6 +8,9 @@ several execution profiles.
 ```text
 Fidelity.Platform/
 ├── Contracts/
+├── AbstractMachines/
+│   ├── eBPF/                     # Reference description; no backend
+│   └── cBPF/                     # Reference description; no backend
 ├── Hardware/
 │   ├── Silicon/
 │   │   ├── CPU/
@@ -21,12 +24,12 @@ Fidelity.Platform/
 │   └── VirtualMachines/
 │       └── <provider>/<machine>/
 ├── Environments/
-│   ├── Linux/x86_64/
+│   ├── Linux/                    # x86_64 bindings; eBPF reference contract
 │   ├── Freestanding/
 │   │   ├── arm_cortex_m33/
 │   │   └── x86_64/
-│   ├── Windows/                  # Reserved
-│   ├── macOS/                    # Reserved
+│   ├── Windows/                  # eBPF reference contract; no native target
+│   ├── macOS/                    # BPF/Metal reference contracts; no native target
 │   ├── Android/                  # Reserved
 │   └── iOS/                      # Reserved
 ├── Protocols/
@@ -39,10 +42,12 @@ Fidelity.Platform/
 | Area | Responsibility |
 | --- | --- |
 | `Contracts/` | Shared requirements, regions, mappings, transactions, grants and predicates; BAREWire supplies memory-layout vocabulary |
+| `AbstractMachines/` | Instruction semantics/widths, independent of the native host CPU and OS admission policy |
 | `Hardware/Silicon/<kind>/<vendor>/<family>/...` | Architecture, chip/compute-block capabilities, peripheral interfaces and concrete part/package facts; generic x86_64 facts do not require a vendor partition |
 | `Hardware/Products/<manufacturer>/<product>/` | Physical assembly: component selection, memory configuration, wiring, clocks and connectors |
 | `Hardware/VirtualMachines/<provider>/<machine>/` | Machine presented to a guest: memory/resources and, when implemented, boot and discovery requirements |
 | `Environments/<environment>/<architecture>/` | ABI, runtime services, native bindings and execution requirements |
+| `Environments/<environment>/<instruction-host>/` | Architecture-independent reference admission/attachment contracts; native loader ABI remains architecture-specific |
 | `Protocols/` | Communication layouts, negotiation, sequencing and transports |
 | `Profiles/<profile>/` | Selected hardware/environment composition and image or workload budgets |
 
@@ -72,7 +77,9 @@ and deployment; OCI would be an orchestration selection, not a hardware branch.
 | [RestrictedGuest64](Profiles/RestrictedGuest64) | Synthetic 64-bit-pointer/32-bit-MMIO compiler fixture using a [synthetic machine](Hardware/VirtualMachines/Synthetic/RestrictedGuest64) and freestanding x86_64 facts; no VM boot or virtio |
 | [MeadowF7](Hardware/Products/WildernessLabs/MeadowF7) | Product scaffold and reference pack; no accepted MCU bring-up |
 | [StrixHalo_iGPU](Hardware/Silicon/GPU/AMD/RDNA3_5/StrixHalo_iGPU), [StrixHalo_NPU](Hardware/Silicon/NPU/AMD/XDNA2/StrixHalo_NPU) | Silicon scaffolds; Linux-hosted [ROCm](Environments/Linux/x86_64/ROCm) and [XRT](Environments/Linux/x86_64/XRT) binding packages are separate |
-| [StrixHalo_ArtyLab](Profiles/StrixHalo_ArtyLab) | Dependency catalogue; not a general multi-target resource resolver |
+| [StrixHalo_ArtyLab](Profiles/StrixHalo_ArtyLab) | ThreeBody physical reference catalogue and checked handoff descriptions; not a general multi-target resource resolver |
+| [BPF_Reference](Profiles/BPF_Reference) | Unresolved Linux/Windows/macOS admission selections; no emitted or loaded BPF artifact |
+| [AppleSilicon_Metal_FPGA_Reference](Profiles/AppleSilicon_Metal_FPGA_Reference) | Synthetic shared-storage/Ethernet handoffs; no native executable or FPGA protocol |
 
 Reference-only ST product packs, the
 [Renesas FPB-RA6E2 pack](Hardware/Products/Renesas/FPB_RA6E2) and reserved branches

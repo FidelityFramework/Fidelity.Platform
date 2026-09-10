@@ -1,0 +1,19 @@
+namespace Fidelity.Platform.Profiles.BPF_Reference
+open Fidelity.Platform.Contracts.Admission
+module Profile =
+    // Independent reference selections, not a portable binary or composed target.
+    let linux: AdmissionProfile = {
+        Id = "linux-xdp-unresolved"
+        Host = Fidelity.Platform.Environments.Linux.EBPF.Contract.description
+        Facts = [||]; Digest = None
+    }
+    let windows: AdmissionProfile = {
+        Id = "windows-xdp-unresolved"
+        Host = Fidelity.Platform.Environments.Windows.EBPF.Contract.description
+        Facts = [||]; Digest = None
+    }
+    let macos: AdmissionProfile = {
+        Id = "macos-capture-unresolved"
+        Host = Fidelity.Platform.Environments.macOS.BPF.Contract.description
+        Facts = [||]; Digest = None
+    }

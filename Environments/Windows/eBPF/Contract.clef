@@ -1,0 +1,30 @@
+namespace Fidelity.Platform.Environments.Windows.EBPF
+open Fidelity.Platform.Contracts.Admission
+module Contract =
+    /// Reference subset only. Required facts and budgets must be resolved.
+    let description: HostContract = {
+        Id = "windows-ebpf-xdp-reference"
+        Machine = Fidelity.Platform.AbstractMachines.EBPF.Machine.description
+        Surface = {
+            Name = "windows-ebpf-xdp-reference"; Kind = "host-api"
+            Endpoints = [|
+                { Name = "xdp"; Location = "symbol"; Address = "XDP for Windows extension"
+                  Signature = "extension-defined context -> extension-defined action"; Contracts = [||]; Since = ""; Until = "" }
+            |]
+            Defaults = [||]; Contracts = [||]
+        }
+        Artifact = "native-signed-driver (package-specific lowering)"
+        AdmissionGate = "eBPF for Windows verification and native driver loading; Windows XDP attachment"
+        RequiredFacts = [| "windows-build"; "host-architecture-and-abi"; "ebpf-for-windows-package"; "prevail-build-and-options"; "xdp-package-and-extension-contract"; "helper-map-inventory"; "privilege-and-signing-policy"; "native-conversion-toolchain"; "verifier-limit-policy"; "nic-and-driver" |]
+        Features = [| "integer-arithmetic"; "packet-read"; "bounded-control-flow"; "xdp-verdict" |]
+        Obligations = [| "termination"; "register-initialization"; "pointer-provenance-and-bounds"; "stack-initialization-and-call-chain"; "context-and-return-convention"; "helper-and-map-permissions"; "reference-lifetime-and-pointer-leaks"; "native-conversion-preservation" |]
+        Budgets = [|
+            { Metric = "stack"; Unit = "bytes"; Scope = "combined-call-chain"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+            { Metric = "verifier-work"; Unit = "abstract-states"; Scope = "one-verification"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+            { Metric = "execution-work"; Unit = "instructions"; Scope = "one-invocation"
+              Maximum = None; Source = "Resolve from the selected host and workload; no global default." }
+        |]
+        Sources = [| "https://github.com/microsoft/xdp-for-windows/blob/main/docs/ebpf.md"; "https://github.com/microsoft/ebpf-for-windows" |]
+    }

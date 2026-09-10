@@ -1,0 +1,21 @@
+namespace Fidelity.Platform.Environments.macOS.Metal
+open BAREWire.Platform
+module Contract =
+    /// Apple-family shared storage semantics. No allocation or native binding.
+    let sharedStorage: BoundarySurface = {
+        Name = "metal-apple-shared-storage"; Kind = "host-api"
+        Endpoints = [|
+            { Name = "shared-buffer"; Location = "symbol"; Address = "MTLStorageMode.shared"
+              Signature = "CPU and Apple GPU access resource backing"
+              Contracts = [|
+                  { Name = "ownership"; Statement = "Producer writes complete before the other processor accesses the resource."
+                    Logic = "assumed"; Refs = [||]; Floor = 0L; AtMost = "" }
+              |]
+              Since = ""; Until = "" }
+        |]
+        Defaults = [||]; Contracts = [||]
+    }
+    let sources = [|
+        "https://developer.apple.com/documentation/metal/mtlstoragemode/shared"
+        "https://developer.apple.com/documentation/metal/choosing-a-resource-storage-mode-for-apple-gpus"
+    |]
