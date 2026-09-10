@@ -4,8 +4,8 @@ version = "0.1.0"
 [compilation]
 target = "cpu"
 [dependencies]
-platform = { path = "../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
-resvg = { path = "../../CPU/Linux/x86_64/Fidelity.Image.Resvg.Native.fidproj" }
+platform = { path = "../../Environments/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+resvg = { path = "../../Environments/Linux/x86_64/Fidelity.Image.Resvg.Native.fidproj" }
 [build]
 sources = ["ResvgIdentity.clef"]
 output = "resvg-identity"

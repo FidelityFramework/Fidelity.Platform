@@ -1,0 +1,17 @@
+# Select the default profile through its shared description package.
+# Environment metadata supplies Console without the full runtime binding tree.
+[package]
+name = "Fidelity.Platform.Linux_x86_64.CompilerSurface"
+version = "0.1.0"
+[compilation]
+target = "cpu"
+[dependencies]
+description = { path = "../../../Profiles/Linux_x86_64_Default/Fidelity.Platform.Description.fidproj" }
+[platform]
+description = "Fidelity.Platform.Linux_x86_64.Description.description"
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+[build]
+output_kind = "library"
+sources = []

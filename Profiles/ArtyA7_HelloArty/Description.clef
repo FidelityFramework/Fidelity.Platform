@@ -1,0 +1,82 @@
+/// HelloArty selection over the Digilent product and its Xilinx silicon.
+/// Preserves the accepted report schema, buffer budget and UART cadence.
+module Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Description
+
+open BAREWire.Platform
+open Fidelity.Platform.Hardware.Silicon.FPGA.Xilinx.Artix7.XC7A100T_CSG324
+open Fidelity.Platform.Hardware.Products.Digilent.ArtyA7_100T.Inventory
+
+module ProductUart = Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Bindings.Uart
+
+// ---------------------------------------------------------------------------
+// Buffer schemas
+// ---------------------------------------------------------------------------
+
+/// The UART transmit buffer carrying HelloArty's `ArtyReport`
+/// (~/repos/HelloArty/src/Shared/Contract.clef). Framed with the BAREWire
+/// envelope (BAREWire docs/05): a 4-byte length prefix and a 5-byte header
+/// before the payload. The payload is at most 12 bytes on the wire (two
+/// one-byte tags and a zigzag `int` of up to 10 bytes), so 21 bytes framed;
+/// 32 is the declared ceiling the obligations check, and the schema consumer
+/// (Audit step 8) computes the exact figure from the type. Lives for the
+/// life of the design. `Slot` is the ring slot size and is 0 for every
+/// framing but `Framing.Ring`.
+let uartTx: BufferSchema = {
+    Name = "uartTx"
+    Schema = "ArtyReport"
+    Capacity = 32
+    Framing = Framing.LengthPrefixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "bram"
+    Lifetime = Lifetime.Program
+    Access = Access.ReadWrite
+    Slot = 0
+}
+
+// ---------------------------------------------------------------------------
+// Transports
+// ---------------------------------------------------------------------------
+
+/// The on-board FTDI FT2232HQ USB-UART bridge (reference manual §"USB-UART
+/// Bridge") as a transport: 115200 baud is Uart.usbUart's DefaultBaud in the
+/// bindings, stated here as the symbol rate; one framed `ArtyReport` is the
+/// largest unit and equals the transmit buffer's capacity. Bytes arrive in
+/// order.
+let uart: Transport = {
+    Name = "uart"
+    Kind = TransportKind.Uart
+    Endpoints = [| "uart_tx"; "uart_rx" |]
+    RateHz = ProductUart.defaultBaud
+    MaxUnit = 32
+    Ordered = true
+    Schema = "ArtyReport"
+    Since = ""
+    Until = ""
+}
+
+// ---------------------------------------------------------------------------
+// The description
+// ---------------------------------------------------------------------------
+
+/// The Arty A7-100T description. Same Id as Platform.descriptor so the two
+/// values name one board; no core (an FPGA has none to describe); no limits.
+let description: PlatformDescription = {
+    Id = "fpga-xilinx-artix7-arty-a7-100t"
+    DisplayName = "Digilent Arty A7-100T (Rev D/E)"
+    Substrate = "FPGA"
+    Core = None
+    Spaces = [| bram; registers; flash |]
+    Surfaces = [| pins |]
+    Buffers = [| uartTx |]
+    Transports = [| uart |]
+    Lifecycle = lifecycle
+    Notes = [|
+        "Block RAM and flip-flop totals: Arty A7 reference manual, Artix-7 feature table, XC7A100TCSG324-1 column."
+        "Flash: Arty A7 reference manual, Quad-SPI Flash; 128 Mbit S25FL128S/S25FL127S by board revision."
+        "UART: Arty A7 reference manual, USB-UART Bridge (FT2232HQ); pins D10/A9 from Arty-A7-100-Master.xdc; baud from Uart.usbUart."
+        "The 256 MB DDR3L (MT41K128M16JT-125) and the distributed RAM total are not declared: the vocabulary has no DRAM kind yet and the manual states no LUT RAM figure."
+        "Pin map and device part remain in Platform.descriptor until Composer projects XDC from this description."
+    |]
+    Limits = [||]
+}

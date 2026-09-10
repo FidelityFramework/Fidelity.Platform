@@ -1,0 +1,14 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.FPGA.Xilinx.Artix7.XC7A100T_CSG324"
+version = "0.1.0"
+description = "XC7A100T CSG324 -1 identity and on-chip resource inventory."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["Part.clef"]
+output_kind = "library"
+
+[dependencies]
+BAREWire = { path = "../../../../../../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }

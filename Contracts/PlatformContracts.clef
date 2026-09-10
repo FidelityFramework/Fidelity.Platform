@@ -133,7 +133,7 @@ type PinEndpoint = {
 [<CLIMutable>]
 type ClockEndpoint = {
     Name: string
-    FrequencyHz: int64
+    FrequencyHz: int
     PackagePin: string
     Standard: ElectricalStandard
     Description: string option

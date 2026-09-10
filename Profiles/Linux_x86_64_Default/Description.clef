@@ -1,0 +1,71 @@
+/// Default Linux selection preserving the previously accepted application budgets.
+module Fidelity.Platform.Linux_x86_64.Description
+
+open BAREWire.Platform
+open Fidelity.Platform.Environments.Linux.X86_64
+open Fidelity.Platform.Profiles.Linux_x86_64_Default.CompatibilityBudgets
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Buffers: the declared homes of the console's capacities.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// `Console.readln`'s line buffer: a `str` read from stdin into the arena,
+/// delimited by newline (byte 10), the delimiter trimmed from the value. The
+/// capacity is `Console.READLINE_CAPACITY`, authored once in Console.clef;
+/// the compiler's `Sys.readline` lowering and the `input_bound_consolereadln`
+/// and `input_copy_bound_consolereadln` obligations both read it from this
+/// declaration (HelloProof, proof-trace 04-the-input-bounds).
+let consoleReadln: BufferSchema = {
+    Name = "consoleReadln"
+    Schema = "str"
+    Capacity = Console.READLINE_CAPACITY
+    Framing = Framing.Delimited
+    Delimiter = 10
+    TrimDelimiter = true
+    Space = "arena"
+    Lifetime = Lifetime.Scope
+    Access = Access.ReadWrite
+    Slot = 0
+}
+
+/// `Console.write`'s source: a `str` handed to write(2) with its own length,
+/// read from `rodata` when it is a literal. The write path allocates no
+/// buffer of its own, so the capacity is the `rodata` budget a literal is
+/// bounded by; program lifetime, read-only.
+let consoleWrite: BufferSchema = {
+    Name = "consoleWrite"
+    Schema = "str"
+    Capacity = 4096
+    Framing = Framing.Fixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "rodata"
+    Lifetime = Lifetime.Program
+    Access = Access.ReadOnly
+    Slot = 0
+}
+
+/// The platform. The selected manifest names this export explicitly and CCS reads
+/// every table through the bindings above. A CPU declares no `Limits`; the
+/// kernel leaf will.
+let description: PlatformDescription = {
+    Id = "cpu-linux-x86_64"
+    DisplayName = "Linux x86-64 (libc)"
+    Substrate = "CPU"
+    Core = Some core
+    Spaces = [| text; rodata; data; bss; stack; arena; heap |]
+    Surfaces = [| syscalls |]
+    Buffers = [| consoleReadln; consoleWrite |]
+    Transports = [| websocket; wayland |]
+    Lifecycle = lifecycle
+    Notes = [|
+        "syscall numbers: Syscalls.clef, arch/x86/entry/syscalls/syscall_64.tbl"
+        "stack: RLIMIT_STACK default soft limit 8 MiB (setrlimit(2)); 16-byte alignment, System V AMD64 ABI 3.2.2"
+        "arena: BAREWire docs/Arena_Design.md, the caller-provided 4096-byte scope arena"
+        "heap: TASK_SIZE_MAX for 4-level paging, arch/x86/include/asm/page_64_types.h, with RLIMIT_DATA unlimited"
+        "consoleReadln capacity: Console.READLINE_CAPACITY in Console.clef"
+        "section budgets: one page each, confirmed against HelloProof targets/helloworld (readelf -SW)"
+        "websocket unit: WebSocket/Server.clef MaxFrameSize"
+    |]
+    Limits = [||]
+}

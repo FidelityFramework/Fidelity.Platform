@@ -1,0 +1,22 @@
+namespace Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M33
+
+open BAREWire.Platform
+
+module Core = Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM33.Description
+
+/// Existing Cortex-M33 Thumb soft-float execution contract; startup is image-owned.
+module Description =
+    let pointerWidth: WidthDeclaration = { Name = "Pointer"; Bits = 32 }
+    let core: TargetCore = {
+        Os = "none"
+        Arch = Core.architecture
+        WordSizeBits = Core.wordSizeBits
+        Endianness = Core.endianness
+        Runtime = "bare"
+        Triple = "thumbv8m.main-none-eabi"
+        CpuModel = Core.cpuModel
+        Widths = [| pointerWidth; Core.registerWidth |]
+        Representations = [| Core.repInt8; Core.repInt16; Core.repInt32; Core.repInt64
+                             Core.repUInt8; Core.repUInt16; Core.repUInt32; Core.repUInt64 |]
+    }
+

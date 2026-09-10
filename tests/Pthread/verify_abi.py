@@ -13,7 +13,7 @@ import re
 
 
 root = Path(__file__).resolve().parents[2]
-types = (root / "CPU/Linux/x86_64/Bindings/Pthread/Types.clef").read_text()
+types = (root / "Environments/Linux/x86_64/Bindings/Pthread/Types.clef").read_text()
 
 
 def layout(name):

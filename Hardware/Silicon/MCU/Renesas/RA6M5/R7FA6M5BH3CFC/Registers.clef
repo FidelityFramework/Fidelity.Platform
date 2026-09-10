@@ -1,0 +1,41 @@
+module Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC.Registers
+
+open Fidelity.Platform.Contracts
+
+// Inventory names the transactions permitted by this driver-facing register
+// view. Grants live with the workload. Register transitions, PFS protection
+// and write-zero IELSR acknowledgement remain driver sequencing requirements.
+let icuRegion: DeviceRegion = { Space = Description.icu; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+let cpscuRegion: DeviceRegion = { Space = Description.cpscu; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+let systemRegion: DeviceRegion = { Space = Description.system; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+let port0Region: DeviceRegion = { Space = Description.port0; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+let pfsRegion: DeviceRegion = { Space = Description.pfs; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+let coreRegion: DeviceRegion = { Space = Description.ppb; AddressSpace = "cpu-physical"; Source = "Hardware/Products/Renesas/EK_RA6M5/docs/HELLOBLINKY_HARDWARE.md, HW-1.50 register subset" }
+
+let pwpr: DeviceRegister = { Name = "pwpr"; Region = pfsRegion; Offset = 0x503; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p004: DeviceRegister = { Name = "p004"; Region = pfsRegion; Offset = 0x10; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p005: DeviceRegister = { Name = "p005"; Region = pfsRegion; Offset = 0x14; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p006: DeviceRegister = { Name = "p006"; Region = pfsRegion; Offset = 0x18; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p007: DeviceRegister = { Name = "p007"; Region = pfsRegion; Offset = 0x1C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p008: DeviceRegister = { Name = "p008"; Region = pfsRegion; Offset = 0x20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p0podr: DeviceRegister = { Name = "p0podr"; Region = port0Region; Offset = 0x0; TransactionBits = 16; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p0pidr: DeviceRegister = { Name = "p0pidr"; Region = port0Region; Offset = 0x6; TransactionBits = 16; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let irqcr9: DeviceRegister = { Name = "irqcr9"; Region = icuRegion; Offset = 0x9; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let irqcr10: DeviceRegister = { Name = "irqcr10"; Region = icuRegion; Offset = 0xA; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ielsr0: DeviceRegister = { Name = "ielsr0"; Region = icuRegion; Offset = 0x300; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ielsr1: DeviceRegister = { Name = "ielsr1"; Region = icuRegion; Offset = 0x304; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let icusarg: DeviceRegister = { Name = "icusarg"; Region = cpscuRegion; Offset = 0x70; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let sckscr: DeviceRegister = { Name = "sckscr"; Region = systemRegion; Offset = 0x26; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let sckdivcr: DeviceRegister = { Name = "sckdivcr"; Region = systemRegion; Offset = 0x20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systickCtrl: DeviceRegister = { Name = "systickCtrl"; Region = coreRegion; Offset = 0x10; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systickLoad: DeviceRegister = { Name = "systickLoad"; Region = coreRegion; Offset = 0x14; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systickVal: DeviceRegister = { Name = "systickVal"; Region = coreRegion; Offset = 0x18; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIser0: DeviceRegister = { Name = "nvicIser0"; Region = coreRegion; Offset = 0x100; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer0: DeviceRegister = { Name = "nvicIcer0"; Region = coreRegion; Offset = 0x180; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr0: DeviceRegister = { Name = "nvicIcpr0"; Region = coreRegion; Offset = 0x280; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicItns0: DeviceRegister = { Name = "nvicItns0"; Region = coreRegion; Offset = 0x380; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicPriority0: DeviceRegister = { Name = "nvicPriority0"; Region = coreRegion; Offset = 0x400; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicPriority1: DeviceRegister = { Name = "nvicPriority1"; Region = coreRegion; Offset = 0x401; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systickPriority: DeviceRegister = { Name = "systickPriority"; Region = coreRegion; Offset = 0xD23; TransactionBits = 8; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let prcr: DeviceRegister = { Name = "prcr"; Region = systemRegion; Offset = 0x3FE; TransactionBits = 16; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let p0sar: DeviceRegister = { Name = "p0sar"; Region = pfsRegion; Offset = 0x510; TransactionBits = 16; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }

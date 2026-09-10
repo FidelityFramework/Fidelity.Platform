@@ -1,0 +1,67 @@
+namespace Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+/// The identified R7FA6M5BH3CFC part and LQFP176 package, not every RA6M5 variant.
+/// Source revisions and applicability are recorded by the EK-RA6M5 product source manifest.
+module Description =
+    let flash: MemorySpace = {
+        Name = "flash"; Kind = MemoryKind.Flash; Base = Some 0; Capacity = 2097152
+        Alignment = 512; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
+        Notes = "Code flash; board part and IDAU access must be checked before download."; MapKind = ""; Since = ""; Until = ""
+    }
+    let sram: MemorySpace = {
+        Name = "sram"; Kind = MemoryKind.Sram; Base = Some 536870912; Capacity = 524288
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Physical SRAM; reset-secure image requires accessible allocations."; MapKind = ""; Since = ""; Until = ""
+    }
+    let icu: MemorySpace = {
+        Name = "icu"; Kind = MemoryKind.Peripheral; Base = Some 1073766400; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "ICU registers have individual byte/word access widths."; MapKind = ""; Since = ""; Until = ""
+    }
+    let cpscu: MemorySpace = {
+        Name = "cpscu"; Kind = MemoryKind.Peripheral; Base = Some 1073774592; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Peripheral security attribution; ICUSARG is at offset 0x70, protected by PRCR.PRC4."
+        MapKind = ""; Since = ""; Until = ""
+    }
+    let system: MemorySpace = {
+        Name = "system"; Kind = MemoryKind.Peripheral; Base = Some 1073864704; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "System control, clock selection and protection."; MapKind = ""; Since = ""; Until = ""
+    }
+    let port0: MemorySpace = {
+        Name = "port0"; Kind = MemoryKind.Peripheral; Base = Some 1074266112; Capacity = 32
+        Alignment = 2; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIO port 0 PODR/PIDR/PDR."; MapKind = ""; Since = ""; Until = ""
+    }
+    let pfs: MemorySpace = {
+        Name = "pfs"; Kind = MemoryKind.Peripheral; Base = Some 1074268160; Capacity = 1536
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "PFS plus PMISC protection/security controls."; MapKind = ""; Since = ""; Until = ""
+    }
+    let ppb: MemorySpace = {
+        Name = "core"; Kind = MemoryKind.Peripheral; Base = Some 3758153728; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Secure PPB: SysTick, NVIC, SCB."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    // Natural vector storage is U32[112]; placement requires 512 alignment.
+    let vectorLayout: StructDescriptor = {
+        Name = "ArmV8MVectors"
+        Layout = { Size = 448; Alignment = 4; Fields = [|
+            { Name = "entries"; Offset = 0; Repr = Repr.U32; Count = 112
+              Access = AccessKind.ReadOnly; BitFields = [||]; Documentation = Some "16 core + 96 ICU entries" }
+        |] }
+        Documentation = Some "Renesas HW 13.3; Arm VTOR placement alignment is a separate requirement."
+    }
+
+    let vectorAlignment = 512
+    let partNumber = "R7FA6M5BH3CFC"
+    let debugDevice = "R7FA6M5BH"
+    let partNumberAddress = 16810224
+    let optionAddress = 16818432
+    let resetIclkHz = 2000000
+    let externalVectors = 96

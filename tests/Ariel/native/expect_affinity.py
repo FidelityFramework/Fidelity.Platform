@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 repository = Path(__file__).resolve().parents[3]
-declaration = (repository / "CPU/Linux/x86_64/Ariel/Capabilities.clef").read_text()
+declaration = (repository / "Environments/Linux/x86_64/Ariel/Capabilities.clef").read_text()
 budget = int(re.search(r"let carrier_budget: int = (\d+)", declaration).group(1))
 allowed = sorted(os.sched_getaffinity(0))
 sizes = sorted({1, min(3, len(allowed)), len(allowed)})

@@ -1,0 +1,24 @@
+[package]
+name = "Fidelity.Platform.Profiles.ArtyA7_HelloArty"
+version = "0.1.0"
+description = "HelloArty FPGA selection with explicit report, buffer and UART requirements."
+
+[compilation]
+target = "fpga"
+
+[build]
+sources = ["Description.clef"]
+output_kind = "library"
+
+[platform]
+description = "Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Description.description"
+runtime_model = "bare"
+substrate = "fpga"
+vendor = "xilinx"
+family = "artix7"
+device = "xc7a100t"
+clock_mhz = 100
+ns_per_weight_unit = 1.6
+
+[dependencies]
+product = { path = "../../Hardware/Products/Digilent/ArtyA7_100T/Fidelity.Platform.fidproj" }

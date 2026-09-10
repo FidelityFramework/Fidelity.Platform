@@ -1,0 +1,33 @@
+namespace Fidelity.Platform.Profiles.EK_RA6M5_HelloBlinky
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC.Description
+module Execution = Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M33.Description
+
+/// One selected image. Shared regions remain direct references to the silicon declarations.
+module Description =
+    let stackBytes = 8192
+    let image: CortexMImageDescriptor = {
+        FlashSpace = "flash"; RamSpace = "sram"; VectorLayout = "ArmV8MVectors"
+        VectorAlignment = Part.vectorAlignment; StackBytes = stackBytes
+        EntrySymbol = "Reset_Handler"; DebugDevice = Part.debugDevice
+        PartNumber = Part.partNumber; PartNumberAddress = Part.partNumberAddress
+        PreservedOptionAddress = Part.optionAddress; PreservedOptionBytes = 8
+    }
+    let lifecycle: LifecycleFacts = {
+        Clocks = [| { Name = "reset-ICLK"; FrequencyHz = Part.resetIclkHz } |]
+        Resets = [| { Name = "RES"; External = true; ActiveHigh = false } |]
+        Entry = "Reset_Handler"; Teardown = "Fault_Handler"; Persistence = Persistence.Volatile
+    }
+    let descriptor: PlatformDescription = {
+        Id = "mcu-renesas-ra6m5-ek-ra6m5"; DisplayName = "Renesas EK-RA6M5 HelloBlinky"
+        Substrate = "mcu"; Core = Some Execution.core
+        Spaces = [| Part.flash; Part.sram; Part.icu; Part.cpscu
+                    Part.system; Part.port0; Part.pfs; Part.ppb |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]; Lifecycle = lifecycle
+        Notes = [| "First slice: secure reset, GPIO, SysTick and two ICU routes. No RTOS, FSP HAL, heap, DMA or option-memory payload."
+                   "Silicon owns register requirements; EK-RA6M5 owns wiring; HelloBlinky owns timing, mappings and grants." |]
+        Limits = [| { Name = "external-vectors"; Value = Part.externalVectors } |]
+    }

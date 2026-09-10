@@ -1,0 +1,150 @@
+module Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Prelude
+
+open Fidelity.Platform.Contracts
+open Fidelity.Platform.FPGA.Xilinx.Artix7.ArtyA7_100T.Bindings
+
+// ---------------------------------------------------------------------------
+// Board color and mode capabilities
+// ---------------------------------------------------------------------------
+
+/// 3-bit color expressible by the Arty A7 RGB LEDs (SW2 SW1 SW0 natural encoding).
+type Color =
+    | Off
+    | Red
+    | Green
+    | Yellow
+    | Blue
+    | Magenta
+    | Cyan
+    | White
+
+/// LED drive mode supported by the board design.
+type Mode =
+    | Solid
+    | Blink
+
+/// RGB component bits (active-high, tuple order: Red, Green, Blue).
+/// Drives the three discrete pins of one RGB LED package.
+type RgbBits = bool * bool * bool
+
+/// Map a Color and brightness flag to RGB pin values for this board's LED wiring.
+let colorToRgbBits (color: Color) (bright: bool) : RgbBits =
+    if not bright then false, false, false
+    else
+        match color with
+        | Off     -> false, false, false
+        | Red     -> true,  false, false
+        | Green   -> false, true,  false
+        | Blue    -> false, false, true
+        | Yellow  -> true,  true,  false
+        | Cyan    -> false, true,  true
+        | Magenta -> true,  false, true
+        | White   -> true,  true,  true
+
+/// Arty A7 system clock frequency.
+let clockHz = 100_000_000
+
+/// Clock ticks per millisecond at system clock rate.
+let ticksPerMs = clockHz / 1_000
+
+/// Is the LED in the ON phase of its blink cycle?
+/// periodMs is the full blink period; the LED is on for the first half.
+let isLedOn (mode: Mode) (counter: int) (periodMs: int) : bool =
+    match mode with
+    | Solid -> true
+    | Blink ->
+        let halfPeriodTicks = periodMs * ticksPerMs
+        (counter % (halfPeriodTicks * 2)) < halfPeriodTicks
+
+// ---------------------------------------------------------------------------
+// Functional hardware interface — Mealy machine types
+//
+// An FPGA design is: State × Inputs → State × Outputs.
+// These types bridge user Clef code and the substrate.
+// The compiler lowers Design<'S,'R> to CIRCT hw/comb/seq MLIR.
+//
+// Field attributes declare the hw.module port names that the compiler emits.
+// These must match the XDC get_ports names exactly so Vivado can bind them.
+// ---------------------------------------------------------------------------
+
+/// Hardware input signals sampled each clock tick.
+/// Each field maps to one physical input port in the synthesised hw.module.
+type Inputs = {
+    [<Pin("sw[0]")>] Sw0: bool
+    [<Pin("sw[1]")>] Sw1: bool
+    [<Pin("sw[2]")>] Sw2: bool
+    [<Pin("sw[3]")>] Sw3: bool
+    [<Pin("btn[0]")>] Btn0: bool
+    [<Pin("btn[1]")>] Btn1: bool
+    [<Pin("btn[2]")>] Btn2: bool
+    [<Pin("btn[3]")>] Btn3: bool
+}
+
+/// LED drive outputs each clock tick.
+/// Single-bit fields map one-to-one to output ports.
+/// RgbBits fields decompose as (R, G, B) into three named output ports.
+type LedOutputs = {
+    [<Pin("led[0]")>] Led0: bool
+    [<Pin("led[1]")>] Led1: bool
+    [<Pin("led[2]")>] Led2: bool
+    [<Pin("led[3]")>] Led3: bool
+    [<Pins("led0_r", "led0_g", "led0_b")>] Rgb0: RgbBits
+    [<Pins("led1_r", "led1_g", "led1_b")>] Rgb1: RgbBits
+    [<Pins("led2_r", "led2_g", "led2_b")>] Rgb2: RgbBits
+    [<Pins("led3_r", "led3_g", "led3_b")>] Rgb3: RgbBits
+}
+
+/// Hardware outputs each clock tick.
+/// UartReport: ValueSome r = Platform serialises r via BAREWire and drives uart_tx
+/// at the endpoint's DefaultBaud rate this tick.
+type Outputs<'Report> = {
+    Leds:       LedOutputs
+    UartReport: 'Report voption
+}
+
+/// A hardware design declaration: initial register state + combinational step function
+/// + the clock source the compiler uses to drive seq.compreg registers.
+///
+/// InitialState fields are synthesised as seq.compreg reset values.
+/// Step body becomes comb logic evaluated each clock edge.
+/// Clock must reference a ClockEndpoint from this board's Endpoints module.
+type Design<'State, 'Report> = {
+    InitialState: 'State
+    Step:         'State -> Inputs -> 'State * Outputs<'Report>
+    Clock:        ClockEndpoint
+}
+
+// ---------------------------------------------------------------------------
+// Endpoint descriptors — physical pin metadata for XDC constraint generation
+// ---------------------------------------------------------------------------
+
+module Endpoints =
+    let clock: ClockEndpoint = Pins.sysClk
+
+    let leds: PinEndpoint list = [
+        Pins.led0; Pins.led1; Pins.led2; Pins.led3
+    ]
+
+    let rgbLeds: PinEndpoint list list = [
+        [ Pins.ledR0; Pins.ledG0; Pins.ledB0 ]
+        [ Pins.ledR1; Pins.ledG1; Pins.ledB1 ]
+        [ Pins.ledR2; Pins.ledG2; Pins.ledB2 ]
+        [ Pins.ledR3; Pins.ledG3; Pins.ledB3 ]
+    ]
+
+    let buttons: PinEndpoint list  = [ Pins.btn0; Pins.btn1; Pins.btn2; Pins.btn3 ]
+    let switches: PinEndpoint list = [ Pins.sw0;  Pins.sw1;  Pins.sw2;  Pins.sw3  ]
+    let chipKitDigitalGpio: PinEndpoint list = Pins.chipKitDigitalGpioPins
+    let usbUart: UartEndpoint = Uart.usbUart
+
+module Package =
+    let descriptor: PlatformDescriptor   = Platform.descriptor
+
+    let pinMap: Map<string, PinEndpoint>        = PlatformDescriptor.pinMap descriptor
+    let packagePinMap: Map<string, PinEndpoint> = PlatformDescriptor.packagePinMap descriptor
+
+    let tryLogicalPin (logicalName: string) : PinEndpoint option =
+        Map.tryFind logicalName pinMap
+
+    let tryPackagePin (packagePin: string) : PinEndpoint option =
+        Map.tryFind packagePin packagePinMap

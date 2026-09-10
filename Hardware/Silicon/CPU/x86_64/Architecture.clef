@@ -1,0 +1,119 @@
+/// Shared x86-64 integer/register and baseline SSE2 representation facts.
+/// Pointer representation and execution services belong to the selected ABI/environment.
+module Fidelity.Platform.Hardware.Silicon.CPU.X86_64
+
+open BAREWire.Platform
+
+/// The natural computational word: the 64-bit general-purpose register.
+let registerWidth: WidthDeclaration = {
+    Name = "Register"
+    Bits = 64
+}
+
+/// Two's-complement integers at 8, 16, 32 and 64 bits: native, wrapping at
+/// their boundaries (the ALU discards the carry; no trap, no saturation).
+let repInt8: Representation = {
+    Name = "int8"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 8
+    MinMagnitude = "-128"
+    MaxMagnitude = "127"
+    Boundary = Boundary.Wrap
+}
+
+let repInt16: Representation = {
+    Name = "int16"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 16
+    MinMagnitude = "-32768"
+    MaxMagnitude = "32767"
+    Boundary = Boundary.Wrap
+}
+
+let repInt32: Representation = {
+    Name = "int32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 32
+    MinMagnitude = "-2147483648"
+    MaxMagnitude = "2147483647"
+    Boundary = Boundary.Wrap
+}
+
+let repInt64: Representation = {
+    Name = "int64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Int
+    Bits = 64
+    MinMagnitude = "-9223372036854775808"
+    MaxMagnitude = "9223372036854775807"
+    Boundary = Boundary.Wrap
+}
+
+/// Unsigned integers at 8, 16, 32 and 64 bits: native, wrapping.
+let repUInt8: Representation = {
+    Name = "uint8"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 8
+    MinMagnitude = "0"
+    MaxMagnitude = "255"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt16: Representation = {
+    Name = "uint16"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 16
+    MinMagnitude = "0"
+    MaxMagnitude = "65535"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt32: Representation = {
+    Name = "uint32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 32
+    MinMagnitude = "0"
+    MaxMagnitude = "4294967295"
+    Boundary = Boundary.Wrap
+}
+
+let repUInt64: Representation = {
+    Name = "uint64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.UInt
+    Bits = 64
+    MinMagnitude = "0"
+    MaxMagnitude = "18446744073709551615"
+    Boundary = Boundary.Wrap
+}
+
+/// IEEE 754 binary32 and binary64 on SSE2: native; the boundary is exact,
+/// since IEEE has no wrap and its overflow is its own infinity. The bounds
+/// are the greatest finite values, (2^24 - 1) * 2^104 and (2^53 - 1) * 2^971,
+/// written out.
+let repFloat32: Representation = {
+    Name = "float32"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Ieee
+    Bits = 32
+    MinMagnitude = "-340282346638528859811704183484516925440"
+    MaxMagnitude = "340282346638528859811704183484516925440"
+    Boundary = Boundary.Exact
+}
+
+let repFloat64: Representation = {
+    Name = "float64"
+    Capability = Capability.Native
+    Family = RepresentationFamily.Ieee
+    Bits = 64
+    MinMagnitude = "-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"
+    MaxMagnitude = "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"
+    Boundary = Boundary.Exact
+}
+

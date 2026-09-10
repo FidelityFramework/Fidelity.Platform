@@ -1,0 +1,21 @@
+[package]
+name = "Fidelity.Platform.Profiles.Linux_x86_64_Default"
+version = "0.1.0"
+description = "Linux x86-64 libc selection with explicit preserved application budgets."
+
+[compilation]
+target = "cpu"
+
+[build]
+sources = []
+output_kind = "library"
+
+[platform]
+description = "Fidelity.Platform.Linux_x86_64.Description.description"
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+description = { path = "Fidelity.Platform.Description.fidproj" }
+bindings = { path = "../../Environments/Linux/x86_64/Fidelity.Platform.fidproj" }

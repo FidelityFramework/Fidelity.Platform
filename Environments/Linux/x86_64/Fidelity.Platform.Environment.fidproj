@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.Linux_x86_64.Environment"
+version = "0.1.0"
+description = "Single source owner for Linux ABI/services and console compiler surface."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["Console.clef", "Environment.clef"]
+output_kind = "library"
+
+[dependencies]
+BAREWire = { path = "../../../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }
+architecture = { path = "../../../Hardware/Silicon/CPU/x86_64/Fidelity.Platform.fidproj" }

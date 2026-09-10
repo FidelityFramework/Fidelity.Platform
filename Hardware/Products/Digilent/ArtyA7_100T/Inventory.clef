@@ -1,0 +1,119 @@
+/// Product resources and wiring; no selected report schema or buffer budget.
+module Fidelity.Platform.Hardware.Products.Digilent.ArtyA7_100T.Inventory
+
+open BAREWire.Platform
+
+/// The Quad-SPI configuration flash: a 128 Mbit (16 MB) serial device
+/// (S25FL128S or S25FL127S by board revision; reference manual §"Quad-SPI
+/// Flash"). The configuration image occupies the bottom of the device and the
+/// remainder is user data. Read-only from the fabric's point of view; the
+/// erase granularity is the 64 KB sector every listed part shares (each
+/// part's smaller parameter sectors are a per-part fact the manual does not
+/// state and this space does not model).
+let flash: MemorySpace = {
+    Name = "flash"
+    Kind = MemoryKind.Flash
+    Capacity = 16777216
+    Alignment = 1
+    Granularity = 65536
+    Growth = Growth.Fixed
+    Access = Access.ReadOnly
+    Base = None
+    Notes = "Quad-SPI configuration flash, 128 Mbit (Arty A7 reference manual, Quad-SPI Flash, Table 5.2.1: N25Q128A13ESF40, S25FL128S or S25FL127S by board revision); 64 KB erase sectors, the parts' smaller parameter sectors not modeled"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+// ---------------------------------------------------------------------------
+// Boundary surface: the package pins the description binds today
+// ---------------------------------------------------------------------------
+
+/// The I/O standard every user pin on this board uses (reference manual;
+/// Platform.descriptor's first note). Declared once as a surface default so
+/// no endpoint restates it.
+let ioStandard: Default = {
+    Key = "io-standard"
+    Value = "LVCMOS33"
+}
+
+/// USB-UART transmit from the FPGA, package pin D10 (Arty-A7-100-Master.xdc
+/// `uart_rxd_out`, named from the PC's side). The same pin is Pins.uartTx in
+/// ArtyA7_100T.Bindings.clef; the two literals agree until the pin map is
+/// re-homed here (Audit step 10).
+let uartTxPin: Endpoint = {
+    Name = "uart_tx"
+    Location = EndpointKind.PackagePin
+    Address = "D10"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// USB-UART receive into the FPGA, package pin A9 (Arty-A7-100-Master.xdc
+/// `uart_txd_in`). Pins.uartRx in the bindings.
+let uartRxPin: Endpoint = {
+    Name = "uart_rx"
+    Location = EndpointKind.PackagePin
+    Address = "A9"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// The 100 MHz oscillator input, package pin E3 (Arty-A7-100-Master.xdc
+/// `CLK100MHZ`). Pins.sysClk in the bindings carries the same pin with the
+/// frequency; the frequency lives in `lifecycle` here.
+let sysClkPin: Endpoint = {
+    Name = "sys_clk"
+    Location = EndpointKind.PackagePin
+    Address = "E3"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// The package-pin surface. Only the pins a declared transport or clock binds
+/// are here today; the remaining user pins stay in Platform.descriptor until
+/// Composer reads endpoints of kind PackagePin for XDC.
+let pins: BoundarySurface = {
+    Name = "pins"
+    Kind = SurfaceKind.Pins
+    Endpoints = [| uartTxPin; uartRxPin; sysClkPin |]
+    Defaults = [| ioStandard |]
+    Contracts = [||]
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
+/// The system clock: 100 MHz on-board oscillator (Pins.sysClk).
+// SUBSET(record-inference): preferred spelling is the unqualified literal under
+// the annotation; the labels are qualified because ClockEndpoint in Contracts
+// shares both of them and the checker types the literal by its labels.
+let sysClk: Clock = {
+    Clock.Name = "sys_clk"
+    Clock.FrequencyHz = 100000000
+}
+
+/// The power-on reset: internal, active-high, single cycle; the Arty A7 has no
+/// user-accessible reset pin (Pins.resetEndpoint and its note).
+let por: Reset = {
+    Name = "rst"
+    External = false
+    ActiveHigh = true
+}
+
+/// A device lifecycle: one clock, one reset, no entry or teardown symbol,
+/// volatile state (configuration is reloaded from flash at power-on).
+let lifecycle: LifecycleFacts = {
+    Clocks = [| sysClk |]
+    Resets = [| por |]
+    Entry = ""
+    Teardown = ""
+    Persistence = Persistence.Volatile
+}

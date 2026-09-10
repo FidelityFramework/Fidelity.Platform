@@ -1,0 +1,24 @@
+[package]
+name = "Fidelity.Platform.Profiles.EK_RA6M5_HelloBlinky"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Selected EK-RA6M5 HelloBlinky image, composed from silicon, product and execution packages."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m33"
+description = "Fidelity.Platform.Profiles.EK_RA6M5_HelloBlinky.Description.descriptor"
+
+[dependencies]
+product = { path = "../../Hardware/Products/Renesas/EK_RA6M5/Fidelity.Platform.fidproj" }
+environment = { path = "../../Environments/Freestanding/arm_cortex_m33/Fidelity.Platform.fidproj" }

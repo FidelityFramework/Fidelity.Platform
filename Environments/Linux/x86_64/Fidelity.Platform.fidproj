@@ -1,0 +1,29 @@
+[package]
+name = "Fidelity.Platform.Linux_x86_64"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Linux x86-64 platform bindings."
+
+[compilation]
+target = "cpu"
+
+[build]
+sources = [
+    "Types.clef",
+    "Helpers.clef",
+    "Syscalls.clef",
+    "Format.clef",
+    "Parse.clef",
+    "WebView.clef",
+    "WebViewWrapper.clef"
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+environment = { path = "Fidelity.Platform.Environment.fidproj" }
+# Runtime binding helpers use the full BAREWire library.
+barewire = { path = "../../../../BAREWire/src/BAREWire.fidproj" }

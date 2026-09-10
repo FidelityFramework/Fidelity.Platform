@@ -4,7 +4,7 @@ Run `python tests/Ariel/lifecycle_model.py` from the repository root. The model
 enumerates 1,747 states, checking exact assignment and separate completion and
 capture release. It makes no claim about POSIX scheduling or a native ABI.
 
-The current typed implementation is `CPU/Linux/x86_64/Ariel/Region.clef`, selected
+The current typed implementation is `Environments/Linux/x86_64/Ariel/Region.clef`, selected
 by `Fidelity.Ariel.fidproj`. It uses ordinary typed state, arrays and functions;
 opaque `CHandle` values cross only the generated pthread/libc boundaries.
 
@@ -25,5 +25,5 @@ retirement check. See [native/STATUS.md](native/STATUS.md) for observed results 
 the remaining coverage limits.
 
 The historical raw-pointer candidate remains isolated under
-`CPU/Linux/x86_64/Experimental/Ariel/`; it is not selected by these gates or the
+`Environments/Linux/x86_64/Experimental/Ariel/`; it is not selected by these gates or the
 typed package. Its source is not a sanctioned current-Clef boundary.

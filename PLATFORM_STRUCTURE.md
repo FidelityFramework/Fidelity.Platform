@@ -1,48 +1,94 @@
-# Fidelity.Platform Structure
+# Fidelity.Platform structure
 
-This repository is organized substrate-first so platform bindings do not collapse into an unstructured bucket.
+Implemented taxonomy, 2026-09-10. Hardware identity, execution environment,
+communication protocol and workload selection have separate owners. Shared
+silicon declarations can support several products; one product can support
+several execution profiles.
 
-## Canonical Layout
+```text
+Fidelity.Platform/
+├── Contracts/
+├── Hardware/
+│   ├── Silicon/
+│   │   ├── CPU/
+│   │   ├── MCU/
+│   │   ├── GPU/
+│   │   ├── NPU/
+│   │   ├── FPGA/
+│   │   └── CGRA/                 # Reserved
+│   ├── Products/
+│   │   └── <manufacturer>/<product>/[<verified-hardware-revision>/]
+│   └── VirtualMachines/
+│       └── <provider>/<machine>/
+├── Environments/
+│   ├── Linux/x86_64/
+│   ├── Freestanding/
+│   │   ├── arm_cortex_m33/
+│   │   └── x86_64/
+│   ├── Windows/                  # Reserved
+│   ├── macOS/                    # Reserved
+│   ├── Android/                  # Reserved
+│   └── iOS/                      # Reserved
+├── Protocols/
+│   └── Virtio/                   # Reserved; no driver implementation
+└── Profiles/
+```
 
-- `Contracts/` - shared substrate-neutral contract types used by leaf packages
-- `CPU/<OS>/<ISA>/` - hosted CPU packages; the current leaf is `CPU/Linux/x86_64`
-- `MCU/<Vendor>/<Family>/<Board>/` - microcontroller substrate packages
-- `GPU/<Vendor>/<Family>/<Device>/` - GPU substrate packages
-- `NPU/<Vendor>/<Family>/<Device>/` - NPU substrate packages
-- `FPGA/<Vendor>/<Family>/<Board>/` - FPGA substrate packages
-- `CGRA/<Vendor>/<Family>/<Device>/` - CGRA substrate packages (reserved)
-- `Profiles/<ProfileName>/` - curated multi-substrate bundles for specific development setups
+## Ownership
 
-## Current Leaves
+| Area | Responsibility |
+| --- | --- |
+| `Contracts/` | Shared requirements, regions, mappings, transactions, grants and predicates; BAREWire supplies memory-layout vocabulary |
+| `Hardware/Silicon/<kind>/<vendor>/<family>/...` | Architecture, chip/compute-block capabilities, peripheral interfaces and concrete part/package facts; generic x86_64 facts do not require a vendor partition |
+| `Hardware/Products/<manufacturer>/<product>/` | Physical assembly: component selection, memory configuration, wiring, clocks and connectors |
+| `Hardware/VirtualMachines/<provider>/<machine>/` | Machine presented to a guest: memory/resources and, when implemented, boot and discovery requirements |
+| `Environments/<environment>/<architecture>/` | ABI, runtime services, native bindings and execution requirements |
+| `Protocols/` | Communication layouts, negotiation, sequencing and transports |
+| `Profiles/<profile>/` | Selected hardware/environment composition and image or workload budgets |
 
-- `CPU/Linux/x86_64`
-- `MCU/ST/STM32F7/MeadowF7`
-- `MCU/Renesas/RA6M5/EK_RA6M5`
-- `GPU/AMD/RDNA3_5/StrixHalo_iGPU`
-- `NPU/AMD/XDNA2/StrixHalo_NPU`
-- `FPGA/Xilinx/Artix7/ArtyA7_100T`
-- `Profiles/StrixHalo_ArtyLab`
+Products include development boards, accelerator cards and complete systems.
+Product and silicon manufacturers can differ. A hardware-revision directory
+requires applicability evidence: EK-RA6M5 schematic issue 3.0 does not establish
+a physical Rev3 board. Supported source design and unconfirmed physical artwork
+or population remain explicit in product documentation.
 
-## Notes
+Family reuse uses package dependencies and immutable references. Each concrete
+part must establish which peripherals and pins it contains. A future SoC model
+must own shared topology and reference its CPU/GPU/NPU blocks; it must not count
+shared RAM again under every compute category. Repeated physical instances and
+general topology composition still need implementation.
 
-- New packages use `.fidproj` as the dependency boundary expected by CCS/Composer source resolution.
-- External application projects (e.g., `HelloArty`) can point their `platform` dependency at one leaf package.
+PC, mobile, SBC, development board and server are descriptive categories. They
+do not select widths, runtime services or permissions. Composer owns packaging
+and deployment; OCI would be an orchestration selection, not a hardware branch.
 
-## Package status
+## Current packages and status
 
-Directory presence is not a claim of working hardware support. Linux x86_64 has
-separate compiler-surface, native binding, display and Ariel manifests. Arty has
-both Contracts pin bindings and an additive BAREWire description. EK-RA6M5 has
-the accepted HelloBlinky path and a complete physical wiring inventory, with an
-initial subset of peripheral registers implemented.
+| Selection or inventory | Status |
+| --- | --- |
+| [EK_RA6M5_HelloBlinky](Profiles/EK_RA6M5_HelloBlinky) | Accepted MCU image composed from [Cortex-M33 facts](Hardware/Silicon/CPU/Arm/CortexM33), the [R7FA6M5BH3CFC part/package](Hardware/Silicon/MCU/Renesas/RA6M5/R7FA6M5BH3CFC), [EK-RA6M5 wiring](Hardware/Products/Renesas/EK_RA6M5) and the freestanding environment |
+| [Linux_x86_64_Default](Profiles/Linux_x86_64_Default) | Hosted Linux/libc selection; architecture facts, services/bindings and preserved application budgets have separate owners |
+| [ArtyA7_HelloArty](Profiles/ArtyA7_HelloArty) | Application report/buffer/UART requirements over [Digilent product wiring](Hardware/Products/Digilent/ArtyA7_100T) and [Xilinx part facts](Hardware/Silicon/FPGA/Xilinx/Artix7/XC7A100T_CSG324); Contracts still supplies the operative pin map |
+| [RestrictedGuest64](Profiles/RestrictedGuest64) | Synthetic 64-bit-pointer/32-bit-MMIO compiler fixture using a [synthetic machine](Hardware/VirtualMachines/Synthetic/RestrictedGuest64) and freestanding x86_64 facts; no VM boot or virtio |
+| [MeadowF7](Hardware/Products/WildernessLabs/MeadowF7) | Product scaffold and reference pack; no accepted MCU bring-up |
+| [StrixHalo_iGPU](Hardware/Silicon/GPU/AMD/RDNA3_5/StrixHalo_iGPU), [StrixHalo_NPU](Hardware/Silicon/NPU/AMD/XDNA2/StrixHalo_NPU) | Silicon scaffolds; Linux-hosted [ROCm](Environments/Linux/x86_64/ROCm) and [XRT](Environments/Linux/x86_64/XRT) binding packages are separate |
+| [StrixHalo_ArtyLab](Profiles/StrixHalo_ArtyLab) | Dependency catalogue; not a general multi-target resource resolver |
 
-Meadow, GPU and NPU leaf descriptors remain scaffolds; the latter two also have
-generated hosted library bindings. Their manifests do not establish working
-device kernels or complete topology/memory models. CGRA is reserved.
-`Profiles/StrixHalo_ArtyLab` lists dependencies; it is not an implemented general
-multi-platform resource resolver. [The audit](docs/DOCUMENTATION_AUDIT.md) records
-specific gaps, including incomplete scaffold records.
+Reference-only ST product packs, the
+[Renesas FPB-RA6E2 pack](Hardware/Products/Renesas/FPB_RA6E2) and reserved branches
+do not claim executable support. Linux's
+[Experimental](Environments/Linux/x86_64/Experimental) sources
+remain explicitly selected legacy candidates, separate from typed packages.
 
-`CPU/Linux/x86_64/Experimental/` preserves explicitly selected legacy candidates.
-It is separate from the typed production packages. Source filenames and package
-dependencies come from each `.fidproj`; no universal `Platform.fs` file is required.
+## Package and selection rules
+
+`.fidproj` manifests own source lists and dependencies. Authored production
+sources use `.clef`; there is no mandatory source filename. Some public namespaces
+retain pre-migration spelling, while live package paths use this hierarchy.
+
+Migrated profiles select one fully qualified `[platform] description` export.
+CCS accepts it only within the selected package's transitive source closure,
+preserving declaration identity across sibling packages. It does not merge
+unrelated catalogue descriptions. See the implemented
+[composition rules](docs/PLATFORM_COMPOSITION.md) and
+[compiler integration](docs/CANONICAL_PLATFORM_SPEC.md).

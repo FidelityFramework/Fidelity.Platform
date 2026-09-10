@@ -36,8 +36,13 @@ to the program objects and relationships they constrain. Introducing a global
 head node would not itself establish either property, prevent stale analysis
 results, or prove the correctness of a placement decision.
 
-The present code supports continuing with declaration nodes, a derived context,
-and program-specific facts on the graph. That is the working baseline. Any
+Explicit profile selection now names the authoritative declaration within the
+selected package's source closure. Silicon, product and environment packages
+retain their own declarations; selection follows references without copying
+the memory nodes authorized by grants. See [composition](PLATFORM_COMPOSITION.md).
+
+The present code uses declaration nodes, a derived context,
+and program-specific facts on the graph. Any
 change to it should identify a concrete consumer the current representation
 cannot serve, the required dependency/invalidation behavior, and a test that
 distinguishes the alternatives. A new head node is not recommended solely to
@@ -52,9 +57,9 @@ representation. Then record the choice and its justification where its consumers
 can read it without independently recomputing it.
 
 Core width, value range, register access width, memory-space identity and workload
-permission are separate constraints. The existing width projection implements
-part of this discipline; it does not implement general resource grants or
-runtime mapping. [The integration reference](CANONICAL_PLATFORM_SPEC.md) describes
+permission are separate constraints. Width projection and static MMIO grants
+implement concrete parts of this discipline; dynamic resource grants and runtime
+mapping remain open. [The integration reference](CANONICAL_PLATFORM_SPEC.md) describes
 that boundary.
 
 ## Concurrency and memory assumptions
@@ -96,9 +101,8 @@ There are distinct mechanisms in the Clef/BAREWire code:
   [NativeTypes](../../clef/src/Compiler/NativeTypedTree/NativeTypes.fs).
   [ProjectChecker](../../clef/src/Compiler/Project/ProjectChecker.fs) initializes
   the map empty. No production resolver or reader of that map was found in
-  the inspected clef/Composer sources. Comments claiming complete saturation
-  resolution are ahead of this implementation.
-- [Ariel capabilities](../CPU/Linux/x86_64/Ariel/Capabilities.clef) contain
+  the inspected clef/Composer sources. The implemented MMIO path is separate.
+- [Ariel capabilities](../Environments/Linux/x86_64/Ariel/Capabilities.clef) contain
   literal quoted booleans, but the manifest explicitly chooses the hosted
   pthread implementation. The literals alone do not prove automatic selection
   or general capability checking.

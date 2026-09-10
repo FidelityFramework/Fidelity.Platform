@@ -1,0 +1,6 @@
+/// Family identity only. Concrete part, package, memory and peripheral maps
+/// await reconciliation with the product source documents.
+module Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32F7
+
+let vendor = "STMicroelectronics"
+let family = "STM32F7"

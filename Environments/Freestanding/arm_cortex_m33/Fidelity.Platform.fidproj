@@ -1,0 +1,17 @@
+[package]
+name = "Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M33"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Freestanding Cortex-M33 Thumb soft-float ABI projection."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+core = { path = "../../../Hardware/Silicon/CPU/Arm/CortexM33/Fidelity.Platform.fidproj" }

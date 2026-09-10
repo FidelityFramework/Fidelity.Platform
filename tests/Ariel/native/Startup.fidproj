@@ -6,8 +6,8 @@ version = "0.1.0"
 target = "cpu"
 
 [dependencies]
-platform = { path = "../../../CPU/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
-ariel = { path = "../../../CPU/Linux/x86_64/Fidelity.Ariel.fidproj" }
+platform = { path = "../../../Environments/Linux/x86_64/Fidelity.Platform.CompilerSurface.fidproj" }
+ariel = { path = "../../../Environments/Linux/x86_64/Fidelity.Ariel.fidproj" }
 
 [build]
 sources = ["Startup.clef"]

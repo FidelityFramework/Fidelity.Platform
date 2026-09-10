@@ -1,0 +1,14 @@
+[package]
+name = "Fidelity.Platform.Profiles.Linux_x86_64_Default.Description"
+version = "0.1.0"
+description = "Single owner for the default Linux profile budgets and assembled description."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["CompatibilityBudgets.clef", "Description.clef"]
+output_kind = "library"
+
+[dependencies]
+environment = { path = "../../Environments/Linux/x86_64/Fidelity.Platform.Environment.fidproj" }

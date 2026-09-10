@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Platform.Environments.Freestanding.X86_64"
+version = "0.1.0"
+description = "Freestanding x86_64 execution facts; machine startup is selected separately"
+
+[compilation]
+target = "library"
+
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "x86_64"
+
+[dependencies]
+architecture = { path = "../../../Hardware/Silicon/CPU/x86_64/Fidelity.Platform.fidproj" }
+
+[build]
+sources = ["Description.clef"]
+output_kind = "library"

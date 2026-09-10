@@ -1,78 +1,55 @@
 # Fidelity.Platform
 
-Platform binding monorepo for the Fidelity framework.
+Platform declarations and native bindings for the Fidelity framework. Shared
+silicon facts, physical products, execution environments and workload profiles
+have separate source owners. CCS resolves the selected declarations; Composer
+uses their evidence to compile, package and deploy the artifact.
 
 ## Structure
 
-The repository now uses a substrate-first layout to keep platform growth organized:
+- `Contracts/`: shared requirements, including BAREWire-backed MMIO contracts.
+- `Hardware/Silicon/`: architecture, part and package facts.
+- `Hardware/Products/`: component selection, wiring and available resources.
+- `Hardware/VirtualMachines/`: guest-machine descriptions; currently synthetic.
+- `Environments/`: execution ABI, runtime services and native bindings.
+- `Protocols/`: reserved protocol implementations, including virtio.
+- `Profiles/`: explicit selection and resource budgets for one execution target.
 
-```
-Fidelity.Platform/
-├── Contracts/                           # Shared substrate-neutral contracts
-├── CPU/
-│   └── Linux/
-│       └── x86_64/
-├── MCU/
-│   ├── ST/
-│   │   └── STM32F7/
-│   │       └── MeadowF7/
-│   └── Renesas/
-│       └── RA6M5/
-│           └── EK_RA6M5/
-├── GPU/
-│   └── AMD/
-│       └── RDNA3_5/
-│           └── StrixHalo_iGPU/
-├── NPU/
-│   └── AMD/
-│       └── XDNA2/
-│           └── StrixHalo_NPU/
-├── FPGA/
-│   └── Xilinx/
-│       └── Artix7/
-│           └── ArtyA7_100T/
-├── CGRA/                                # Reserved substrate space
-├── Profiles/
-│   └── StrixHalo_ArtyLab/
-```
+[PLATFORM_STRUCTURE.md](PLATFORM_STRUCTURE.md) lists current packages and support
+status. The former top-level CPU/MCU/GPU/NPU/FPGA package paths have moved; source
+namespaces are retained where needed for existing APIs.
 
-For package boundaries and support status, see [PLATFORM_STRUCTURE.md](PLATFORM_STRUCTURE.md).
-The [documentation index](docs/README.md) links the current compiler integration,
-BAREWire migration status, and engineering audit. `Contracts/` already exists;
-it currently overlaps with BAREWire and is not yet a unified resource-grant API.
+## Selecting a platform
 
-## Usage in fidproj
-
-Reference the specific platform package your project targets:
+Applications select a package through their `platform` dependency. For example,
+from the sibling HelloBlinky repository:
 
 ```toml
 [dependencies]
-platform = { path = "/home/hhh/repos/Fidelity.Platform/FPGA/Xilinx/Artix7/ArtyA7_100T" }
+platform = { path = "../../../../Fidelity.Platform/Profiles/EK_RA6M5_HelloBlinky/Fidelity.Platform.fidproj" }
 ```
 
-Or use the current Linux/x86_64 CPU package used by existing sample projects:
+The selected package declares its authoritative export:
 
 ```toml
-[dependencies]
-platform = { path = "/home/hhh/repos/Fidelity.Platform/CPU/Linux/x86_64" }
+[platform]
+description = "Fidelity.Platform.Profiles.EK_RA6M5_HelloBlinky.Description.descriptor"
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m33"
 ```
 
-## Architecture
+Other selections include [Linux x86_64](Profiles/Linux_x86_64_Default),
+[HelloArty](Profiles/ArtyA7_HelloArty) and the compiler-only
+[restricted guest](Profiles/RestrictedGuest64). Linux binding packages remain
+under [Environments/Linux/x86_64](Environments/Linux/x86_64).
 
-Platform bindings provide data that ultimately informs backend lowering:
+Profiles reference shared declarations through explicit dependencies. Available
+hardware does not grant application access: HelloBlinky owns its mappings, grants
+and timing predicate. A product with several compute blocks does not implicitly
+select several compilation targets.
 
-1. Type/layout and substrate metadata
-2. Endpoint and channel definitions
-3. Device capability declarations
-4. Memory and clock topology
-
-These are expressed in source and consumed through the normal project loading path.
-
-## Design Principle
-
-Platform knowledge flows from binding packages, not ad hoc compiler inference.
-A consistent package shape across CPU/MCU/GPU/NPU/FPGA/CGRA allows:
-
-- Clean multi-substrate composition via profiles
-- Per-target evolution without contaminating unrelated substrates
-- Explicit dependency wiring from application manifests
+See [compiler integration](docs/CANONICAL_PLATFORM_SPEC.md),
+[composition rules](docs/PLATFORM_COMPOSITION.md) and the
+[documentation index](docs/README.md). General resource instantiation, memory-domain
+composition, virtio drivers and OCI orchestration remain further work.

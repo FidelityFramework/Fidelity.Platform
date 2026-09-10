@@ -1,0 +1,21 @@
+[package]
+name = "Fidelity.Platform.GPU.AMD.RDNA3_5.StrixHalo_iGPU"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "GPU substrate binding metadata for Strix Halo integrated RDNA 3.5."
+
+[compilation]
+target = "gpu"
+
+[build]
+sources = ["Platform.clef"]
+output = "fidelity-platform-gpu-strixhalo"
+output_kind = "library"
+
+[platform]
+description = "Fidelity.Platform.GPU.AMD.RDNA3_5.StrixHalo_iGPU.Platform.descriptor"
+runtime_model = "rocm"
+arch = "rdna3_5"
+
+[dependencies]
+contracts = { path = "../../../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

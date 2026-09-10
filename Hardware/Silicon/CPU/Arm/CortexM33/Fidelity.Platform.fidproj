@@ -1,0 +1,18 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM33"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Cortex-M33 integer and instruction-set facts."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

@@ -1,0 +1,11 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32F7"
+version = "0.1.0"
+description = "STM32F7 family identity scaffold; no concrete memory or register inventory."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["Family.clef"]
+output_kind = "library"

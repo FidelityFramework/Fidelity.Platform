@@ -1,132 +1,141 @@
 # Platform declarations and compiler integration
 
-Status: implementation reference, audited 2026-09-10. The filename is retained
-because source comments refer to it. This replaces the earlier HTML design
-proposal; it does not claim that every platform has one fully unified schema.
-Revision anchors and remaining defects are in [the audit](DOCUMENTATION_AUDIT.md).
+Status: implementation reference, 2026-09-10. The historical filename is retained
+for source references. The [taxonomy](../PLATFORM_STRUCTURE.md) is implemented;
+[composition rules](PLATFORM_COMPOSITION.md) describe the current single-target
+selection boundary.
 
-## Responsibilities and current schemas
+## Responsibilities and schemas
 
-Fidelity.Platform supplies target declarations and binding packages. CCS checks
-their source, resolves supported declaration shapes, and settles numeric and
-layout facts. Composer consumes those results and drives the selected backend.
+Fidelity.Platform owns target declarations and binding packages. CCS checks their
+source, resolves supported declaration shapes, and settles numeric/layout/access
+facts. Composer consumes those results and drives the selected backend.
 
 | Vocabulary | Current role | Consumers |
 | --- | --- | --- |
-| [Contracts/PlatformContracts.clef](../Contracts/PlatformContracts.clef) | Shared tags, `TargetCore`, board endpoints and `PlatformDescriptor` | Arty endpoint bindings; Meadow, GPU and NPU scaffold descriptors |
-| [BAREWire platform description](../../BAREWire/src/Platform/Description.fs) | `TargetCore`, memory spaces, surfaces, buffers, transports and lifecycle facts | Linux CPU, Arty's additive description, and RA6M5 |
-| [BAREWire hardware descriptors](../../BAREWire/src/Hardware/Descriptors.fs) | Physical ABI/layout and Cortex-M image vocabulary | Generated bindings and Composer's MCU backend |
+| [Contracts/PlatformContracts.clef](../Contracts/PlatformContracts.clef) | Substrate tags, core facts, endpoints and PlatformDescriptor | Arty pin map and Meadow/GPU/NPU scaffolds |
+| [BAREWire platform description](../../BAREWire/src/Platform/Description.fs) | Core, memory spaces, surfaces, buffers, transports and lifecycle | Linux/HelloArty/HelloBlinky profiles and synthetic guest |
+| [BAREWire hardware descriptors](../../BAREWire/src/Hardware/Descriptors.fs) | ABI/layout and Cortex-M image vocabulary | Native bindings and Composer MCU image backend |
+| [Contracts/DeviceAccess.clef](../Contracts/DeviceAccess.clef) | Regions, mappings, register requirements, grants and Clef predicates | CCS MMIO validation and Composer evidence-based lowering |
 
-Contracts is currently a real, separate schema, **not a type-alias layer over
-BAREWire**. Its collections are lists and its triple/CPU overrides are optional;
-BAREWire uses arrays and string fields. The duplication is migration work, not
-evidence that either family can be deleted. Several leaf manifests include the
-Contracts source directly; the existence of its own `.fidproj` does not mean
-all leaves depend on it as a package.
+Contracts and BAREWire remain distinct, partly overlapping schemas. Contracts
+collections use lists and optional toolchain overrides; BAREWire uses arrays and
+string fields. Their consumers have not been replaced by a universal alias layer.
+Consumers now depend on the Contracts package instead of copying its source list.
+BAREWire metadata/full-library packages likewise share explicit source owners.
 
-## The mechanism constraint
+## Authoritative export selection
 
-Declarations compile with the application into typed PSG records. The reader
-follows supported bindings, references and `Quote` nodes to their values; it does
-not run a general quotation evaluator. Quotations remain a supported authoring
-form. Existing literal record declarations do not need to be wrapped merely to
-be read. Arbitrary helper calls or partially specified records are not implied
-by this mechanism. Use complete, explicitly typed records for new facts until
-the reader and its tests support another form.
+A selected platform manifest can name its root explicitly:
 
-[PlatformResolution.fs](../../clef/src/Compiler/PSGSaturation/SemanticGraph/PlatformResolution.fs)
-defines the actual supported shapes. `read` prefers a BAREWire
-`PlatformDescription` when present, otherwise a Contracts `PlatformDescriptor`.
-It reports additional descriptions of the selected form as ambiguous. It does
-not merge a collection of platform descriptions or prove equivalence between
-the two forms. Declaration defects have located CCS8206/8207/8208 diagnostics.
-`readDescriptors` separately projects ABI and native function declarations.
+```toml
+[platform]
+description = "Fidelity.Platform.Profiles.EK_RA6M5_HelloBlinky.Description.descriptor"
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m33"
+```
 
-The declaration scan includes bindings outside executable reachability. A
-platform declaration can inform compilation without becoming a live application
-table. Ordinary emission traversal still begins at the program's declaration
-roots. See [platform facts and derived state](D4b_PLATFORM_CARRIER_LOCATION.md).
+[SourceResolver](../../clef/src/Compiler/Project/SourceResolver.fs) resolves
+manifest dependencies before workload sources, diagnoses cycles, deduplicates
+completed diamonds and normalized source paths, and records the selected
+platform's transitive source closure.
+[PlatformResolution.read](../../clef/src/Compiler/PSGSaturation/SemanticGraph/PlatformResolution.fs)
+looks for exactly that qualified immutable binding in that closure. Plain records,
+quotations and immutable aliases are supported; calls or mutable initializers do
+not establish the export. References outside the closure are rejected. Missing,
+malformed, conflicting and ambiguous declarations use CCS8206/8207/8208 diagnostics.
 
-## TargetCore and numeric narrowing
+This is explicit selection, not merging. Unselected catalogue records do not
+become authority. Without `[platform] description`, the legacy directory-scoped
+reader prefers BAREWire PlatformDescription over Contracts PlatformDescriptor
+and rejects additional descriptions of the chosen form. Existing compatibility
+entry packages retain that behavior where they do not opt into explicit selection.
 
-Source value ranges, named core widths, and device transaction widths are
-different facts. A 64-bit pointer declaration does not make every register or
-value 64 bits. Both current core vocabularies declare named `Widths` and numeric
-`Representations`; the Linux and RA6M5 leaves supply `Pointer` and `Register`.
+Declarations compile as typed PSG nodes and retain source provenance. The reader
+follows supported values; it does not run arbitrary quotation programs. Use
+complete typed records and literal/reference arrays. Declaration discovery includes
+unreachable metadata without making it a live firmware/application table.
+`readDescriptors` separately projects ABI and native-function declarations.
+See [platform facts and derived state](D4b_PLATFORM_CARRIER_LOCATION.md).
 
+Under explicit selection, auxiliary platform pin/clock/device inventory, C ABI
+facts and citations are restricted to the selected source closure too. This
+does not remove application-owned pin attributes, native function descriptors
+or layout declarations from their respective consumers.
+
+## Narrowing and execution checks
+
+Source value range, pointer representation, register width and transaction width
+are separate facts. A 64-bit pointer does not select a 64-bit device transaction.
 [PlatformDeclaration.fill](../../clef/src/Compiler/PSGSaturation/SemanticGraph/PlatformDeclaration.fs)
-projects widths, representations and endpoint return bounds into the graph's
-`PlatformContext`. Missing dimensions and unavailable representations are
-diagnosed where required. `WordSizeBits` remains in both schemas and is checked
-against a declared `Register` width; it is not a replacement for `Pointer`.
-The project key `word_size` is no longer a width source and is reported as unused.
+projects named widths, representations and endpoint return bounds into the graph
+context. Missing dimensions and unavailable representations are diagnosed where
+required. WordSizeBits is checked against Register width; it does not replace
+Pointer. The old `word_size` project key is not a width source.
 
-This is an implemented narrowing boundary. A fully general resource-grant,
-runtime mapping, or memory-tier selection system is not implemented by those
-fields. A representation marked `native` is a declaration; it does not by itself
-prove instruction count, hardware execution cost, or every operation's support.
+For explicit selections with a core, CCS reconciles architecture, OS and runtime
+with selected package metadata. `bare` and `freestanding` are equivalent runtime
+labels for that check. Workload backend selection must agree with a selected
+non-library platform package.
+[CompilationOrchestrator](../../Composer/src/Core/CompilationOrchestrator.fs)
+requires explicit CPU/MCU profiles to supply a core and nonempty target triple,
+and rejects a conflicting CLI target triple before lowering. Thus those profiles
+cannot silently select the build host because their triple is absent.
 
-## Project loading and backend selection
+CCS also checks the architecture and OS components of supported triple forms
+against the core, including x86_64 Linux/none and `thumbv8m.main-none-eabi`.
+It does not implement LLVM's complete target-triple alias grammar.
 
-1. [ProjectChecker](../../clef/src/Compiler/Project/ProjectChecker.fs) builds the
-   initial context from the selected package and project metadata. Its numeric
-   maps start empty and are filled from the compiled declaration.
-2. [MLIRGeneration](../../Composer/src/MiddleEnd/MLIRGeneration.fs) reads the
-   declared architecture and the context's settled widths. The implementation
-   still has architecture-name matching and an unknown-name x86_64 fallback.
-   This is a remaining implementation limitation, not a portability guarantee.
-3. [CompilationOrchestrator](../../Composer/src/Core/CompilationOrchestrator.fs)
-   supplies the declared triple, pointer width and CPU model to the backend;
-   an explicit CLI target override takes precedence over the declared triple.
-4. The MCU backend additionally requires agreement between the resolved image
-   contract and target settings. Other backends have their own checks. There is
-   no demonstrated universal reconciliation of every overlapping project,
-   Contracts and BAREWire identity field, including OS/runtime/endianness.
+These checks do not establish universal ABI/toolchain compatibility. The legacy
+path retains limitations, and
+[MLIRGeneration.architectureOf](../../Composer/src/MiddleEnd/MLIRGeneration.fs)
+still has architecture-name matching and an unknown-name fallback. The MCU backend
+adds its specific Cortex-M33 Thumb soft-float checks. A Native representation is
+an authored capability claim, not a proof of cost or every operation's support.
 
-Do not use folder names as numeric facts or document a generic triple derivation
-that the code does not implement. The CPU package still has the public name
-`Fidelity.Platform.Linux_x86_64`; its directory is `CPU/Linux/x86_64`.
+## FPGA composition
 
-## FPGA path
+[Arty silicon](../Hardware/Silicon/FPGA/Xilinx/Artix7/XC7A100T_CSG324) owns the part,
+package and capacities; [Digilent product bindings](../Hardware/Products/Digilent/ArtyA7_100T)
+own board wiring, clock and storage. The
+[HelloArty profile](../Profiles/ArtyA7_HelloArty) owns report, buffer and UART choices.
 
 [PlatformBindings.pins](../../clef/src/Compiler/PSGSaturation/SemanticGraph/PlatformBindings.fs)
-still reads Contracts `PinEndpoint`, `ClockEndpoint`, `ResetEndpoint` and
-`PlatformDescriptor` values, and relates them to design pin attributes. The
-result is carried in `graph.Codata.Pins`.
+still reads Contracts PinEndpoint, ClockEndpoint, ResetEndpoint and
+PlatformDescriptor records, relates them to design attributes and emits
+`graph.Codata.Pins`.
 [XDCTransfer](../../Composer/src/MiddleEnd/Alex/Traversal/XDCTransfer.fs) serializes
-that mapping. The old Composer `PlatformPinResolution` path named by earlier
-documents is no longer its location.
+that mapping. The selected BAREWire profile adds memory/buffer/lifecycle metadata;
+its smaller surface list does not replace the broader pin map. See
+[BAREWire integration](BAREWire_Rebase_Plan.md).
 
-Arty's BAREWire description is additive. Its three surface endpoints do not
-replace the broader Contracts pin map or device-part declaration. The remaining
-migration and its acceptance criteria are in [BAREWire integration status](BAREWire_Rebase_Plan.md).
+## MCU composition and evidence
 
-## MCU path and evidence boundary
+[EK_RA6M5_HelloBlinky](../Profiles/EK_RA6M5_HelloBlinky) explicitly selects one
+PlatformDescription and CortexMImageDescriptor. It references the original
+[R7FA6M5BH3CFC spaces and vectors](../Hardware/Silicon/MCU/Renesas/RA6M5/R7FA6M5BH3CFC)
+and [freestanding execution core](../Environments/Freestanding/arm_cortex_m33).
+The [product](../Hardware/Products/Renesas/EK_RA6M5) owns board wiring, the full
+netlist and vendor provenance. HelloBlinky owns timing, mappings and grants.
 
-The [EK-RA6M5 package](../MCU/Renesas/RA6M5/EK_RA6M5/Fidelity.Platform.fidproj)
-selects package pins, board nets, a BAREWire description/image contract and the
-initial register declarations. Its old `Platform.clef` scaffold is gone.
+Composer owns BAREWire layout validation, startup/linker constants, assembly,
+linking, image verification and optional SEGGER deployment. No application C,
+Python or shell build wrapper participates. The extracted build preserves the
+accepted 2,350-byte firmware and 112-vector image; see
+[acceptance](../../MCU/Renesas/EK-RA6M5/HelloBlinky/docs/ACCEPTANCE.md) and
+[MCU_Backend.md](../../Composer/docs/MCU_Backend.md).
 
-Composer owns layout generation, assembly/linking, image checks and optional
-SEGGER deployment. [MCU_Backend.md](../../Composer/docs/MCU_Backend.md) documents
-the actual commands, tool dependencies and F# regression projects.
-[HelloBlinky acceptance](../../MCU/Renesas/EK-RA6M5/HelloBlinky/docs/ACCEPTANCE.md)
-records the board result and the limits of that evidence.
+[MMIO contracts](MMIO_CONTRACTS.md) describe the static grant/predicate consumer.
+Its evidence does not establish runtime page tables, DMA ordering, physical
+memory attribution, concurrency or cooperative scheduling. The restricted guest
+exercises 64-bit mappings with 32-bit transactions; it does not implement virtio.
 
-The MMIO and device-access suites check source rejection, grant/predicate evidence
-and optimized exact-width volatile access on 32-bit MCU and 64-bit guest profiles.
-Fourteen MCU checks cover image/linker failures. Composer's I/O test
-compares 1,149 terminals against a pinned netlist and checks package/header
-coverage. These are distinct from proof of interrupt interleavings, stack
-adequacy, memory protection, or a cooperative scheduler. Wiring completeness is
-not completeness of the implemented peripheral register map or driver set.
+## Remaining boundaries
 
-## Extension boundary
-
-[The MMIO contract slice](MMIO_CONTRACTS.md) now separates resource availability,
-workload grants, address-space identity, mapping lifetime and device transaction
-requirements in Contracts. It references BAREWire memory spaces directly and
-settles used accesses in CCS before Composer lowering. Runtime mappings, memory
-attribute establishment, virtio, DMA ownership and wait/rearm protocols remain
-design work. The implemented subset and its evidence limits are explicit in
-that document.
+Single-target composition is implemented. General SoC/resource instances,
+qualified cross-domain memory composition, negotiated resources and multiple
+execution targets are not. Hosted budgets remain profile assumptions. GPU/NPU
+scaffolds, reserved OS/protocol directories and generated binding inventories do
+not establish executable device support. The dated
+[audit](DOCUMENTATION_AUDIT.md) preserves earlier findings and their disposition.

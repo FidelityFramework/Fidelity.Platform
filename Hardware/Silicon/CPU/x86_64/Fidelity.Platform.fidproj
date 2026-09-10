@@ -1,0 +1,14 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.CPU.X86_64"
+version = "0.1.0"
+description = "Shared x86-64 architecture facts; no selected ABI, OS or machine."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["Architecture.clef"]
+output_kind = "library"
+
+[dependencies]
+BAREWire = { path = "../../../../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }

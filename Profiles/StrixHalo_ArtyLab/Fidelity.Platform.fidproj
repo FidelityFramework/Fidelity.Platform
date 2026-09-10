@@ -15,6 +15,6 @@ output_kind = "library"
 target = "cpu"
 
 [dependencies]
-gpu = { path = "../../GPU/AMD/RDNA3_5/StrixHalo_iGPU/Fidelity.Platform.fidproj" }
-npu = { path = "../../NPU/AMD/XDNA2/StrixHalo_NPU/Fidelity.Platform.fidproj" }
-fpga = { path = "../../FPGA/Xilinx/Artix7/ArtyA7_100T/Fidelity.Platform.fidproj" }
+gpu = { path = "../../Hardware/Silicon/GPU/AMD/RDNA3_5/StrixHalo_iGPU/Fidelity.Platform.fidproj" }
+npu = { path = "../../Hardware/Silicon/NPU/AMD/XDNA2/StrixHalo_NPU/Fidelity.Platform.fidproj" }
+fpga = { path = "../../Hardware/Products/Digilent/ArtyA7_100T/Fidelity.Platform.fidproj" }

@@ -1,0 +1,23 @@
+namespace Fidelity.Platform.Hardware.VirtualMachines.Synthetic.RestrictedGuest64
+
+open BAREWire.Platform
+open Fidelity.Platform.Contracts
+
+/// Synthetic device inventory for compiler validation. These addresses do not
+/// describe a running hypervisor or a supported virtio machine.
+module Description =
+    let transport: MemorySpace = {
+        Name = "transport"; Kind = "peripheral"; Capacity = 4096; Alignment = 4096; Granularity = 4
+        Growth = "fixed"; Access = "rw"; Base = Some 4294967296
+        Notes = "Synthetic guest-physical transport window"; MapKind = ""; Since = ""; Until = ""
+    }
+    let management: MemorySpace = {
+        Name = "management"; Kind = "peripheral"; Capacity = 4096; Alignment = 4096; Granularity = 4
+        Growth = "fixed"; Access = "rw"; Base = Some 4295032832
+        Notes = "Available inventory; the example workload grants no access"; MapKind = ""; Since = ""; Until = ""
+    }
+    let transportRegion: DeviceRegion = { Space = transport; AddressSpace = "guest-physical"; Source = "Synthetic compiler fixture" }
+    let managementRegion: DeviceRegion = { Space = management; AddressSpace = "guest-physical"; Source = "Synthetic compiler fixture" }
+    let status: DeviceRegister = { Name = "status"; Region = transportRegion; Offset = 0; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+    let control: DeviceRegister = { Name = "control"; Region = transportRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+    let managementControl: DeviceRegister = { Name = "management-control"; Region = managementRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }

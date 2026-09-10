@@ -1,0 +1,23 @@
+[package]
+name = "Fidelity.XRT.Bridge"
+version = "0.1.0"
+description = "Layer 2 marshaling for xrt_coreutil — protocol dispatch and callback wrappers."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "XRTBridge/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+Fidelity.Platform = { path = "../Fidelity.Platform.fidproj" }
+Fidelity.XRT = { path = "Fidelity.XRT.fidproj" }
+Fidelity.Libc = { path = "../Fidelity.Libc.fidproj" }

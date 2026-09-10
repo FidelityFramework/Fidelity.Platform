@@ -1,0 +1,25 @@
+namespace Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM33
+
+open BAREWire.Platform
+
+/// Cortex-M33 integer capabilities. ABI pointer representation belongs to the environment.
+module Description =
+    let registerWidth: WidthDeclaration = { Name = "Register"; Bits = 32 }
+
+    // The integer representations the core offers natively: two's-complement
+    // and unsigned at 8, 16, 32 and 64 bits, wrapping at their boundaries
+    // (64-bit arithmetic is register pairs on ARMv8-M, still native and
+    // wrapping). Ranges as exact decimal text.
+    let repInt8: Representation = { Name = "int8"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 8; MinMagnitude = "-128"; MaxMagnitude = "127"; Boundary = Boundary.Wrap }
+    let repInt16: Representation = { Name = "int16"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 16; MinMagnitude = "-32768"; MaxMagnitude = "32767"; Boundary = Boundary.Wrap }
+    let repInt32: Representation = { Name = "int32"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 32; MinMagnitude = "-2147483648"; MaxMagnitude = "2147483647"; Boundary = Boundary.Wrap }
+    let repInt64: Representation = { Name = "int64"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 64; MinMagnitude = "-9223372036854775808"; MaxMagnitude = "9223372036854775807"; Boundary = Boundary.Wrap }
+    let repUInt8: Representation = { Name = "uint8"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 8; MinMagnitude = "0"; MaxMagnitude = "255"; Boundary = Boundary.Wrap }
+    let repUInt16: Representation = { Name = "uint16"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 16; MinMagnitude = "0"; MaxMagnitude = "65535"; Boundary = Boundary.Wrap }
+    let repUInt32: Representation = { Name = "uint32"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 32; MinMagnitude = "0"; MaxMagnitude = "4294967295"; Boundary = Boundary.Wrap }
+    let repUInt64: Representation = { Name = "uint64"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 64; MinMagnitude = "0"; MaxMagnitude = "18446744073709551615"; Boundary = Boundary.Wrap }
+
+    let architecture = "arm_cortex_m33"
+    let cpuModel = "cortex-m33"
+    let wordSizeBits = 32
+    let endianness = "little"

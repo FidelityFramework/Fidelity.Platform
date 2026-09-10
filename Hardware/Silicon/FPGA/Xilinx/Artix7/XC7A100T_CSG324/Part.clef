@@ -1,0 +1,51 @@
+/// XC7A100T, CSG324 package, speed grade -1, as populated on the Arty A7-100T.
+/// Resource counts retain the source-backed declarations from the product description.
+module Fidelity.Platform.Hardware.Silicon.FPGA.Xilinx.Artix7.XC7A100T_CSG324
+
+open BAREWire.Platform
+
+let vendor = "Xilinx"
+let family = "Artix-7"
+let device = "XC7A100T"
+let package = "CSG324"
+let speedGrade = "-1"
+
+/// Block RAM of the XC7A100T: 4,860 Kbit in the reference manual's feature
+/// table ("Block RAM 607.5 KB"), 622,080 bytes. That figure counts the parity
+/// bits of every RAMB36; they are addressable as data only at x9/x18/x36 port
+/// widths. Granularity is the data half of one RAMB18 (16 Kbit, 2,048 bytes),
+/// the smallest block the synthesizer allocates. No base: block RAM is not
+/// address-mapped until a design instantiates it.
+let bram: MemorySpace = {
+    Name = "bram"
+    Kind = MemoryKind.BlockRam
+    Capacity = 622080
+    Alignment = 1
+    Granularity = 2048
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "XC7A100T block RAM, 4,860 Kbit including parity (Arty A7 reference manual feature table); allocated per RAMB18/RAMB36 by synthesis"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The register fabric: 126,800 flip-flops in the reference manual's feature
+/// table, 15,850 bytes. Every `seq.compreg` the compiler synthesises for a
+/// design's state consumes flip-flops of its inferred width, so this is the
+/// space a state record's size is an obligation against.
+let registers: MemorySpace = {
+    Name = "registers"
+    Kind = MemoryKind.Registers
+    Capacity = 15850
+    Alignment = 1
+    Granularity = 1
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "XC7A100T flip-flops, 126,800 (Arty A7 reference manual feature table), stated in bytes; register widths are inferred per design"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}

@@ -1,0 +1,219 @@
+/// Linux x86-64 ABI, runtime, service and transport declarations.
+/// Shared architecture facts are dependencies; application budgets and the
+/// selected description belong to Profiles/Linux_x86_64_Default.
+/// Plain typed records retain declaration identity through explicit references.
+module Fidelity.Platform.Environments.Linux.X86_64
+
+open BAREWire.Platform
+open Fidelity.Platform.Hardware.Silicon.CPU.X86_64
+
+/// AMD64 psABI §3.2.3: scalar aggregates exceeding two eightbytes are MEMORY.
+/// https://gitlab.com/x86-psABIs/x86-64-ABI/-/blob/master/low-level-sys-info.tex
+let cAbi: CAbiDescriptor = {
+    Name = "sysv-amd64"
+    PointerBits = 64
+    ScalarAggregateRegisterBytes = 16
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// The syscall surface: the boundary with the kernel. Numbers are those of
+// Syscalls.clef (arch/x86/entry/syscalls/syscall_64.tbl). Contracts on the
+// far side are trusted-base assumptions, stated and cited but not proven
+// (docs/11, "The TCB, mechanized").
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// read(2): the kernel writes at most `count` bytes into `buf` and returns
+/// how many, 0 at end of input, or a negative errno (man 2 read). This is the
+/// fact the input-bound obligations rest on. The return bound is data: at
+/// least the errno floor (-4095, the kernel's MAX_ERRNO negated, since every
+/// error is a negative return) and at most the `count` argument; the compiler
+/// reads the return's range [Floor, hi(count)] from this declaration alone.
+let readBound: Contract = {
+    Name = "read-bound"
+    Statement = "writes at most count bytes into buf and returns n with 0 <= n <= count; n = 0 is end of input; a negative return is an errno"
+    Logic = Logic.Assumed
+    Refs = [| "CWE-120" |]
+    Floor = -4095
+    AtMost = "count"
+}
+
+/// write(2): the kernel reads at most `count` bytes from `buf` and returns how
+/// many it wrote, or a negative errno (man 2 write); the same declared bound.
+let writeBound: Contract = {
+    Name = "write-bound"
+    Statement = "writes at most count bytes from buf and returns the number written or a negative errno"
+    Logic = Logic.Assumed
+    Refs = [| "CWE-125" |]
+    Floor = -4095
+    AtMost = "count"
+}
+
+/// `read`, syscall 0 (`Syscalls.SYS_read`).
+let sysRead: Endpoint = {
+    Name = "read"
+    Location = EndpointKind.SyscallNumber
+    Address = "0"
+    Contracts = [| readBound |]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `write`, syscall 1 (`Syscalls.SYS_write`).
+let sysWrite: Endpoint = {
+    Name = "write"
+    Location = EndpointKind.SyscallNumber
+    Address = "1"
+    Contracts = [| writeBound |]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `mmap`, syscall 9 (`Syscalls.SYS_mmap`).
+let sysMmap: Endpoint = {
+    Name = "mmap"
+    Location = EndpointKind.SyscallNumber
+    Address = "9"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `munmap`, syscall 11 (`Syscalls.SYS_munmap`).
+let sysMunmap: Endpoint = {
+    Name = "munmap"
+    Location = EndpointKind.SyscallNumber
+    Address = "11"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `exit_group`, syscall 231 (`Syscalls.SYS_exit_group`): the teardown.
+let sysExitGroup: Endpoint = {
+    Name = "exit_group"
+    Location = EndpointKind.SyscallNumber
+    Address = "231"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// `clock_gettime`, syscall 228 (`Syscalls.SYS_clock_gettime`).
+let sysClockGettime: Endpoint = {
+    Name = "clock_gettime"
+    Location = EndpointKind.SyscallNumber
+    Address = "228"
+    Contracts = [||]
+    Signature = ""
+    Since = ""
+    Until = ""
+}
+
+/// Every syscall returns its error as a negative errno in the result register.
+let errnoConvention: Default = {
+    Key = "errno-convention"
+    Value = "negative-return"
+}
+
+/// The syscall table as a described interface.
+let syscalls: BoundarySurface = {
+    Name = "syscalls"
+    Kind = SurfaceKind.Syscall
+    Endpoints = [| sysRead; sysWrite; sysMmap; sysMunmap; sysExitGroup; sysClockGettime |]
+    Defaults = [| errnoConvention |]
+    Contracts = [||]
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Transports: declared surfaces of this platform, not bound to endpoints
+// until the socket and Wayland syscalls are described on the surface above.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// WebSocket over TCP: `WebSocket/Server.clef` caps a frame at `MaxFrameSize`,
+/// 65536 bytes; frames arrive in order. Declared, not yet bound.
+let websocket: Transport = {
+    Name = "websocket"
+    Kind = TransportKind.WebSocket
+    Endpoints = [||]
+    RateHz = 0
+    MaxUnit = 65536
+    Ordered = true
+    Schema = ""
+    Since = ""
+    Until = ""
+}
+
+/// Wayland over a Unix socket (`Fidelity.Wayland.fidproj`): declared, not yet
+/// bound; rate and largest unit undeclared.
+let wayland: Transport = {
+    Name = "wayland"
+    Kind = TransportKind.Wayland
+    Endpoints = [||]
+    RateHz = 0
+    MaxUnit = 0
+    Ordered = true
+    Schema = ""
+    Since = ""
+    Until = ""
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Lifecycle, core, and the description that composes them.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// A hosted ELF process: libc's `_start` runs `main`; exit_group(2) ends every
+/// thread; nothing survives the process. No clocks or resets to declare.
+let lifecycle: LifecycleFacts = {
+    Clocks = [||]
+    Resets = [||]
+    Entry = "_start"
+    Teardown = "exit_group"
+    Persistence = Persistence.Volatile
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// The width dimensions and the numeric representations this core declares
+// The selected ABI declares Pointer; the architecture package owns Register
+// and native representations. This environment also opts into software posit32.
+// A representation absent from the selected Core remains unavailable.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// The address width: 64 bits (a canonical-form virtual address; the whole
+/// register is the pointer under the System V AMD64 ABI).
+let pointerWidth: WidthDeclaration = {
+    Name = "Pointer"
+    Bits = 64
+}
+
+/// posit32 (es = 2): no posit unit on x86-64, so emulated in software; a
+/// posit saturates at maxpos = 2^120 rather than overflowing.
+let repPosit32: Representation = {
+    Name = "posit32"
+    Capability = Capability.Emulated
+    Family = RepresentationFamily.Posit
+    Bits = 32
+    MinMagnitude = "-1329227995784915872903807060280344576"
+    MaxMagnitude = "1329227995784915872903807060280344576"
+    Boundary = Boundary.Saturate
+}
+
+/// The core (docs/CANONICAL_PLATFORM_SPEC.md, "TargetCore"): the facts of
+/// Fidelity.Platform.fidproj's `[platform]` table, plus the triple LLVM is
+/// handed, and the widths and representations declared above. No CPU model:
+/// the toolchain's generic x86-64.
+let core: TargetCore = {
+    Os = "linux"
+    Arch = "x86_64"
+    WordSizeBits = 64
+    Endianness = "little"
+    Runtime = "libc"
+    Triple = "x86_64-unknown-linux-gnu"
+    CpuModel = ""
+    Widths = [| pointerWidth; registerWidth |]
+    Representations = [| repInt8; repInt16; repInt32; repInt64; repUInt8; repUInt16; repUInt32; repUInt64; repFloat32; repFloat64; repPosit32 |]
+}

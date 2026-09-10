@@ -1,0 +1,25 @@
+[package]
+name = "Fidelity.Platform.MCU.ST.STM32F7.MeadowF7"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "MCU substrate binding metadata scaffold for Wilderness Labs Meadow F7."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Platform.clef"
+]
+output = "fidelity-platform-mcu-stm32f7-meadowf7"
+output_kind = "library"
+
+[platform]
+description = "Fidelity.Platform.MCU.ST.STM32F7.MeadowF7.Platform.descriptor"
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m7"
+
+[dependencies]
+silicon = { path = "../../../Silicon/MCU/ST/STM32F7/Fidelity.Platform.fidproj" }
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

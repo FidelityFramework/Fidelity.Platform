@@ -1,0 +1,26 @@
+namespace Fidelity.Platform.Hardware.Products.Renesas.EK_RA6M5
+
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC.Description
+module Package = Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC.PackagePins
+
+/// EK-RA6M5 v1 MP connectivity, schematic issue 3.0; physical PCB revision remains unconfirmed.
+/// Signal names describe wiring. An application assigns color/pace or other button roles.
+module Description =
+    let product = "EK-RA6M5"
+    let siliconPart = Part.partNumber
+    let packagePins = Package.pins
+    let boardTerminals = BoardNets.terminals
+    let blueLedPort = 0
+    let blueLedPin = 6
+    let greenLedPort = 0
+    let greenLedPin = 7
+    let redLedPort = 0
+    let redLedPin = 8
+    let ledsActiveHigh = true
+    let s1Port = 0
+    let s1Pin = 5
+    let s1IrqEvent = 11
+    let s2Port = 0
+    let s2Pin = 4
+    let s2IrqEvent = 10
+    let switchesActiveHigh = false

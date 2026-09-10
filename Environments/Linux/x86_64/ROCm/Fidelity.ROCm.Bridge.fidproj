@@ -1,0 +1,23 @@
+[package]
+name = "Fidelity.ROCm.Bridge"
+version = "0.1.0"
+description = "Layer 2 marshaling for amdhip64 — protocol dispatch and callback wrappers."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "ROCmBridge/Callbacks.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+Fidelity.Platform = { path = "../Fidelity.Platform.fidproj" }
+Fidelity.ROCm = { path = "Fidelity.ROCm.fidproj" }
+Fidelity.Libc = { path = "../Fidelity.Libc.fidproj" }

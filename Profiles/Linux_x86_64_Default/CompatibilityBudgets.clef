@@ -1,0 +1,136 @@
+/// Preserved budgets and mapping assumptions of the original Linux platform.
+/// These values are explicit compatibility policy, not universal x86-64 or Linux capacities.
+module Fidelity.Platform.Profiles.Linux_x86_64_Default.CompatibilityBudgets
+
+open BAREWire.Platform
+
+/// `.text`: the program's code, mapped read-execute in whole pages. The
+/// capacity is a one-page budget, confirmed against HelloProof's `helloworld`
+/// (`readelf -lW`: R E segment 0x489 bytes; `.text` 0x40b).
+let text: MemorySpace = {
+    Name = "text"
+    Kind = MemoryKind.Text
+    Capacity = 4096
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadExecute
+    Base = None
+    Notes = "linker-placed code; one-page budget confirmed against the ELF R E segment"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.rodata`: string literals and constants, mapped read-only. HelloProof's
+/// `.rodata` is 50 bytes (`readelf -SW`, section 14), the bytes the Rocq coda
+/// tiles; the capacity is the declared budget the reachable string storages
+/// are proved to fit.
+let rodata: MemorySpace = {
+    Name = "rodata"
+    Kind = MemoryKind.Rodata
+    Capacity = 4096
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadOnly
+    Base = None
+    Notes = "linker-placed constants; one-page budget, 50 bytes used by HelloProof"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.data`: initialised variables, mapped read-write. One-page budget
+/// (HelloProof: 16 bytes).
+let data: MemorySpace = {
+    Name = "data"
+    Kind = MemoryKind.Data
+    Capacity = 4096
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "linker-placed initialised data; one-page budget"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `.bss`: zero-initialised variables the loader maps without file backing.
+/// One-page budget (HelloProof: 8 bytes).
+let bss: MemorySpace = {
+    Name = "bss"
+    Kind = MemoryKind.Bss
+    Capacity = 4096
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "zero-initialised data; one-page budget"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The process stack: 8 MiB, the Linux default `RLIMIT_STACK` soft limit
+/// (setrlimit(2); `ulimit -s` reports 8192 KiB), growing down from an address
+/// the kernel chooses. The 16-byte alignment is the System V AMD64 ABI's
+/// call-site rule (§3.2.2).
+let stack: MemorySpace = {
+    Name = "stack"
+    Kind = MemoryKind.Stack
+    Capacity = 8388608
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Down
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "RLIMIT_STACK default soft limit; SysV AMD64 16-byte alignment"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The scope arena: bump allocation over a caller-provided 4096-byte block
+/// (BAREWire docs/Arena_Design.md; the `Arena` intrinsic), byte-granular,
+/// 16-byte aligned, growing up, freed when the scope ends. `consoleReadln`
+/// lives here.
+let arena: MemorySpace = {
+    Name = "arena"
+    Kind = MemoryKind.Arena
+    Capacity = 4096
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Up
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "bump discipline of docs/Arena_Design.md; caller-provided block"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// The heap: brk(2) and mmap(2) memory the kernel hands out on demand, with
+/// no declared base and no declared budget. Its capacity is the ceiling the
+/// address space imposes when `RLIMIT_DATA` is at its default of unlimited:
+/// `TASK_SIZE_MAX` for 4-level paging, (1 << 47) - 4096 bytes
+/// (arch/x86/include/asm/page_64_types.h). 16-byte alignment is malloc(3)'s
+/// guarantee on this ABI.
+let heap: MemorySpace = {
+    Name = "heap"
+    Kind = MemoryKind.Heap
+    Capacity = 140737488351232
+    Alignment = 16
+    Granularity = 1
+    Growth = Growth.Up
+    Access = Access.ReadWrite
+    Base = None
+    Notes = "brk/mmap memory; capacity is TASK_SIZE_MAX, the address-space ceiling"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+

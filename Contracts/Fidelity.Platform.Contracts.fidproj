@@ -5,7 +5,7 @@ authors = ["SpeakEZ Technologies"]
 description = "Shared substrate-neutral contracts for Fidelity.Platform packages."
 
 [compilation]
-target = "cpu"
+target = "library"
 
 [build]
 sources = [

@@ -1,0 +1,20 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.MCU.Renesas.RA6M5.R7FA6M5BH3CFC"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "R7FA6M5BH3CFC memory, vectors, LQFP176 pin inventory and initial MMIO requirements."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "PackagePins.clef",
+    "Description.clef",
+    "Registers.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

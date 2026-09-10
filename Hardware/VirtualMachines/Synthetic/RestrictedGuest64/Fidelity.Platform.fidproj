@@ -1,0 +1,14 @@
+[package]
+name = "Fidelity.Platform.Hardware.VirtualMachines.Synthetic.RestrictedGuest64"
+version = "0.1.0"
+description = "Synthetic guest-physical register inventory for compiler validation"
+
+[compilation]
+target = "library"
+
+[dependencies]
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+
+[build]
+sources = ["Description.clef"]
+output_kind = "library"

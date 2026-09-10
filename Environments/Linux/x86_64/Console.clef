@@ -1,0 +1,55 @@
+/// Console I/O operations for Fidelity.Platform
+/// These use compiler intrinsics (Sys.write, Sys.read) with string types.
+/// String is memref<?xi8> in MLIR — the backend extracts pointer and length
+/// at syscall boundaries via memref.extract_aligned_pointer_as_index and memref.dim.
+///
+/// NOTE: Top-level module declaration provides "Console.readln" etc. directly matching
+/// the intrinsic names for write/writeln/error/errorln. This allows user code to
+/// call Console.* uniformly.
+module Console
+
+/// Standard file descriptors
+[<Literal>]
+let STDIN = 0
+
+[<Literal>]
+let STDOUT = 1
+
+[<Literal>]
+let STDERR = 2
+
+/// Read a line from stdin, returning it as a string.
+/// Backend handles buffer allocation, byte-level I/O, and newline trimming.
+let readln () : string =
+    Sys.readline STDIN
+
+/// Write a string to stdout.
+let write (s: string) : unit =
+    let _ = Sys.write STDOUT s
+    ()
+
+/// Write a string to stdout followed by newline.
+let writeln (s: string) : unit =
+    write s
+    let _ = Sys.write STDOUT "\n"
+    ()
+
+/// Write a string to stderr.
+let error (s: string) : unit =
+    let _ = Sys.write STDERR s
+    ()
+
+/// Write a string to stderr followed by newline.
+let errorln (s: string) : unit =
+    error s
+    let _ = Sys.write STDERR "\n"
+    ()
+
+/// Capacity in bytes of the line buffer `readln` reads into. Authored here
+/// once as a library API constraint. The selected profile's `Description.clef`
+/// references it as the `consoleReadln` buffer schema,
+/// and the compiler's `Sys.readline` lowering and the input-bound proof
+/// obligations read it from that declaration, never from a literal of their
+/// own (BAREWire docs/11, "three observers, one truth").
+[<Literal>]
+let READLINE_CAPACITY = 1024

@@ -29,6 +29,8 @@ x86/
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
+# Architecture catalogue source, not an IDE build-output directory.
+!/Hardware/Silicon/CPU/Arm/
 bld/
 [Bb]in/
 [Oo]bj/

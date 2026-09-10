@@ -1,0 +1,18 @@
+[package]
+name = "Fidelity.Platform.Hardware.Products.Renesas.EK_RA6M5"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "EK-RA6M5 v1 product connectivity; physical PCB revision applicability remains explicit."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "BoardNets.clef",
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+silicon = { path = "../../../Silicon/MCU/Renesas/RA6M5/R7FA6M5BH3CFC/Fidelity.Platform.fidproj" }

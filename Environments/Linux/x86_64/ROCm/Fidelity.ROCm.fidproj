@@ -1,0 +1,38 @@
+[package]
+name = "Fidelity.ROCm"
+version = "0.1.0"
+description = "Generated bindings for amdhip64."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Types.clef",
+    "Bindings/HipError.clef",
+    "Bindings/Device/Types.clef",
+    "Bindings/Device/Device.clef",
+    "Bindings/Device/DeviceApi.clef",
+    "Bindings/Memory/Types.clef",
+    "Bindings/Memory/Memory.clef",
+    "Bindings/Memory/MemoryApi.clef",
+    "Bindings/Stream/Types.clef",
+    "Bindings/Stream/Stream.clef",
+    "Bindings/Stream/StreamApi.clef",
+    "Bindings/Event/Event.clef",
+    "Bindings/Event/EventApi.clef",
+    "Bindings/Module/Types.clef",
+    "Bindings/Module/Module.clef",
+    "Bindings/Module/ModuleApi.clef",
+    "Bindings/Error/Error.clef",
+    "Bindings/Error/ErrorApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+Fidelity.Platform = { path = "../Fidelity.Platform.fidproj" }

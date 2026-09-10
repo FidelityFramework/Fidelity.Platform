@@ -1,0 +1,18 @@
+module Fidelity.Platform.Environments.Freestanding.X86_64
+
+open BAREWire.Platform
+open Fidelity.Platform.Hardware.Silicon.CPU
+
+/// The selected 64-bit freestanding ABI. This declaration supplies no boot
+/// protocol, page tables or devices; a machine and profile must supply those.
+let pointerWidth: WidthDeclaration = { Name = "Pointer"; Bits = 64 }
+
+let core: TargetCore = {
+    Os = "none"; Arch = "x86_64"; WordSizeBits = 64; Endianness = "little"
+    Runtime = "bare"; Triple = "x86_64-unknown-none"; CpuModel = "x86-64"
+    Widths = [| pointerWidth; X86_64.registerWidth |]
+    Representations = [|
+        X86_64.repInt8; X86_64.repInt16; X86_64.repInt32; X86_64.repInt64
+        X86_64.repUInt8; X86_64.repUInt16; X86_64.repUInt32; X86_64.repUInt64
+    |]
+}

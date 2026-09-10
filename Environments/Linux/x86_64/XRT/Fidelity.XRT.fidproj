@@ -1,0 +1,37 @@
+[package]
+name = "Fidelity.XRT"
+version = "0.1.0"
+description = "Generated bindings for xrt_coreutil."
+
+[compilation]
+target = "cpu"
+
+[build]
+output_kind = "library"
+sources = [
+    "Bindings/Types.clef",
+    "Bindings/ReturnCode.clef",
+    "Bindings/Device/Device.clef",
+    "Bindings/Device/DeviceApi.clef",
+    "Bindings/Buffer/Types.clef",
+    "Bindings/Buffer/Buffer.clef",
+    "Bindings/Buffer/BufferApi.clef",
+    "Bindings/Kernel/Types.clef",
+    "Bindings/Kernel/Kernel.clef",
+    "Bindings/Kernel/KernelApi.clef",
+    "Bindings/Xclbin/Xclbin.clef",
+    "Bindings/Xclbin/XclbinApi.clef",
+    "Bindings/Graph/Types.clef",
+    "Bindings/Graph/Graph.clef",
+    "Bindings/Graph/GraphApi.clef",
+    "Bindings/AIE/AIE.clef",
+    "Bindings/AIE/AIEApi.clef",
+]
+
+[platform]
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+
+[dependencies]
+Fidelity.Platform = { path = "../Fidelity.Platform.fidproj" }

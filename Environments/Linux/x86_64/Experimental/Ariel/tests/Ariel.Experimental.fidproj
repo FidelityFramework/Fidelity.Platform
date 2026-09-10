@@ -1,0 +1,16 @@
+[package]
+name = "ArielLifecycle.Experimental"
+version = "0.1.0"
+description = "Uncompiled experimental native region lifecycle harness."
+
+[compilation]
+target = "cpu"
+
+[dependencies]
+platform = { path = "../../../../../../Profiles/Linux_x86_64_Default/Fidelity.Platform.fidproj" }
+ariel = { path = "../Fidelity.Ariel.Experimental.fidproj" }
+
+[build]
+sources = ["Lifecycle.clef"]
+output = "ariel-lifecycle"
+output_kind = "console"

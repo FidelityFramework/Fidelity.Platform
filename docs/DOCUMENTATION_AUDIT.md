@@ -1,9 +1,11 @@
 # Documentation engineering audit — 2026-09-10
 
-This audit records the baseline below. The subsequent implementation of
-[MMIO contracts and predicates](MMIO_CONTRACTS.md) addresses the static MMIO
-portion of the last two code findings. The legacy capability map, runtime
-mapping and unrelated harness/schema findings remain separate work.
+This audit preserves the pinned baseline below. Links now point to relocated
+source owners; findings in the original tables describe that baseline, not a
+new assertion that repaired defects persist. Subsequent MMIO and taxonomy work
+is recorded under **Follow-up disposition**. Current behavior is described by
+[compiler integration](CANONICAL_PLATFORM_SPEC.md) and
+[composition](PLATFORM_COMPOSITION.md).
 
 ## Scope and evidence
 
@@ -23,8 +25,8 @@ Source baseline:
 
 The revisions identify the inspected source, not newly rerun acceptance of every
 package. The preceding main-branch convergence passed the RA6M5 F# I/O check and
-a Composer HelloBlinky rebuild with the accepted binary hash. This pass changes
-documentation only; it does not change firmware or compiler behavior. A .NET/F#
+a Composer HelloBlinky rebuild with the accepted binary hash. That original pass changed
+documentation only; it did not change firmware or compiler behavior. A .NET/F#
 inspection checked 33 Markdown documents and all 146 local Markdown links, with
 no missing targets or HTML documents under Markdown suffixes. `git diff --check`
 also passed. The inspection ran from standard input and added no test script or
@@ -37,29 +39,29 @@ build dependency. Structural claims were checked against the named sources.
 | [CANONICAL_PLATFORM_SPEC.md](CANONICAL_PLATFORM_SPEC.md) | HTML under a Markdown suffix; mixes pre-implementation claims, completed changes and hypothetical APIs | Rewritten as a source-linked implementation reference; retain filename for code references |
 | [D4b_PLATFORM_CARRIER_LOCATION.md](D4b_PLATFORM_CARRIER_LOCATION.md) | Overlong HTML decision brief; incomplete account of declaration nodes/context/derived graph state; unsafe single-core simplification | Keep the useful distinction in a short Markdown note; remove the obsolete binary choice and unsupported proof claims |
 | [BAREWire_Rebase_Plan.md](BAREWire_Rebase_Plan.md) | Some work landed, but via different reader locations; alias migration remains incomplete | Replace chronology with current state and remaining acceptance criteria |
-| [README](../README.md), [structure](../PLATFORM_STRUCTURE.md), [MCU](../MCU/README.md), [CGRA](../CGRA/README.md) | Removed CPU path and assumed `Platform.fs` filenames | Correct paths and describe manifests as the source list authority |
-| [Arty README](../FPGA/Xilinx/Artix7/ArtyA7_100T/README.md) | `.fs` references are stale; additive BAREWire description missing from ownership explanation | Correct filenames and link migration status; retain vendor-source precedence |
-| [RA6M5 docs](../MCU/Renesas/RA6M5/EK_RA6M5/docs/README.md) | Useful, sourced material; manifest coverage table and missing-schematic prose contradict accepted bring-up | Retain and reconcile implemented subset, complete wiring inventory and unimplemented drivers |
-| [Meadow source pack](../MCU/ST/STM32F7/MeadowF7/docs/README.md) | Placeholder manifest ignores actual staged PDFs/web snapshot | Inventory existing assets without assigning unverified revisions or claiming a completed pin map |
-| [Ariel](../CPU/Linux/x86_64/Ariel/README.md), [test guide](../tests/Ariel/README.md), [native status](../tests/Ariel/native/STATUS.md) | Production API and dated native evidence are useful; temporary artifacts may expire | Retain, link source/status and distinguish recorded results from a new audit run |
-| [Experimental Ariel](../CPU/Linux/x86_64/Experimental/Ariel/README.md), [status](../CPU/Linux/x86_64/Experimental/Ariel/STATUS.md), [experimental pthread](../CPU/Linux/x86_64/Experimental/Pthread/README.md) | Historical failure language can be read as applying to the later typed implementation | Explicitly scope failures and proposals to the preserved raw-pointer candidate |
-| [CPU report](../CPU/Linux/x86_64/LAYER3-REPORT.md), [GPU report](../GPU/AMD/RDNA3_5/LAYER3-REPORT.md), [NPU report](../NPU/AMD/XDNA2/LAYER3-REPORT.md) | Generated inventories contain obsolete generic NativePtr guidance | Preserve as generation records with status notices; do not use as current API guidance or native acceptance |
-| Pthread bridge reports ([typed](../CPU/Linux/x86_64/Bindings/PthreadBridge/REPORT.md), [experimental](../CPU/Linux/x86_64/Experimental/Pthread/Bindings/PthreadBridge/REPORT.md)) | Small generation inventories, different source generations | Retain with explicit scope; generated counts are not fresh test results |
+| [README](../README.md), [structure](../PLATFORM_STRUCTURE.md), [MCU](../Hardware/Silicon/MCU/README.md), [CGRA](../Hardware/Silicon/CGRA/README.md) | Removed CPU path and assumed `Platform.fs` filenames | Correct paths and describe manifests as the source list authority |
+| [Arty README](../Hardware/Products/Digilent/ArtyA7_100T/README.md) | `.fs` references are stale; additive BAREWire description missing from ownership explanation | Correct filenames and link migration status; retain vendor-source precedence |
+| [RA6M5 docs](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md) | Useful, sourced material; manifest coverage table and missing-schematic prose contradict accepted bring-up | Retain and reconcile implemented subset, complete wiring inventory and unimplemented drivers |
+| [Meadow source pack](../Hardware/Products/WildernessLabs/MeadowF7/docs/README.md) | Placeholder manifest ignores actual staged PDFs/web snapshot | Inventory existing assets without assigning unverified revisions or claiming a completed pin map |
+| [Ariel](../Environments/Linux/x86_64/Ariel/README.md), [test guide](../tests/Ariel/README.md), [native status](../tests/Ariel/native/STATUS.md) | Production API and dated native evidence are useful; temporary artifacts may expire | Retain, link source/status and distinguish recorded results from a new audit run |
+| [Experimental Ariel](../Environments/Linux/x86_64/Experimental/Ariel/README.md), [status](../Environments/Linux/x86_64/Experimental/Ariel/STATUS.md), [experimental pthread](../Environments/Linux/x86_64/Experimental/Pthread/README.md) | Historical failure language can be read as applying to the later typed implementation | Explicitly scope failures and proposals to the preserved raw-pointer candidate |
+| [CPU report](../Environments/Linux/x86_64/LAYER3-REPORT.md), [GPU report](../Environments/Linux/x86_64/ROCm/LAYER3-REPORT.md), [NPU report](../Environments/Linux/x86_64/XRT/LAYER3-REPORT.md) | Generated inventories contain obsolete generic NativePtr guidance | Preserve as generation records with status notices; do not use as current API guidance or native acceptance |
+| Pthread bridge reports ([typed](../Environments/Linux/x86_64/Bindings/PthreadBridge/REPORT.md), [experimental](../Environments/Linux/x86_64/Experimental/Pthread/Bindings/PthreadBridge/REPORT.md)) | Small generation inventories, different source generations | Retain with explicit scope; generated counts are not fresh test results |
 
 No archive copy of the superseded design pages is added. Their exact originals
 remain in the baseline commit, keeping only one active account of each topic.
 
-## Findings that require code work, not prose repair
+## Original code findings
 
 | Finding | Evidence | Required follow-up before claiming support |
 | --- | --- | --- |
 | Contracts and BAREWire are distinct, partly overlapping schemas | [Contracts](../Contracts/PlatformContracts.clef), [BAREWire description](../../BAREWire/src/Platform/Description.fs) | Migrate consumers with equivalent layout/pin/diagnostic gates; do not remove either schema solely because it overlaps |
 | Multi-platform composition is not a resolved resource model | [Profile manifest](../Profiles/StrixHalo_ArtyLab/Fidelity.Platform.fidproj), [PlatformResolution.read](../../clef/src/Compiler/PSGSaturation/SemanticGraph/PlatformResolution.fs) | Define composition/selection; a second selected-form description currently produces ambiguity, not a merged inventory |
-| Three scaffold descriptors omit the required `Resets` field | [Meadow](../MCU/ST/STM32F7/MeadowF7/Platform.clef), [GPU](../GPU/AMD/RDNA3_5/StrixHalo_iGPU/Platform.clef), [NPU](../NPU/AMD/XDNA2/StrixHalo_NPU/Platform.clef) | Repair and compile each intended entry; no fresh failure count is asserted here |
-| Arty Prelude has an unresolved member reference | [Prelude.Package](../FPGA/Xilinx/Artix7/ArtyA7_100T/ArtyA7_100T.Prelude.clef) names `Platform.xdcConstraints`, absent from bindings | Remove or replace under an application/API gate; successful reachable code does not validate this export |
-| Legacy generated bridge packages remain beside newer typed packages | [WaylandBridge](../CPU/Linux/x86_64/Bindings/WaylandBridge/ProtocolDispatch.clef), [ROCm callbacks](../GPU/AMD/RDNA3_5/StrixHalo_iGPU/ROCmBridge/Callbacks.clef), [XRT callbacks](../NPU/AMD/XDNA2/StrixHalo_NPU/XRTBridge/Callbacks.clef) | Reconcile consumers and regenerate or retire unsupported raw-address surfaces; generation reports are not compatibility evidence |
+| Three scaffold descriptors omit the required `Resets` field | [Meadow](../Hardware/Products/WildernessLabs/MeadowF7/Platform.clef), [GPU](../Hardware/Silicon/GPU/AMD/RDNA3_5/StrixHalo_iGPU/Platform.clef), [NPU](../Hardware/Silicon/NPU/AMD/XDNA2/StrixHalo_NPU/Platform.clef) | Repair and compile each intended entry; no fresh failure count is asserted here |
+| Arty Prelude has an unresolved member reference | [Prelude.Package](../Hardware/Products/Digilent/ArtyA7_100T/ArtyA7_100T.Prelude.clef) names `Platform.xdcConstraints`, absent from bindings | Remove or replace under an application/API gate; successful reachable code does not validate this export |
+| Legacy generated bridge packages remain beside newer typed packages | [WaylandBridge](../Environments/Linux/x86_64/Bindings/WaylandBridge/ProtocolDispatch.clef), [ROCm callbacks](../Environments/Linux/x86_64/ROCm/ROCmBridge/Callbacks.clef), [XRT callbacks](../Environments/Linux/x86_64/XRT/XRTBridge/Callbacks.clef) | Reconcile consumers and regenerate or retire unsupported raw-address surfaces; generation reports are not compatibility evidence |
 | Architecture selection has residual inference/fallback | [MLIRGeneration.architectureOf](../../Composer/src/MiddleEnd/MLIRGeneration.fs) | Diagnose unsupported identities and check target-field agreement before claiming generic cross-target correctness |
-| Hosted memory capacities include assumptions and a virtual-address ceiling | [Linux description](../CPU/Linux/x86_64/Description.clef) | Distinguish authored budgets from discovered/granted memory and runtime limits |
+| Hosted memory capacities include assumptions and a virtual-address ceiling | [Linux description](../Profiles/Linux_x86_64_Default/Description.clef) | Distinguish authored budgets from discovered/granted memory and runtime limits |
 | MMIO handles lack a general mapped-region/grant contract | [MmioPatterns](../../Composer/src/MiddleEnd/Alex/Patterns/MmioPatterns.fs) | Define region provenance, mapping lifetime, access policy and ordering with target-specific enforcement |
 | Platform predicate design is ahead of the inspected implementation | [PlatformContext](../../clef/src/Compiler/NativeTypedTree/NativeTypes.fs), [ProjectChecker](../../clef/src/Compiler/Project/ProjectChecker.fs) | The predicate map starts empty; no production map resolver/consumer was found. Reconcile the spec before treating quoted capabilities as proof or automatic dispatch |
 
@@ -67,11 +69,37 @@ The graph already carries typed obligation bodies and source references; a
 predicate design should build on that evidence path. The F★/deferred-inference
 connection is assessed in [the carrier note](D4b_PLATFORM_CARRIER_LOCATION.md).
 
+## Follow-up disposition
+
+The subsequent static MMIO increment established region/mapping/grant checks and
+the Clef predicate consumer. The taxonomy increment then implemented explicit
+single-target export selection, source-closure checks, cycle/diamond handling,
+source ownership, metadata agreement and Composer's explicit target guards.
+It moved package paths and separated silicon/product/environment/profile owners.
+
+| Original finding | Current disposition |
+| --- | --- |
+| Missing Resets in three scaffolds | Fields supplied; empty inventories remain scaffolds |
+| Arty Prelude xdcConstraints reference | Removed; operative pin/XDC projection remains in CCS/Composer |
+| Hosted budgets mixed with environment facts | Preserved explicitly under Linux_x86_64_Default; no runtime resource-discovery claim |
+| No mapped-region/grant contract | Static MMIO implemented with original-node identity and source evidence; runtime mapping and ordering remain open |
+| Predicate design ahead of consumer | Closed integer/Boolean ClefPredicate consumer implemented; legacy capability map remains unused |
+| Composition/selection absent | One explicit export per selected target implemented; heterogeneous instances and memory topology remain open |
+| Contracts/BAREWire overlap | Source ownership reconciled; schema/pin-consumer unification remains open |
+| Legacy bridges and harnesses | Relocated with their owners; migration alone is not native acceptance or harness replacement |
+
+HelloBlinky's extracted build retains the accepted 2,350-byte firmware and
+112-vector image with all 27 register bindings and six grants. Its
+[acceptance record](../../MCU/Renesas/EK-RA6M5/HelloBlinky/docs/ACCEPTANCE.md)
+distinguishes rebuild evidence from physical-board acceptance. Vendor assets
+retain original bytes and provenance. The baseline revisions above do not
+identify the entire subsequent coordinated implementation.
+
 ## Verification and harness debt
 
 The maintained MCU checks are compiled F# projects documented by
 [Composer](../../Composer/docs/MCU_Backend.md) and the
-[RA6M5 I/O map](../MCU/Renesas/RA6M5/EK_RA6M5/docs/IO_MAP.md).
+[RA6M5 I/O map](../Hardware/Products/Renesas/EK_RA6M5/docs/IO_MAP.md).
 
 Python runners remain under `tests/Ariel`, `tests/Pthread` and
 `tests/WaylandNative`; the experimental Ariel candidate also has a shell runner.

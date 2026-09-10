@@ -10,6 +10,15 @@ its address-space identity, CPU mapping, hardware transactions and a workload's
 grants. Physical register inventory does not grant access. Pointer width, value
 range and transaction width remain separate requirements.
 
+The selected [HelloBlinky profile](../Profiles/EK_RA6M5_HelloBlinky) assembles
+the part's original memory declarations with the freestanding execution core.
+[Silicon](../Hardware/Silicon/MCU/Renesas/RA6M5/R7FA6M5BH3CFC/Registers.clef)
+owns transaction requirements; the
+[product](../Hardware/Products/Renesas/EK_RA6M5) owns wiring. The application owns
+clock/PWM selections, mappings and grants. Explicit profile export selection
+does not widen those grants or copy region records. See
+[composition rules](PLATFORM_COMPOSITION.md).
+
 | Declaration | Responsibility |
 | --- | --- |
 | `DeviceRegion` | References the actual BAREWire `MemorySpace` in the selected platform, its address-space identity and hardware source |
@@ -109,7 +118,7 @@ as F#. All authored production sources in Fidelity.Platform use `.clef`.
 The gate covers `Mmio` intrinsics. Assembly and foreign code remain explicit
 trust boundaries. Grants do not themselves configure an MPU, MMU or TrustZone.
 
-Validation on 2026-09-10:
+Initial MMIO validation on 2026-09-10, before the subsequent taxonomy extraction:
 
 | Gate | Result |
 | --- | --- |
@@ -121,12 +130,14 @@ Validation on 2026-09-10:
 | Board I/O projection | 1,149 terminals, 355 connector contacts, 176 package pins and 38 trace links checked against the pinned netlist |
 | Source migration | The three renamed platform declarations have identical git blobs; all authored Fidelity.Platform sources and manifest source entries use `.clef` |
 
-HelloBlinky remains 2,350 bytes with SHA-256
+The subsequent taxonomy build also retains HelloBlinky's 2,350 bytes with SHA-256
 `bd6acfa3589471faff46f3004ce1d159bff6a0650c4e9bddf6deaf091127a2dd`.
 Its ledger contains 81 constructor/access sites over 27 registers and six grants.
-No board download or new physical acceptance was performed for this migration.
+No board download or new physical acceptance was performed for either migration.
 
 These changes require coordinated versions of Fidelity.Platform, clef, Composer
 and HelloBlinky. The predicate specification is reconciled in clef-lang-spec.
-BAREWire's source is unchanged. Use the rebuilt Composer checkout; an older
-binary cannot consume the new binding operations or their evidence.
+The MMIO increment did not change BAREWire source. The subsequent taxonomy work
+reconciles BAREWire's metadata/full-library source ownership through its manifests;
+use that coordinated checkout too. An older Composer cannot consume the new
+binding evidence or explicit platform export selection.
