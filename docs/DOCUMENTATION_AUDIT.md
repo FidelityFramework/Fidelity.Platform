@@ -1,5 +1,10 @@
 # Documentation engineering audit — 2026-09-10
 
+This audit records the baseline below. The subsequent implementation of
+[MMIO contracts and predicates](MMIO_CONTRACTS.md) addresses the static MMIO
+portion of the last two code findings. The legacy capability map, runtime
+mapping and unrelated harness/schema findings remain separate work.
+
 ## Scope and evidence
 
 Reviewed the three root design documents, repository navigation, authored leaf
@@ -76,7 +81,6 @@ Python-free, or as evidence that the experimental candidate compiles. Replacing
 them should preserve the native scenarios and failure checks in compiled F#
 projects rather than merely translating command wrappers.
 
-Before adding an MMIO plan, use this reference set to state the missing contract,
-the source of each assumption, where narrowing occurs and which consumer will
-enforce it. A device inventory, a permission grant and a proved access are three
-different claims.
+The subsequent MMIO slice uses this reference set to identify the source of each
+premise, where narrowing occurs and which consumer enforces it. A device
+inventory, a permission grant and an established access remain distinct claims.

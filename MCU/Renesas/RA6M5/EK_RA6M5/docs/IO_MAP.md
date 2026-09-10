@@ -9,13 +9,13 @@ mapped, not implemented or electrically qualified by this work.
 
 ## Maintained declarations
 
-- [PackagePins.fs](../PackagePins.fs): all 176 physical package pins, GPIO names,
+- [PackagePins.clef](../PackagePins.clef): all 176 physical package pins, GPIO names,
   system/debug functions, external bus, interrupts, serial interfaces, timers,
   analog channels and touch functions from DS-1.50 Table 1.16. Alternative
   functions are capabilities, not simultaneous assignments. Select the PSEL,
   PMR, ASEL/ISEL and electrical settings from HW-1.50 Tables 19.5–19.16 for the
   chosen function; a function name alone does not configure it.
-- [BoardNets.fs](../BoardNets.fs): all 1,149 terminal-to-net facts in the MP
+- [BoardNets.clef](../BoardNets.clef): all 1,149 terminal-to-net facts in the MP
   netlist, plus the 38 trace-link defaults and the ordinary not-fitted footprints.
   This includes the MCU, connectors, passives, switches, LEDs, external memories,
   PHY, CAN transceiver and debug MCU. It preserves separate nets across components.
@@ -88,13 +88,13 @@ or external-memory programming was performed by this mapping work.
 
 ## Validation
 
-Run the .NET source check against the untracked local design package:
+From the Composer checkout, run the F# test against the untracked local design package:
 
 ```sh
-dotnet run --project tests/IOMap.Tests.fsproj -- "/path/to/ek-ra6m5-v1-designpackage/Design Files - Cadence/ek_ra6m5_archive/worklib/ek_ra6m5/packaged/pstxnet.dat"
+dotnet run --project tests/IOMap/IOMap.Tests.fsproj -- "/path/to/ek-ra6m5-v1-designpackage/Design Files - Cadence/ek_ra6m5_archive/worklib/ek_ra6m5/packaged/pstxnet.dat"
 ```
 
-It checks the netlist hash and every terminal, unique package coverage and U1 pin
+It loads HelloBlinky through CCS and projects the checked `.clef` declaration arrays. Production platform sources are not compiled as F# by the test runner. It checks the netlist hash and every terminal, unique package coverage and U1 pin
 labels, all four complete 40-contact headers, and all 38 trace links. This check
 does not build firmware or program the board. The MP source artifacts remain local;
 their hashes and relative locations are in [SOURCE_MANIFEST.md](SOURCE_MANIFEST.md).

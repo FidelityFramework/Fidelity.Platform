@@ -1,0 +1,20 @@
+[package]
+name = "Fidelity.Platform.Profiles.RestrictedGuest64"
+version = "0.1.0"
+description = "Synthetic 64-bit guest device-access profile for compiler validation"
+
+[compilation]
+target = "cpu"
+
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "x86_64"
+
+[dependencies]
+contracts = { path = "../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+
+[build]
+sources = ["Description.clef"]
+output = "restricted-guest64"
+output_kind = "library"

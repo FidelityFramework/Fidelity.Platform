@@ -1,0 +1,46 @@
+namespace Fidelity.Platform.Profiles.RestrictedGuest64
+
+open BAREWire.Platform
+open Fidelity.Platform.Contracts
+
+/// A compiler design probe. These addresses do not describe a running VM.
+/// The boot loader's mapping assertion remains an explicit external premise.
+module Description =
+    let core: BAREWire.Platform.TargetCore = {
+        Os = "none"; Arch = "x86_64"; WordSizeBits = 64; Endianness = "little"
+        Runtime = "bare"; Triple = "x86_64-unknown-none"; CpuModel = "x86-64"
+        Widths = [| { Name = "Pointer"; Bits = 64 }; { Name = "Register"; Bits = 64 } |]
+        Representations = [|
+            { Name = "int8"; Capability = "native"; Family = "int"; Bits = 8; MinMagnitude = "-128"; MaxMagnitude = "127"; Boundary = "wrap" }
+            { Name = "int16"; Capability = "native"; Family = "int"; Bits = 16; MinMagnitude = "-32768"; MaxMagnitude = "32767"; Boundary = "wrap" }
+            { Name = "int32"; Capability = "native"; Family = "int"; Bits = 32; MinMagnitude = "-2147483648"; MaxMagnitude = "2147483647"; Boundary = "wrap" }
+            { Name = "int64"; Capability = "native"; Family = "int"; Bits = 64; MinMagnitude = "-9223372036854775808"; MaxMagnitude = "9223372036854775807"; Boundary = "wrap" }
+            { Name = "uint8"; Capability = "native"; Family = "uint"; Bits = 8; MinMagnitude = "0"; MaxMagnitude = "255"; Boundary = "wrap" }
+            { Name = "uint16"; Capability = "native"; Family = "uint"; Bits = 16; MinMagnitude = "0"; MaxMagnitude = "65535"; Boundary = "wrap" }
+            { Name = "uint32"; Capability = "native"; Family = "uint"; Bits = 32; MinMagnitude = "0"; MaxMagnitude = "4294967295"; Boundary = "wrap" }
+            { Name = "uint64"; Capability = "native"; Family = "uint"; Bits = 64; MinMagnitude = "0"; MaxMagnitude = "18446744073709551615"; Boundary = "wrap" }
+        |]
+    }
+    let transport: MemorySpace = {
+        Name = "transport"; Kind = "peripheral"; Capacity = 4096; Alignment = 4096; Granularity = 4
+        Growth = "fixed"; Access = "rw"; Base = Some 4294967296
+        Notes = "Synthetic guest-physical transport window"; MapKind = ""; Since = ""; Until = ""
+    }
+    let management: MemorySpace = {
+        Name = "management"; Kind = "peripheral"; Capacity = 4096; Alignment = 4096; Granularity = 4
+        Growth = "fixed"; Access = "rw"; Base = Some 4295032832
+        Notes = "Available inventory; the example workload grants no access"; MapKind = ""; Since = ""; Until = ""
+    }
+    let descriptor: PlatformDescription = {
+        Id = "restricted-guest64-design-probe"; DisplayName = "Restricted 64-bit guest (synthetic)"
+        Substrate = "cpu"; Core = Some core; Spaces = [| transport; management |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = { Clocks = [||]; Resets = [||]; Entry = "main"; Teardown = ""; Persistence = "volatile" }
+        Notes = [| "Compiler validation only: no boot image, page tables, virtio discovery or queues." |]
+        Limits = [||]
+    }
+    let transportRegion: DeviceRegion = { Space = transport; AddressSpace = "guest-physical"; Source = "Synthetic compiler fixture" }
+    let managementRegion: DeviceRegion = { Space = management; AddressSpace = "guest-physical"; Source = "Synthetic compiler fixture" }
+    let status: DeviceRegister = { Name = "status"; Region = transportRegion; Offset = 0; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+    let control: DeviceRegister = { Name = "control"; Region = transportRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+    let managementControl: DeviceRegister = { Name = "management-control"; Region = managementRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }

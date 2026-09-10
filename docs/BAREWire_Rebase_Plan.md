@@ -9,7 +9,7 @@ different compiler paths, while the Contracts pin migration remains incomplete.
 | Area | Implemented | Remaining boundary |
 | --- | --- | --- |
 | Linux CPU | [Description.clef](../CPU/Linux/x86_64/Description.clef) uses BAREWire for core, memory and boundary facts | Declared budgets are not runtime resource discovery or universal link-time limits |
-| EK-RA6M5 | [Description.fs](../MCU/Renesas/RA6M5/EK_RA6M5/Description.fs) uses BAREWire directly; Composer checks the memory projection and Cortex-M image | Initial peripheral regions/registers only; full wiring inventory is separate |
+| EK-RA6M5 | [Description.clef](../MCU/Renesas/RA6M5/EK_RA6M5/Description.clef) uses BAREWire directly; Composer checks the memory projection and Cortex-M image | Initial peripheral regions/registers only; full wiring inventory is separate |
 | Arty | [Description.clef](../FPGA/Xilinx/Artix7/ArtyA7_100T/ArtyA7_100T.Description.clef) declares spaces, UART buffer/transport and lifecycle | Pin map and device part still come from Contracts bindings |
 | Contracts | [PlatformContracts.clef](../Contracts/PlatformContracts.clef) remains a distinct schema | It has not become aliases over BAREWire |
 | Meadow/GPU/NPU leaf descriptors | Continue to include Contracts source | Scaffold records omit required `Resets`; no new full-leaf build acceptance is claimed |

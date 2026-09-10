@@ -2,7 +2,7 @@
 
 Derived from the pinned MP-release Cadence netlist, checked against schematic sheet 11 for the native headers and sheet 6 for Pmod/Grove/Qwiic. See [source provenance](SOURCE_MANIFEST.md) and [I/O usage and conflicts](IO_MAP.md).
 
-All **355 contacts on 32 connector references** are listed, including mounting/shield contacts and configuration headers. J32 is not present in this design. `NC` is a no-connect marker; separate NC contacts are not a common electrical net. Names beginning `UNNAMED_` are preserved vendor net names and require following the components in [BoardNets.fs](../BoardNets.fs). They are not unspecified connections. Trace links, resistors, filters and transceivers separate nets; the table does not short across them.
+All **355 contacts on 32 connector references** are listed, including mounting/shield contacts and configuration headers. J32 is not present in this design. `NC` is a no-connect marker; separate NC contacts are not a common electrical net. Names beginning `UNNAMED_` are preserved vendor net names and require following the components in [BoardNets.clef](../BoardNets.clef). They are not unspecified connections. Trace links, resistors, filters and transceivers separate nets; the table does not short across them.
 
 ## J1 — Native header
 
@@ -438,5 +438,4 @@ All **355 contacts on 32 connector references** are listed, including mounting/s
 | 1 | UNNAMED_18_RES_I31_A |
 | 2 | UNNAMED_18_RES_I32_A |
 | 3 | GND |
-
 

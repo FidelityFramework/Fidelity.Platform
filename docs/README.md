@@ -10,6 +10,7 @@ boundaries. The historical filename is retained for source references.
 | [Platform declarations](CANONICAL_PLATFORM_SPEC.md) | Current contracts and their actual consumers | Implementation reference |
 | [Platform facts and derived state](D4b_PLATFORM_CARRIER_LOCATION.md) | Declaration/context/graph responsibilities and deferred decisions | Current baseline plus explicitly open design questions |
 | [BAREWire integration](BAREWire_Rebase_Plan.md) | What migrated and the remaining pin/schema work | Migration status and acceptance criteria |
+| [MMIO contracts and predicates](MMIO_CONTRACTS.md) | Region inventory, mappings, workload grants, CCS evidence and executable limits | Implemented static MMIO slice |
 
 The [repository structure](../PLATFORM_STRUCTURE.md) lists package boundaries.
 Hardware sources and board acceptance belong with each leaf; see the

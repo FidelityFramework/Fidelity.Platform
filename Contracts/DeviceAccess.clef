@@ -1,0 +1,61 @@
+namespace Fidelity.Platform.Contracts
+
+/// A source predicate is typed Clef syntax, read by CCS. The source names the
+/// engineering requirement; it is not a certificate or an executable callback.
+type ClefPredicate = {
+    Name: string
+    Condition: Expr<bool>
+    Source: string
+}
+
+/// Available device storage uses the same BAREWire space as the platform's
+/// memory layout. AddressSpace distinguishes physical, guest and CPU mappings.
+type DeviceRegion = {
+    Space: BAREWire.Platform.MemorySpace
+    AddressSpace: string
+    Source: string
+}
+
+/// A hardware transaction requirement. Clef integers retain their inferred
+/// ranges; TransactionBits is narrowed only when an accessor is selected.
+type DeviceRegister = {
+    Name: string
+    Region: DeviceRegion
+    Offset: int
+    TransactionBits: int
+    Access: BAREWire.Platform.Access
+    ByteOrder: string
+    Ordering: string
+}
+
+/// The CPU-visible placement of a region. None preserves a base that has to
+/// be supplied later. Establishment names the premise that makes it usable:
+/// reset-identity, boot-contract, or runtime. Current lowering accepts only
+/// image-lifetime static mappings, and records the external premise as such.
+type DeviceMapping = {
+    Name: string
+    Region: DeviceRegion
+    AddressSpace: string
+    Base: int option
+    Lifetime: string
+    Establishment: string
+    Source: string
+}
+
+/// A workload's permission to use these registers through this mapping.
+/// Its access may narrow the registers' own permissions. Every predicate is
+/// required at a binding site; an undecided predicate remains pending.
+type DeviceGrant = {
+    Name: string
+    Mapping: DeviceMapping
+    Registers: DeviceRegister array
+    Access: BAREWire.Platform.Access
+    Predicates: ClefPredicate array
+}
+
+/// Exactly one selected plan closes raw-address construction for the workload.
+/// Mmio.bind8/16/32 select a grant name and a register name from this plan.
+type DeviceAccessPlan = {
+    Name: string
+    Grants: DeviceGrant array
+}

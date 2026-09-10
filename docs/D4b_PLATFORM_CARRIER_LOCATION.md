@@ -73,7 +73,9 @@ future work, not claims that HelloBlinky or the hosted Ariel tests prove them.
 
 ## Predicates and the F★ connection
 
-This is an open design question, not an implemented general predicate API.
+The first implementation is the [static MMIO predicate slice](MMIO_CONTRACTS.md).
+General runtime predicates and relational inference over arbitrary program
+state remain open work.
 [The Gift of Deferred Inference](../../clef-lang-site/hugo/content/blog/deferred-inference.md),
 especially "Immutable Evidence" and "Pending Obligations", argues for keeping
 relationships, their premises and their dependencies until a concrete decision
@@ -88,7 +90,7 @@ scope through the existing inference and obligation machinery. See the official 
 on [refinements](https://fstar-lang.org/tutorial/book/part1/part1_getting_off_the_ground.html#boolean-refinement-types)
 and [effect refinements](https://fstar-lang.org/tutorial/book/part4/part4_pure.html).
 
-There are three separate mechanisms in the inspected Clef/BAREWire code:
+There are distinct mechanisms in the Clef/BAREWire code:
 
 - `PlatformPredicate` and `PlatformContext.Predicates` exist in
   [NativeTypes](../../clef/src/Compiler/NativeTypedTree/NativeTypes.fs).
@@ -104,16 +106,21 @@ There are three separate mechanisms in the inspected Clef/BAREWire code:
   fields. CCS reads `Floor`/`AtMost`; arbitrary `Statement` prose is not a parsed
   predicate or a proof certificate. Separately, the graph already has typed
   `ObligationBody` cases with source references for concrete proof families.
+- `ClefPredicate` now carries a typed condition and provenance in Contracts.
+  CCS evaluates its supported immutable integer/Boolean fragment, retains
+  dependency nodes and checks it at a concrete MMIO binding. The resulting
+  access evidence is graph codata, consumed by Composer. This path does not
+  populate or consult the legacy Boolean capability map.
 
-The older [platform-predicates draft](../../clef-lang-spec/spec/platform-predicates.md)
-places resolution in Alex and presents architecture-wide capability matrices.
-Those claims need reconciliation with current CCS saturation and actual target
-declarations. Its illustrative `assume val` pattern is an assumption boundary,
-not evidence that a device has the asserted property. This audit does not amend
-the external language specification or adopt those matrices as hardware facts.
+The [platform-predicates specification](../../clef-lang-spec/spec/platform-predicates.md)
+now describes the implemented CCS boundary and its limits. The earlier draft's
+Alex-time resolution and architecture-wide capability matrices are superseded.
+External hardware and boot-mapping assertions remain premises, separately
+recorded from the relation that CCS establishes.
 
-For a future region access, a useful obligation might be expressed as the
-following mathematical conditions (not proposed Clef syntax):
+The region-access checks preserve the following relationships (mathematical
+notation). Mapping lifetime currently means a static image-lifetime declaration;
+runtime ownership and release require further implementation.
 
 ```text
 offset >= 0
@@ -130,18 +137,19 @@ its required transaction width, but that need not erase the relation that
 justifies the access. Arithmetic proof does not establish the physical map;
 hardware provenance and any runtime mapping guards remain explicit premises.
 
-If this direction is adopted, a fact needs a subject, provenance, validity scope,
-dependencies and evidence status: pending, established, assumed or contradicted.
+Each fact needs a subject, provenance, validity scope, dependencies and evidence
+status. The current path records pending, established and contradicted source
+conditions, with assumed hardware/mapping premises kept separately.
 Unknown must not silently mean false or true. Editing can retain a pending
 obligation; an access or lowering decision must discharge it, depend on a checked
 runtime guard where supported, or report the missing premise. A changed mapping
 or mutable state can invalidate evidence that was valid earlier.
 
-The engineering question is where existing typed obligations, range relations
-and scoped boundary descriptors already preserve this information, and where
-a declaration or projection is missing. Contracts can name the platform facts
-and requirements; CCS owns inference and proof status. Trace one concrete
-boundary from its premises to its final access to establish that fit.
+Contracts names platform facts and requirements; CCS owns inference and evidence
+status. HelloBlinky now exercises that path from declared premises through the
+final access. Runtime mapping, ordering and cooperative-scheduling obligations
+will need their own concrete producers and consumers before those claims can
+be added to this evidence.
 
 ## Disposition of the earlier page
 

@@ -9,7 +9,11 @@ target = "cpu"
 
 [build]
 sources = [
-    "PlatformContracts.clef"
+    "PlatformContracts.clef",
+    "DeviceAccess.clef"
 ]
 output = "fidelity-platform-contracts"
 output_kind = "library"
+
+[dependencies]
+BAREWire = { path = "../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }

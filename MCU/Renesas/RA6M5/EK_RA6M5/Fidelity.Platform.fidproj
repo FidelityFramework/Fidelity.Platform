@@ -9,9 +9,9 @@ target = "mcu"
 
 [build]
 sources = [
-    "PackagePins.fs",
-    "BoardNets.fs",
-    "Description.fs",
+    "PackagePins.clef",
+    "BoardNets.clef",
+    "Description.clef",
     "Registers.clef"
 ]
 output = "fidelity-platform-mcu-ra6m5-ek-ra6m5"
@@ -23,4 +23,4 @@ os = "none"
 arch = "arm_cortex_m33"
 
 [dependencies]
-BAREWire = { path = "../../../../../BAREWire/src/BAREWire.PlatformMetadata.fidproj" }
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }

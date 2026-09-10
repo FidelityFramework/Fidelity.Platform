@@ -113,8 +113,9 @@ the actual commands, tool dependencies and F# regression projects.
 [HelloBlinky acceptance](../../MCU/Renesas/EK-RA6M5/HelloBlinky/docs/ACCEPTANCE.md)
 records the board result and the limits of that evidence.
 
-The eight MMIO cases check source rejection and optimized exact-width volatile
-access. Fourteen MCU checks cover image/linker failures. The platform I/O test
+The MMIO and device-access suites check source rejection, grant/predicate evidence
+and optimized exact-width volatile access on 32-bit MCU and 64-bit guest profiles.
+Fourteen MCU checks cover image/linker failures. Composer's I/O test
 compares 1,149 terminals against a pinned netlist and checks package/header
 coverage. These are distinct from proof of interrupt interleavings, stack
 adequacy, memory protection, or a cooperative scheduler. Wiring completeness is
@@ -122,10 +123,10 @@ not completeness of the implemented peripheral register map or driver set.
 
 ## Extension boundary
 
-The shared Contracts location is appropriate for substrate-neutral vocabulary,
-but extending it must account for the BAREWire vocabulary already in use.
-Resource availability, workload grants, address-space identity, mapping lifetime,
-memory attributes and device transaction policy need explicit consumers and
-checks before being presented as supported APIs. Virtio, DMA ownership and
-wait/rearm protocols remain design work. This document records the current
-foundation; it does not prescribe a new MMIO implementation plan.
+[The MMIO contract slice](MMIO_CONTRACTS.md) now separates resource availability,
+workload grants, address-space identity, mapping lifetime and device transaction
+requirements in Contracts. It references BAREWire memory spaces directly and
+settles used accesses in CCS before Composer lowering. Runtime mappings, memory
+attribute establishment, virtio, DMA ownership and wait/rearm protocols remain
+design work. The implemented subset and its evidence limits are explicit in
+that document.
