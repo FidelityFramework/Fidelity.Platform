@@ -1,0 +1,32 @@
+module Fidelity.Platform.MCU.Renesas.RA6M5.EK_RA6M5.Registers
+
+// Exact-width handles. They constrain bus accesses, not each register's
+// legal bit transitions. PFS protection and IELSR IR=write-zero remain
+// sequencing obligations of the driver. See docs/HELLOBLINKY_HARDWARE.md.
+let pwpr: Mmio8 = Mmio.reg8 0x40080D03
+let p004: Mmio32 = Mmio.reg32 0x40080810
+let p005: Mmio32 = Mmio.reg32 0x40080814
+let p006: Mmio32 = Mmio.reg32 0x40080818
+let p007: Mmio32 = Mmio.reg32 0x4008081C
+let p008: Mmio32 = Mmio.reg32 0x40080820
+let p0podr: Mmio16 = Mmio.reg16 0x40080000
+let p0pidr: Mmio16 = Mmio.reg16 0x40080006
+let irqcr9: Mmio8 = Mmio.reg8 0x40006009
+let irqcr10: Mmio8 = Mmio.reg8 0x4000600A
+let ielsr0: Mmio32 = Mmio.reg32 0x40006300
+let ielsr1: Mmio32 = Mmio.reg32 0x40006304
+let icusarg: Mmio32 = Mmio.reg32 0x40008070
+let sckscr: Mmio8 = Mmio.reg8 0x4001E026
+let sckdivcr: Mmio32 = Mmio.reg32 0x4001E020
+let systickCtrl: Mmio32 = Mmio.reg32 0xE000E010
+let systickLoad: Mmio32 = Mmio.reg32 0xE000E014
+let systickVal: Mmio32 = Mmio.reg32 0xE000E018
+let nvicIser0: Mmio32 = Mmio.reg32 0xE000E100
+let nvicIcer0: Mmio32 = Mmio.reg32 0xE000E180
+let nvicIcpr0: Mmio32 = Mmio.reg32 0xE000E280
+let nvicItns0: Mmio32 = Mmio.reg32 0xE000E380
+let nvicPriority0: Mmio8 = Mmio.reg8 0xE000E400
+let nvicPriority1: Mmio8 = Mmio.reg8 0xE000E401
+let systickPriority: Mmio8 = Mmio.reg8 0xE000ED23
+let prcr: Mmio16 = Mmio.reg16 0x4001E3FE
+let p0sar: Mmio16 = Mmio.reg16 0x40080D10
