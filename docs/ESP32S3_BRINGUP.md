@@ -8,11 +8,18 @@ The accepted MCU path in this repository is
 checked MMIO, an owned vector table and J-Link download. This document records
 what carries over to Xtensa, what does not, and in what order to attack it.
 
-**Nothing here has been built or run.** The declarations added alongside it
+**Superseded in part: an image has now been built and run.** On 2026-09-11 a
+Composer-built ESP image was loaded into the badge's RAM and executed, and it
+drove the panel backlight. What that validated, and what it did not, is recorded
+in [§9 First light](#9-first-light).
+
+The Clef declarations added alongside this document
 ([silicon](../Hardware/Silicon/MCU/Espressif/ESP32S3/ESP32_S3_WROOM_1_N8),
 [product](../Hardware/Products/CircuitBoardMedics/CCC2026Badge),
-[environment](../Environments/Freestanding/xtensa_esp32s3)) have not been checked
-by CCS, because the compiler cannot yet target this architecture.
+[environment](../Environments/Freestanding/xtensa_esp32s3),
+[profile](../Profiles/CCC2026Badge_HelloESP)) have still **not** been checked by
+CCS. The image that ran was built from hand-written LLVM IR standing in for
+Clef's output, through the real Composer backend.
 
 ---
 
@@ -82,7 +89,48 @@ we can supply as flags.
 | **C. Build Espressif's fork with MLIR** | Larger build, repeated per rebase | Yes, but carries the fork |
 | **D. Upstream the `esp32s3` Proc definition** | Real LLVM contribution work | Yes — and now plausibly small: one `Proc<>` line plus three features |
 
-### Recommendation: A
+### Correction, from building it: upstream cannot LINK Xtensa
+
+Option A was tried on 2026-09-11 and is **two thirds right**. Upstream LLVM
+22.1.8 built with `LLVM_EXPERIMENTAL_TARGETS_TO_BUILD=Xtensa` gives working
+**code generation** and **assembly**, and the `-mattr` substitution works better
+than predicted: checking the accepted feature list, upstream has `timers3` and
+`highpriinterrupts-level7` after all (they are spelled with suffixes, which an
+earlier grep missed). **28 of the esp32s3 bundle's 29 features are present**;
+only `ESP32S3Ops` is absent, and `llc` accepts all 28 with no diagnostics.
+
+But **`ld.lld` in upstream LLVM cannot link Xtensa at all**:
+
+```
+ld.lld: error: unsupported e_machine value: 94
+```
+
+There is no `lld/ELF/Arch/Xtensa.cpp` upstream — the file 404s on `main` and
+exists only in Espressif's fork. LLD's `setTarget` has no `EM_XTENSA` case.
+
+**The fix used here was to port it, not to adopt the fork wholesale.** The
+backend is 204 lines and its factory signature (`setXtensaTargetInfo(Ctx &)`)
+matches 22.1.8's convention exactly, so it applies cleanly:
+
+1. copy the fork's `lld/ELF/Arch/Xtensa.cpp` into the 22.1.8 tree
+2. add it to `lld/ELF/CMakeLists.txt`
+3. declare `setXtensaTargetInfo` in `lld/ELF/Target.h`
+4. add `case EM_XTENSA:` to `setTarget` in `lld/ELF/Target.cpp`
+5. append six relocations the fork added and upstream lacks —
+   `R_XTENSA_PDIFF8/16/32` (57-59) and `R_XTENSA_NDIFF8/16/32` (60-62) — to
+   `llvm/include/llvm/BinaryFormat/ELFRelocs/Xtensa.def`
+
+That yields **one version-matched 22.1.8 toolchain** that generates, assembles
+and links Xtensa, with no clang anywhere in the lowering path. It is built at
+`~/repos/llvm-xtensa/llvm-project/build/bin`.
+
+The data layout, obtained from `opt` rather than from clang, is:
+
+```
+e-m:e-p:32:32-i8:8:32-i16:16:32-i64:64-n32
+```
+
+### The original recommendation, for the record
 
 Build upstream LLVM 22.1.8 with the Xtensa experimental target enabled and
 select the S3 by `-mattr`. This is the option that actually satisfies the
@@ -450,3 +498,175 @@ wrong address and a rejected grant simultaneously is worth avoiding.
 - **`EXTMEM` provenance.** If flash execution is ever needed, its address comes
   from the SVD and not the TRM, whose address table marks that range reserved.
   That should be reconciled before relying on it.
+
+---
+
+## 9. First light
+
+On 2026-09-11 an image built through this backend ran on the badge and drove the
+panel backlight. The chain, end to end:
+
+```
+hand-written LLVM IR  ──llc -mattr=<28 esp32s3 features>──▶  main.o
+boot/startup.S        ──llvm-mc──────────────────────────▶  startup.o
+                        Composer XtensaLayout.generate   ─▶  memory.ld, layout.inc
+startup.o + main.o    ──ld.lld -T memory.ld─────────────▶  hello.elf  (EM_XTENSA)
+hello.elf             ──Composer XtensaImage.readLoadSegments
+                        + EspImage.build────────────────▶  hello.bin  (1392 bytes)
+hello.bin             ──esptool load-ram──────────────────▶  the badge
+                                                             backlight ON
+```
+
+The image disarms the RTC, super and timer-group watchdogs, puts GPIO5 into GPIO
+mode through IO MUX, drives it high, and spins.
+
+### What this establishes
+
+| Claim | Evidence |
+| --- | --- |
+| The Xtensa toolchain works, no clang in the lowering path | `llc`, `llvm-mc` and `ld.lld` produced the artifacts |
+| The vector block is correctly laid out | `llvm-nm` shows all ten entries on their required offsets, `.vectors` exactly 1024 bytes, 1024-aligned |
+| Composer's linker script is correct | `ld.lld` linked against it; `__vectors` landed at the instruction window's origin |
+| Composer's ELF segment reader is correct | It read both `PT_LOAD`s and excluded the zero-`filesz` BSS reservation |
+| Composer's image writer is correct | The ROM loader parsed the container and jumped to the declared entry |
+| MMIO declarations reach real peripherals | A pin physically changed state |
+| `Ordering = "volatile"` lowers correctly | `llc` emits `memw` before each volatile store |
+
+### What this does NOT establish
+
+- **The window handlers have not executed.** `main` is shallow, so no window
+  overflow occurred. They are assembled and correctly placed; they are not
+  exercised. The first real test is a call chain deeper than the register
+  window, which is exactly what a draw tree produces.
+- **No interrupt has been taken**, so the interrupt matrix, the level-1 path
+  through the user exception vector, and `EXCCAUSE` discrimination are untested.
+- **No Clef was compiled.** The IR was hand-written to stand in for Clef's
+  output. CCS has checked none of the declarations.
+- **The panel, the LEDs and the buttons are untouched.**
+
+### Closed the same day: booting from flash
+
+The `load-ram` caveat above — that the image checksum and SHA-256 had not been
+validated by hardware — was closed within the hour. The same image was written
+to flash offset 0 and the badge was reset with no host attached:
+
+```sh
+esptool --port /dev/ttyACM0 --before no-reset write-flash 0 hello.bin
+# "Wrote 1392 bytes ... Hash of data verified."  Readback compared equal.
+# then: tap RESET
+```
+
+The backlight came on by itself. Two independent signals confirm the image ran
+rather than the ROM falling back to its download loop — which would present the
+same USB device id:
+
+- **the backlight is lit**, and a rejected image leaves GPIO5 untouched and the
+  panel dark;
+- **the ROM download protocol does not answer**, because the image spins in a
+  loop and services nothing. Execution left the ROM, and the entry point is the
+  only other place it can be.
+
+So the ROM's *boot* path — which does check the container's magic, segment
+count, chip id, revision range, **checksum** and **appended SHA-256** before
+loading — accepted a container produced entirely by Composer's F# writer.
+
+The panel showed full white, which is correct: an uninitialised ST7735S with its
+backlight on is white. The image contains no display code.
+
+### Two bugs the hardware found that reading did not
+
+**Literal pools must precede text.** Xtensa's `L32R` loads a constant at a
+*negative* offset — it reaches backwards only. The generated script emitted
+`*(.text*)` before `*(.literal*)`, and every `movi` in the startup code failed
+to link with `relocation R_XTENSA_SLOT0_OP out of range`. Fixed in
+`XtensaLayout.fs`, and the regression now asserts the *ordering* rather than
+merely the presence of the pools.
+
+**Upstream LLD cannot link Xtensa**, which no amount of reading the feature
+tables would have revealed, because the gap is in LLD and the tables describe
+LLVM. See §1.
+
+### A field confirmation of a documented hazard
+
+While the image was running, three of the five WS2812s lit reddish. The image
+never touches GPIO4. That is the power-up glitch recorded in the badge's
+hardware reference — GPIO4 glitches low for about 60 us at power-up, which can
+clock a spurious symbol into the LED chain. An image must clear the LEDs
+explicitly rather than assume they start dark.
+
+### Reproducing
+
+```sh
+B=~/repos/llvm-xtensa/llvm-project/build/bin
+ESP32S3="+density,+fp,+loop,+mac16,+windowed,+bool,+sext,+nsa,+mul16,+mul32,\
++mul32high,+s32c1i,+threadptr,+div32,+dcache,+debug,+exception,+highpriinterrupts,\
++highpriinterrupts-level7,+coprocessor,+interrupt,+rvector,+timers3,+prid,\
++regprotect,+miscsr,+minmax,+clamps"
+
+$B/llc     -mtriple=xtensa-esp-elf -mattr="$ESP32S3" -O2 -filetype=obj main.ll -o main.o
+$B/llvm-mc -triple=xtensa-esp-elf  -mattr="$ESP32S3" -filetype=obj -I boot boot/startup.S -o startup.o
+$B/ld.lld  --static --gc-sections --entry=_start -T boot/memory.ld startup.o main.o -o hello.elf
+# then Composer's XtensaImage/EspImage produce hello.bin, and:
+esptool --port /dev/ttyACM0 --before no-reset --after no-reset load-ram hello.bin
+```
+
+`load-ram` writes no flash, so a plain RESET returns the badge to whatever is
+installed there.
+
+## 10. HelloESP runs (2026-09-12)
+
+The Clef sources compiled by Composer — CCS, `opt`, `llc -filetype=asm`,
+`llvm-mc`, `ld.lld`, `EspImage` — booted from flash offset 0 and ran the whole
+workload: panel, five WS2812s over RMT, three buttons, and a 1 kHz SYSTIMER tick
+taken through the interrupt matrix, the user exception vector and the owned
+level-1 trampoline into a Clef `FnPtr`. Everything §9 listed as *not
+established* is now established, including the window handlers (the draw tree
+is deep enough) and `EXCCAUSE` discrimination.
+
+### What the hardware found, in the order it cost a flash cycle
+
+1. **Mistyped decimal constants.** `1356348577` is `0x50D83CA1`, not the
+   watchdog key `0x50D83AA1`; the write-protect never opened, the disable was
+   discarded, and the super watchdog reset the part once a second — a boot
+   loop with no output. Hex literals are fine in Clef when they fit `int`.
+   Cross-check every decimal against its hex comment mechanically.
+2. **Field positions from memory.** Against the SVD: RMT `CONF_UPDATE` is bit
+   24 and `MEM_SIZE` bits 19:16; `RMT_SYS_CONF = 0` turns the module clock
+   *off*; SPI2 needs `CLK_GATE.MST_CLK_ACTIVE`, a `CMD.UPDATE` after
+   configuration, and IO MUX function 4 on GPIO10/11/12; the SYSTIMER clock
+   enable is bit 29. The audit that caught these parsed
+   `docs/svd/esp32s3.svd` for every register the image writes; do that first.
+3. **The stack was in SRAM2 Block10.** The ROM's flash-boot path
+   (`ets_run_flash_bootloader` → `ROM_Boot_Cache_Init`) enables a 32 KB DCache
+   over `0x3FCF_8000..0x3FCF_FFFF` and never disables it before the jump; the
+   download path does not, so `esptool write-mem`/`read-mem` say SRAM2 is
+   fine. The image ran to its first stack spill (`Logo.init`) and parked.
+   Fixed at the layout: `romHandoverDataLimit = 0x3FCD7E00` on the silicon
+   (below the ROM's shared buffers, stacks and `.bss`), `DataLimit` on the
+   `XtensaImageDescriptor`, and `XtensaLayout` ends the data window — and the
+   stack — there. Composer's layout tests assert it.
+4. **`.rodata` in the instruction window.** LLVM made a `[4 x i16]` table
+   from a `match`; the instruction bus only serves aligned 32-bit loads, so
+   the first tick would have faulted. `.rodata` now goes to the DRAM `.data`
+   output section (two-segment image).
+5. **Panel orientation.** The glass is mounted portrait, 128×160, the
+   controller's native scan; the stock firmware's `rotation=0, bgr=True` is
+   MADCTL `0xC8`. Read the shipped configuration before guessing.
+
+### How the hang was placed
+
+SRAM does not survive the RESET button (`CHIP_PU` is a power-on reset), so
+no-init fault words are noise after the fact. The USB-Serial/JTAG peripheral
+is a hardware CDC-ACM endpoint — it enumerates under the image with no USB
+stack — and `HelloESP/src/Console.clef` writes stage markers to it through
+`EP1` and `EP1_CONF.WR_DONE` with bounded waits. `S4` then silence put the
+fault inside `Logo.init`; the ELF showed that function's first stack store;
+the ROM disassembly showed why that address was dead.
+
+### Still open
+
+Later-stage polish from the same audit: `Leds.waitIdle` polls `TX_START`,
+which is write-only (use the `CH0STATUS` state field); `SPI_CMD.UPDATE` could
+be re-issued per transfer; SYSTIMER period-mode write ordering; RMT
+`SYS_CONF` `MEM_FORCE_PU`/`SCLK_DIV_B` as esp-idf sets them.
+

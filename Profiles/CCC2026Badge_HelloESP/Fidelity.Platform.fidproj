@@ -1,0 +1,24 @@
+[package]
+name = "Fidelity.Platform.Profiles.CCC2026Badge_HelloESP"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Selected CCC 2026 badge HelloESP image, composed from silicon, product and execution packages."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "xtensa_esp32s3"
+description = "Fidelity.Platform.Profiles.CCC2026Badge_HelloESP.Description.descriptor"
+
+[dependencies]
+product = { path = "../../Hardware/Products/CircuitBoardMedics/CCC2026Badge/Fidelity.Platform.fidproj" }
+environment = { path = "../../Environments/Freestanding/xtensa_esp32s3/Fidelity.Platform.fidproj" }

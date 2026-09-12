@@ -27,7 +27,7 @@ comfortable for this board — a 160 × 128 16 bpp framebuffer is 40,960 bytes �
 and it enables the shortest bring-up path: an image that lives entirely in SRAM
 needs no flash cache or MMU configuration.
 
-## Memory: three banks, two buses, one alias
+## Memory: three banks, two buses, one bank on both
 
 The 512 KB of SRAM is three physical banks, and one of them is visible from both
 CPU buses at two different addresses:
@@ -40,9 +40,19 @@ CPU buses at two different addresses:
 
 SRAM1's two windows are the same silicon (TRM Table 15.3-1 lists SRAM Block2 at
 both addresses). `Description.clef` therefore declares the bank's capacity
-**once**, on the instruction-bus declaration, and gives the data-bus window
-`Capacity = 0` as an explicit alias. Adding the published window sizes together
-would claim 928 KB of SRAM on a 512 KB part.
+**once**, on the instruction-bus declaration, and carries the data-bus window as
+a plain base, `sram1DataBusBase`, that the image descriptor takes as
+`Sram1DataBase`. A second MemorySpace for the alias would either double-count
+the silicon — adding the published window sizes together claims 928 KB on a
+512 KB part — or fail the platform checker with zero capacity.
+
+Two more facts about this memory are the ROM's, not the silicon's, and the
+description states them because an image cannot discover them by reading the
+part: the mask ROM still owns everything from `romHandoverDataLimit`
+(`0x3FCD_7E00`) up when it jumps to an image — its shared buffers, its two CPU
+stacks, its `.bss` and `.data` — and its flash-boot path leaves a 32 KB data
+cache enabled over SRAM2 Block10 (`0x3FCF_8000..`), memory the CPU then cannot
+address at all. An image's data window and stack end at the limit.
 
 The two windows also carry different access tags — `rx` for the instruction
 view, `rw` for the data view — because the buses genuinely differ. Code is

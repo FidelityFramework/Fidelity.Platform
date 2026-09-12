@@ -21,9 +21,9 @@ module Description =
     // 416 KB bank reachable from both CPU buses at two different addresses
     // (TRM Table 15.3-1 lists SRAM Block2 as instruction 0x4037_8000 and data
     // 0x3FC8_8000 -- the same silicon). Its capacity is declared once, on the
-    // bank, and the two bus windows are declared as views that carry no capacity
-    // of their own. Adding the two windows together would count 416 KB twice and
-    // claim 928 KB of SRAM on a 512 KB part.
+    // bank; its data-bus address is a second base, not a second space. Adding
+    // the two windows together would count 416 KB twice and claim 928 KB of
+    // SRAM on a 512 KB part.
     //
     // The access tags differ by view because the buses differ: code is fetched
     // through the instruction window (rx) and data is loaded/stored through the
@@ -32,40 +32,52 @@ module Description =
 
     /// 32 KB, instruction bus only. No data-bus window exists for this bank.
     let sram0: MemorySpace = {
-        Name = "sram0"; Kind = MemoryKind.Sram; Base = Some 0x40370000L; Capacity = 32768L
+        Name = "sram0"; Kind = MemoryKind.Sram; Base = Some 0x40370000; Capacity = 32768
         Alignment = 16; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
         Notes = "Internal SRAM 0, instruction bus only (0x4037_0000..0x4037_7FFF). Not data-addressable."
         MapKind = ""; Since = ""; Until = ""
     }
 
-    /// 416 KB, dual-mapped. THIS declaration owns the bank's capacity.
+    /// 416 KB, dual-mapped. This declaration owns the bank's capacity; its
+    /// data-bus base is sram1DataBusBase below.
     let sram1: MemorySpace = {
-        Name = "sram1"; Kind = MemoryKind.Sram; Base = Some 0x40378000L; Capacity = 425984L
+        Name = "sram1"; Kind = MemoryKind.Sram; Base = Some 0x40378000; Capacity = 425984
         Alignment = 16; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
-        Notes = "Internal SRAM 1, 416 KB. Instruction-bus window 0x4037_8000..0x403D_FFFF. The same physical bank appears on the data bus as sram1Data; capacity is counted here only."
+        Notes = "Internal SRAM 1, 416 KB. Instruction-bus window 0x4037_8000..0x403D_FFFF. The same physical bank appears on the data bus at 0x3FC8_8000; capacity is counted here only."
         MapKind = ""; Since = ""; Until = ""
     }
 
-    /// The data-bus window onto sram1. Zero capacity: it aliases sram1.
-    let sram1Data: MemorySpace = {
-        Name = "sram1-data"; Kind = MemoryKind.Sram; Base = Some 0x3FC88000L; Capacity = 0L
-        Alignment = 16; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
-        Notes = "Data-bus view of sram1 at 0x3FC8_8000..0x3FCE_FFFF. An alias, not additional storage: Capacity is 0 so that a sum over spaces cannot double-count the bank. Extent is sram1.Capacity."
-        MapKind = ""; Since = ""; Until = ""
-    }
+    /// Where sram1 appears on the DATA bus. The same silicon as the instruction
+    /// window at 0x4037_8000 (TRM Table 15.3-1, SRAM Block2). One bank, two
+    /// bases: declaring a second MemorySpace for the alias either double-counts
+    /// the capacity or fails the platform checker with zero capacity, so the
+    /// second base is a plain fact the image descriptor carries.
+    let sram1DataBusBase = 0x3FC88000
+
+    /// The first data-bus address the mask ROM still owns when it hands over
+    /// to an image, and so the end of the data window an image may use.
+    /// Above it, in esp-idf's account of the ROM's static memory: the ROM's
+    /// shared buffers from 0x3FCD_7E00, the PRO and APP CPU stacks from
+    /// 0x3FCE_9710, and the ROM's own .bss/.data from 0x3FCE_D710 to the top
+    /// of the bank. Beyond that lies sram2, whose upper 32 KB the ROM's
+    /// flash-boot path (ROM_Boot_Cache_Init) leaves allocated to the data
+    /// cache it enables and never disables before the jump to the entry.
+    /// A stack placed up there is dead on its first store -- observed on the
+    /// badge as an image that ran until its first spill and then parked.
+    let romHandoverDataLimit = 0x3FCD7E00
 
     /// 64 KB, data bus only. No instruction-bus window: code cannot run here.
     let sram2: MemorySpace = {
-        Name = "sram2"; Kind = MemoryKind.Sram; Base = Some 0x3FCF0000L; Capacity = 65536L
+        Name = "sram2"; Kind = MemoryKind.Sram; Base = Some 0x3FCF0000; Capacity = 65536
         Alignment = 16; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
-        Notes = "Internal SRAM 2, data bus only (0x3FCF_0000..0x3FCF_FFFF). Not instruction-fetchable."
+        Notes = "Internal SRAM 2, data bus only (0x3FCF_0000..0x3FCF_FFFF). Not instruction-fetchable. Block10 (0x3FCF_8000..0x3FCF_FFFF) belongs to the 32 KB data cache the ROM enables at flash boot; Block9 is CPU memory. See romHandoverDataLimit."
         MapKind = ""; Since = ""; Until = ""
     }
 
     /// 384 KB mask ROM holding the first-stage bootloader and ROM routines.
     /// The reset vector lives here at 0x4000_0400 and is not relocatable.
     let romInstruction: MemorySpace = {
-        Name = "rom-instruction"; Kind = MemoryKind.Flash; Base = Some 0x40000000L; Capacity = 393216L
+        Name = "rom-instruction"; Kind = MemoryKind.Flash; Base = Some 0x40000000; Capacity = 393216
         Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
         Notes = "Internal mask ROM, instruction bus. Holds the reset vector at 0x4000_0400 and the ROM download/boot code. Not writable and not part of any image."
         MapKind = ""; Since = ""; Until = ""
@@ -81,7 +93,7 @@ module Description =
 
     /// Executable flash window (IROM), 32 MB of address space.
     let flashInstructionWindow: MemorySpace = {
-        Name = "flash-instruction-window"; Kind = MemoryKind.Flash; Base = None; Capacity = 33554432L
+        Name = "flash-instruction-window"; Kind = MemoryKind.Flash; Base = None; Capacity = 33554432
         Alignment = 65536; Granularity = 65536; Growth = Growth.Fixed; Access = Access.ReadExecute
         Notes = "Cache window 0x4200_0000..0x43FF_FFFF for flash mapped as instructions, in 64 KB pages via the external-memory MMU. Base is deferred: a workload that runs from flash must establish the MMU/cache mapping, which this package does not do."
         MapKind = ""; Since = ""; Until = ""
@@ -89,7 +101,7 @@ module Description =
 
     /// Read-only data flash window (DROM), 32 MB of address space.
     let flashDataWindow: MemorySpace = {
-        Name = "flash-data-window"; Kind = MemoryKind.Flash; Base = None; Capacity = 33554432L
+        Name = "flash-data-window"; Kind = MemoryKind.Flash; Base = None; Capacity = 33554432
         Alignment = 65536; Granularity = 65536; Growth = Growth.Fixed; Access = Access.ReadOnly
         Notes = "Cache window 0x3C00_0000..0x3DFF_FFFF for flash mapped as read-only data, in 64 KB pages. Reads are 8/16/32/128-bit; writes are not supported through this window."
         MapKind = ""; Since = ""; Until = ""
@@ -97,7 +109,7 @@ module Description =
 
     /// The physical flash part behind those windows: 8 MB, quad SPI, in package.
     let flashStore: MemorySpace = {
-        Name = "flash-store"; Kind = MemoryKind.PersistentStore; Base = Some 0L; Capacity = 8388608L
+        Name = "flash-store"; Kind = MemoryKind.PersistentStore; Base = Some 0; Capacity = 8388608
         Alignment = 4096; Granularity = 4096; Growth = Growth.Fixed; Access = Access.ReadWrite
         Notes = "8 MB in-module quad SPI NOR flash addressed by offset, not by CPU address. The ROM bootloader reads the image header at offset 0. 4 KB erase sector. This is the download target, not a mapped space."
         MapKind = ""; Since = ""; Until = ""
@@ -105,7 +117,7 @@ module Description =
 
     /// 8 KB RTC FAST memory: retains contents through Deep-sleep.
     let rtcFast: MemorySpace = {
-        Name = "rtc-fast"; Kind = MemoryKind.Sram; Base = Some 0x600FE000L; Capacity = 8192L
+        Name = "rtc-fast"; Kind = MemoryKind.Sram; Base = Some 0x600FE000; Capacity = 8192
         Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
         Notes = "RTC FAST memory, read/write/instruction-fetch by the main CPU only. Retains data in Deep-sleep."
         MapKind = ""; Since = ""; Until = ""
@@ -114,7 +126,7 @@ module Description =
     /// 8 KB RTC SLOW memory: also the ULP coprocessor's memory, and the
     /// address the CPU resets to on a Deep-sleep wake (reset vector 0).
     let rtcSlow: MemorySpace = {
-        Name = "rtc-slow"; Kind = MemoryKind.Sram; Base = Some 0x50000000L; Capacity = 8192L
+        Name = "rtc-slow"; Kind = MemoryKind.Sram; Base = Some 0x50000000; Capacity = 8192
         Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
         Notes = "RTC SLOW memory, shared with the ULP coprocessor. Deep-sleep wake resets to 0x5000_0000 (reset vector 0), so a wake stub placed here runs before the ROM bootloader path."
         MapKind = ""; Since = ""; Until = ""
@@ -129,67 +141,98 @@ module Description =
     // grants access to a subset.
     // -----------------------------------------------------------------------
 
-    let private peripheral name baseAddress notes : MemorySpace = {
-        Name = name; Kind = MemoryKind.Peripheral; Base = Some baseAddress; Capacity = 4096L
-        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
-        Notes = notes; MapKind = ""; Since = ""; Until = ""
-    }
 
     /// Low-Power Management. Holds the RTC watchdog and the super watchdog,
     /// both of which are armed out of reset and must be disarmed by an image
     /// that does not feed them.
-    let rtcCntl = peripheral "rtc-cntl" 0x60008000L
-                    "Low-Power Management (RTC_CNTL). RTC WDT and super WDT are armed at reset; WDTWPROTECT/SWD_WPROTECT gate writes behind a magic value."
+    let rtcCntl: MemorySpace = {
+        Name = "rtc-cntl"; Kind = MemoryKind.Peripheral; Base = Some 0x60008000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Low-Power Management (RTC_CNTL). RTC WDT and super WDT are armed at reset; WDTWPROTECT/SWD_WPROTECT gate writes behind a magic value."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// Timer Group 0 -- carries main watchdog MWDT0 alongside its timers.
-    let timg0 = peripheral "timg0" 0x6001F000L
-                    "Timer Group 0. MWDT0 is armed by the ROM bootloader and must be disarmed or fed."
+    let timg0: MemorySpace = {
+        Name = "timg0"; Kind = MemoryKind.Peripheral; Base = Some 0x6001F000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Timer Group 0. MWDT0 is armed by the ROM bootloader and must be disarmed or fed."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// Timer Group 1 -- carries main watchdog MWDT1.
-    let timg1 = peripheral "timg1" 0x60020000L
-                    "Timer Group 1. MWDT1 watchdog and timers."
+    let timg1: MemorySpace = {
+        Name = "timg1"; Kind = MemoryKind.Peripheral; Base = Some 0x60020000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Timer Group 1. MWDT1 watchdog and timers."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// System registers: peripheral clock gating and peripheral reset. A
     /// peripheral is clock-gated at reset, so its registers read back as
     /// zero or garbage until it is ungated here.
-    let system = peripheral "system" 0x600C0000L
-                    "System registers: PERIP_CLK_EN0/1 and PERIP_RST_EN0/1 gate and reset every peripheral. Ungating precedes any other peripheral transaction."
+    let system: MemorySpace = {
+        Name = "system"; Kind = MemoryKind.Peripheral; Base = Some 0x600C0000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "System registers: PERIP_CLK_EN0/1 and PERIP_RST_EN0/1 gate and reset every peripheral. Ungating precedes any other peripheral transaction."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// IO MUX: per-pad function select, drive strength and pull configuration.
-    let ioMux = peripheral "io-mux" 0x60009000L
-                    "IO MUX. PIN_CTRL plus one 32-bit config word per pad at offset 0x4 + 4*n (n = GPIO number), selecting the pad's IO MUX function, drive strength, pull-up/pull-down and input enable."
+    let ioMux: MemorySpace = {
+        Name = "io-mux"; Kind = MemoryKind.Peripheral; Base = Some 0x60009000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "IO MUX. PIN_CTRL plus one 32-bit config word per pad at offset 0x4 + 4*n (n = GPIO number), selecting the pad's IO MUX function, drive strength, pull-up/pull-down and input enable."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// GPIO controller: output/enable/input registers and the GPIO matrix
     /// that routes arbitrary peripheral signals to arbitrary pads.
-    let gpio = peripheral "gpio" 0x60004000L
-                    "GPIO controller. OUT/ENABLE have set-on-write (W1TS) and clear-on-write (W1TC) aliases, so a single pin change needs no read-modify-write. FUNCn_OUT_SEL_CFG is the GPIO matrix output route for pad n. STRAP reads the latched strapping-pin values."
+    let gpio: MemorySpace = {
+        Name = "gpio"; Kind = MemoryKind.Peripheral; Base = Some 0x60004000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIO controller. OUT/ENABLE have set-on-write (W1TS) and clear-on-write (W1TC) aliases, so a single pin change needs no read-modify-write. FUNCn_OUT_SEL_CFG is the GPIO matrix output route for pad n. STRAP reads the latched strapping-pin values."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// SPI Controller 2 (FSPI): the display bus on this board.
-    let spi2 = peripheral "spi2" 0x60024000L
-                    "SPI Controller 2 (FSPI). Drives the panel. W0..W15 are the 64-byte CPU-controlled data buffer used when no GDMA descriptor chain is configured."
+    let spi2: MemorySpace = {
+        Name = "spi2"; Kind = MemoryKind.Peripheral; Base = Some 0x60024000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "SPI Controller 2 (FSPI). Drives the panel. W0..W15 are the 64-byte CPU-controlled data buffer used when no GDMA descriptor chain is configured."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// LED PWM controller: backlight brightness.
-    let ledc = peripheral "ledc" 0x60019000L
-                    "LED PWM controller. Four timers and eight channels; the backlight uses timer 0 / channel 0."
+    let ledc: MemorySpace = {
+        Name = "ledc"; Kind = MemoryKind.Peripheral; Base = Some 0x60019000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "LED PWM controller. Four timers and eight channels; the backlight uses timer 0 / channel 0."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// Remote Control peripheral: generates the WS2812 bit stream in hardware.
-    let rmt = peripheral "rmt" 0x60016000L
-                    "Remote Control peripheral. Its symbol RAM emits precise level/duration pairs, which is how WS2812 timing is met without CPU bit-banging."
+    let rmt: MemorySpace = {
+        Name = "rmt"; Kind = MemoryKind.Peripheral; Base = Some 0x60016000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Remote Control peripheral. Its symbol RAM emits precise level/duration pairs, which is how WS2812 timing is met without CPU bit-banging."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// System Timer: the 52-bit monotonic counter used for the LVGL tick.
-    let systimer = peripheral "systimer" 0x60023000L
-                    "System Timer. UNIT0 is a 52-bit up-counter read as a HI/LO pair after a UNIT0_OP capture; TARGET0 provides the periodic tick interrupt."
+    let systimer: MemorySpace = {
+        Name = "systimer"; Kind = MemoryKind.Peripheral; Base = Some 0x60023000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "System Timer. UNIT0 is a 52-bit up-counter read as a HI/LO pair after a UNIT0_OP capture; TARGET0 provides the periodic tick interrupt."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// USB Serial/JTAG controller: the console. This board breaks out no UART,
     /// and GPIO43/GPIO44 (the default UART0 pins) are used for other functions,
     /// so this peripheral is the only console path.
-    let usbSerialJtag = peripheral "usb-serial-jtag" 0x60038000L
-                    "USB Serial/JTAG controller, hard-wired to GPIO19/GPIO20 and the USB-Micro connector. The only console on this board: GPIO43/44 (default U0TXD/U0RXD) carry a button and the font-chip data line instead."
+    let usbSerialJtag: MemorySpace = {
+        Name = "usb-serial-jtag"; Kind = MemoryKind.Peripheral; Base = Some 0x60038000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "USB Serial/JTAG controller, hard-wired to GPIO19/GPIO20 and the USB-Micro connector. The only console on this board: GPIO43/44 (default U0TXD/U0RXD) carry a button and the font-chip data line instead."; MapKind = ""; Since = ""; Until = ""
+    }
 
     /// Interrupt Matrix: routes peripheral interrupt sources onto CPU
     /// interrupt numbers. Xtensa has no NVIC; this is the equivalent step.
-    let interruptCore0 = peripheral "interrupt-core0" 0x600C2000L
-                    "Interrupt Matrix, one 4 KB block covering both cores (TRM Table 4.3-3; 0x600C_3000 is reserved). Writing a CPU interrupt number into a source's *_INT_MAP register routes it; the CPU's own vector then dispatches it."
+    let interruptCore0: MemorySpace = {
+        Name = "interrupt-core0"; Kind = MemoryKind.Peripheral; Base = Some 0x600C2000; Capacity = 4096
+        Alignment = 4; Granularity = 4; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Interrupt Matrix, one 4 KB block covering both cores (TRM Table 4.3-3; 0x600C_3000 is reserved). Writing a CPU interrupt number into a source's *_INT_MAP register routes it; the CPU's own vector then dispatches it."; MapKind = ""; Since = ""; Until = ""
+    }
 
     // -----------------------------------------------------------------------
     // Xtensa LX7 vector table.
@@ -260,16 +303,16 @@ module Description =
     /// The ROM reset vector. Fixed in mask ROM; an image cannot move it and
     /// does not contain it. Execution reaches an image only after the ROM
     /// first-stage bootloader has run.
-    let romResetVector = 0x40000400L
+    let romResetVector = 0x40000400
 
     /// Deep-sleep wake resets here instead (reset vector 0), in RTC SLOW memory.
-    let wakeResetVector = 0x50000000L
+    let wakeResetVector = 0x50000000
 
     let partNumber = "ESP32-S3-WROOM-1-N8"
     let siliconDie = "ESP32-S3"
     let cpuCores = 2
-    let flashBytes = 8388608L
-    let psramBytes = 0L
+    let flashBytes = 8388608
+    let psramBytes = 0
 
     /// Number of CPU interrupt numbers the matrix can target per core.
     let cpuInterrupts = 32

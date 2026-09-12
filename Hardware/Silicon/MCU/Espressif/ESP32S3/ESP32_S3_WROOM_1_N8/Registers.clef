@@ -121,6 +121,11 @@ let rmtTxSim: DeviceRegister = { Name = "rmtTxSim"; Region = rmtRegion; Offset =
 let rmtIntEna: DeviceRegister = { Name = "rmtIntEna"; Region = rmtRegion; Offset = 0x78; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
 let rmtIntRaw: DeviceRegister = { Name = "rmtIntRaw"; Region = rmtRegion; Offset = 0x70; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
 let rmtIntClr: DeviceRegister = { Name = "rmtIntClr"; Region = rmtRegion; Offset = 0x7C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rmtCh0data: DeviceRegister = { Name = "rmtCh0data"; Region = rmtRegion; Offset = 0x0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rmtCh0TxConf0: DeviceRegister = { Name = "rmtCh0TxConf0"; Region = rmtRegion; Offset = 0x20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rmtCh0TxStatus: DeviceRegister = { Name = "rmtCh0TxStatus"; Region = rmtRegion; Offset = 0x50; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rmtCh0TxLim: DeviceRegister = { Name = "rmtCh0TxLim"; Region = rmtRegion; Offset = 0xA0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rmtCh0carrierDuty: DeviceRegister = { Name = "rmtCh0carrierDuty"; Region = rmtRegion; Offset = 0x80; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
 
 // --- SYSTIMER @ 0x60023000 ------------------------------------
 let systimerRegion: DeviceRegion = { Space = Description.systimer; AddressSpace = "cpu-physical"; Source = source }

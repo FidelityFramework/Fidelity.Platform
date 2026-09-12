@@ -67,8 +67,15 @@ SELECTION = [
         "CONF", "TIMER[0]_CONF", "CH[0]_CONF0", "CH[0]_CONF1",
     ]),
     ("RMT", "rmt", [
-        # WS2812 bit timing for the five badge LEDs.
+        # WS2812 bit timing for the five badge LEDs. Channel 0 transmits; the
+        # per-channel registers are what actually drive it, and the global ones
+        # alone cannot send a symbol.
         "SYS_CONF", "REF_CNT_RST", "TX_SIM", "INT_ENA", "INT_RAW", "INT_CLR",
+        "CH[0]DATA",           # FIFO window: each write pushes one 32-bit symbol pair
+        "CH[0]_TX_CONF0",      # divider, memory size, carrier, start/stop
+        "CH[0]_TX_STATUS",
+        "CH[0]_TX_LIM",        # threshold for the wrap interrupt
+        "CH[0]CARRIER_DUTY",   # carrier off, but the register must be written
     ]),
     ("SYSTIMER", "systimer", [
         # The LVGL tick and every bring-up delay read UNIT0.

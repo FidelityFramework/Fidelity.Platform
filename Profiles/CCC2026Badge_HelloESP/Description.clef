@@ -1,0 +1,109 @@
+namespace Fidelity.Platform.Profiles.CCC2026Badge_HelloESP
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.Espressif.ESP32S3.ESP32_S3_WROOM_1_N8.Description
+module Board = Fidelity.Platform.Hardware.Products.CircuitBoardMedics.CCC2026Badge.Description
+module Execution = Fidelity.Platform.Environments.Freestanding.Xtensa_ESP32S3.Description
+
+/// One selected image: HelloESP on the Carolina Code Conference 2026 badge.
+/// Shared regions stay direct references to the silicon declarations rather
+/// than copies, so the profile selects rather than restates.
+module Description =
+
+    /// The stack the Xtensa call ABI unwinds into. Register windows spill here
+    /// on overflow, so it is not merely the C stack -- it is where the window
+    /// exception handlers put registers, and running out of it faults inside
+    /// an exception handler rather than in the code that overflowed.
+    let stackBytes = 16384
+
+    /// How much of the dual-mapped SRAM1 bank the instruction side takes.
+    ///
+    /// This is the one number a reader should stop at. SRAM1 answers to both
+    /// CPU buses at different addresses; whatever the instruction side takes
+    /// here, the data side cannot have. 128 KB leaves the instruction window
+    /// at 160 KB (SRAM0's 32 KB plus this) and the data window at 352 KB.
+    ///
+    /// HelloESP's data side must hold a 160x128 16bpp framebuffer (40,960
+    /// bytes), the 1,352-byte logo mask, and the stack. 352 KB is generous,
+    /// and deliberately so: an image that later links LVGL grows on the data
+    /// side, and this split can move without touching anything else.
+    let sram1InstructionBytes = 131072
+
+    let image: XtensaImageDescriptor = {
+        Sram0Space = "sram0"
+        Sram1Space = "sram1"
+        Sram1DataBase = Part.sram1DataBusBase
+        Sram2Space = "sram2"
+        DataLimit = Part.romHandoverDataLimit
+        FlashStoreSpace = "flash-store"
+        Sram1InstructionBytes = sram1InstructionBytes
+        VectorLayout = "XtensaLX7Vectors"
+        VectorAlignment = Part.vectorAlignment
+        StackBytes = stackBytes
+        EntrySymbol = "_start"
+        PartNumber = Part.partNumber
+        // esp_image_header_t fields the mask ROM reads before any code runs.
+        // These are not preferences: the ROM configures the flash bus from them
+        // and a wrong value is a boot failure with no output.
+        //
+        // Taken from this board's own stock bootloader header, read out of the
+        // 2026-09-11 flash capture rather than chosen: spi_mode 2 (DIO),
+        // spi_speed 15 (80 MHz), spi_size 3 (8 MB). The eFuse reports the part
+        // as quad-capable, but the image that ships on it boots DIO, so DIO is
+        // the setting known to work on this hardware.
+        ChipId = 9                  // ESP_CHIP_ID_ESP32S3
+        MinChipRevFull = 0
+        MaxChipRevFull = 9999
+        SpiMode = 2                 // DIO
+        SpiSpeed = 15               // 80 MHz
+        SpiSize = 3                 // 8 MB
+        HashAppended = 1
+    }
+
+    let lifecycle: LifecycleFacts = {
+        // The ROM bootloader has already configured the CPU clock by the time
+        // an image runs. 40 MHz is the crystal this board carries, read from
+        // the part on 2026-09-11.
+        Clocks = [| { Name = "xtal"; FrequencyHz = 40000000 } |]
+        // RESET (silkscreen SW2) drives CHIP_PU, which is active high: the
+        // button pulls it low to reset.
+        Resets = [| { Name = "CHIP_PU"; External = true; ActiveHigh = false } |]
+        Entry = "_start"
+        Teardown = "PanicHandler"
+        Persistence = Persistence.Volatile
+    }
+
+    let descriptor: PlatformDescription = {
+        Id = "mcu-espressif-esp32s3-ccc2026badge"
+        DisplayName = "Carolina Code Conference 2026 Badge — HelloESP"
+        Substrate = "mcu"
+        Core = Some Execution.core
+        // Memory: three SRAM banks (the shared bank's data-bus base rides on the
+        // image descriptor), and
+        // the flash store as a download target. No flash window is selected --
+        // this image lives entirely in SRAM and establishes no cache mapping.
+        Spaces = [| Part.sram0; Part.sram1; Part.sram2
+                    Part.flashStore
+                    // Peripherals this workload's registers live in. Inventory
+                    // here; the grants are HelloESP's own.
+                    Part.rtcCntl; Part.timg0; Part.timg1; Part.system
+                    Part.ioMux; Part.gpio; Part.spi2; Part.ledc; Part.rmt
+                    Part.systimer; Part.usbSerialJtag; Part.interruptCore0 |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = lifecycle
+        Notes = [|
+            "First Xtensa slice: watchdog disarm, peripheral clock ungate, IO MUX, SPI2 to the ST7735S panel, RMT to five WS2812s, SYSTIMER tick and three buttons. No RTOS, no ESP-IDF, no heap, no DMA, no WiFi, no BLE."
+            "Silicon owns register requirements; the badge product owns wiring; HelloESP owns mappings, grants and timing."
+            "The image is loaded into SRAM by the mask ROM from flash offset 0. No second-stage bootloader, no partition table, and no flash MMU or cache configuration."
+            "SRAM1 is dual-mapped on both CPU buses. Sram1InstructionBytes partitions it; the generated linker script asserts the two sides do not meet."
+            "The data window and the stack stop at the silicon's romHandoverDataLimit: above it are the ROM's own buffers and stacks and the SRAM2 half the ROM leaves to the data cache. Nothing of this image lives in SRAM2."
+            "LVGL is not linked into this image. HelloESP draws its own framebuffer so that the hardware path can be proven before a foreign archive joins the link."
+        |]
+        Limits = [|
+            { Name = "cpu-interrupts"; Value = Part.cpuInterrupts }
+            { Name = "interrupt-levels"; Value = Part.interruptLevels }
+            { Name = "vector-bytes"; Value = 1024 }
+        |]
+    }
