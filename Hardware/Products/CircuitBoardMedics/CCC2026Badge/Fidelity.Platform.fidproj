@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Platform.Hardware.Products.CircuitBoardMedics.CCC2026Badge"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Carolina Code Conference 2026 badge wiring: ST7735S panel, WS2812 chain, buttons, USB console and broken-out solder pads."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+silicon = { path = "../../../Silicon/MCU/Espressif/ESP32S3/ESP32_S3_WROOM_1_N8/Fidelity.Platform.fidproj" }

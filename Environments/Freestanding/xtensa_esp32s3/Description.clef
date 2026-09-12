@@ -1,0 +1,117 @@
+namespace Fidelity.Platform.Environments.Freestanding.Xtensa_ESP32S3
+
+open BAREWire.Platform
+
+module Core = Fidelity.Platform.Hardware.Silicon.MCU.Espressif.ESP32S3.ESP32_S3_WROOM_1_N8.Description
+
+/// Freestanding execution contract for one Xtensa LX7 core of an ESP32-S3.
+/// Startup, the vector block and every peripheral initialization are
+/// image-owned; nothing here provides a runtime, a bootloader or an RTOS.
+///
+/// This environment is DECLARED BUT NOT EXECUTABLE. The triple below names a
+/// target that the LLVM installed on a stock system cannot emit: upstream
+/// LLVM's Xtensa backend defines esp32, esp8266 and esp32s2 processors and has
+/// no esp32s3 CPU model. `esp32s3` exists in Espressif's LLVM fork. Selecting
+/// this environment therefore also selects that toolchain. See
+/// ../../../Hardware/Products/CircuitBoardMedics/CCC2026Badge/README.md.
+module Description =
+    let pointerWidth: WidthDeclaration = { Name = "Pointer"; Bits = 32 }
+
+    // One core of a dual-core part. This environment describes a single
+    // hardware thread: the second core is not started, and an image that
+    // starts it owns the second core's stack, vector base and cache coherence.
+    let coresSelected = 1
+    let coresAvailable = Core.cpuCores
+
+    /// Integer representations. The LX7 is a 32-bit machine with hardware
+    /// 32x32 high multiply and hardware integer divide (MUL32_HIGH, DIV32), so
+    /// 32-bit and narrower integer arithmetic is native and wrapping. 64-bit
+    /// integers are register pairs, as they are on ARMv8-M: still native
+    /// instruction sequences, still wrapping at the declared boundary.
+    let repInt8: Representation = { Name = "int8"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 8; MinMagnitude = "-128"; MaxMagnitude = "127"; Boundary = Boundary.Wrap }
+    let repInt16: Representation = { Name = "int16"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 16; MinMagnitude = "-32768"; MaxMagnitude = "32767"; Boundary = Boundary.Wrap }
+    let repInt32: Representation = { Name = "int32"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 32; MinMagnitude = "-2147483648"; MaxMagnitude = "2147483647"; Boundary = Boundary.Wrap }
+    let repInt64: Representation = { Name = "int64"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 64; MinMagnitude = "-9223372036854775808"; MaxMagnitude = "9223372036854775807"; Boundary = Boundary.Wrap }
+    let repUInt8: Representation = { Name = "uint8"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 8; MinMagnitude = "0"; MaxMagnitude = "255"; Boundary = Boundary.Wrap }
+    let repUInt16: Representation = { Name = "uint16"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 16; MinMagnitude = "0"; MaxMagnitude = "65535"; Boundary = Boundary.Wrap }
+    let repUInt32: Representation = { Name = "uint32"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 32; MinMagnitude = "0"; MaxMagnitude = "4294967295"; Boundary = Boundary.Wrap }
+    let repUInt64: Representation = { Name = "uint64"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 64; MinMagnitude = "0"; MaxMagnitude = "18446744073709551615"; Boundary = Boundary.Wrap }
+
+    /// Single-precision IEEE 754 is a hardware coprocessor on this core, with
+    /// divide, square root and reciprocal instructions
+    /// (XCHAL_HAVE_FP/FP_DIV/FP_SQRT/FP_RECIP = 1).
+    ///
+    /// It is a COPROCESSOR, which is a bring-up obligation rather than a
+    /// detail: CPENABLE must have the FPU's bit set before the first floating
+    /// point instruction executes, or that instruction raises a coprocessor
+    /// exception. Nothing sets CPENABLE for a bare image.
+    let repIeee32: Representation = { Name = "ieee32"; Capability = Capability.Native; Family = RepresentationFamily.Ieee; Bits = 32; MinMagnitude = "1.175494351e-38"; MaxMagnitude = "3.402823466e+38"; Boundary = Boundary.Saturate }
+
+    /// Double precision is NOT present on this core: XCHAL_HAVE_DFP = 0 and
+    /// XCHAL_HAVE_DFPU_SINGLE_ONLY = 1, and Espressif's esp32s3 processor
+    /// definition carries FeatureSingleFloat without FeatureDFPAccel. Doubles
+    /// are software sequences, so declaring them native would be false and
+    /// omitting them would leave a used representation undeclared.
+    let repIeee64: Representation = { Name = "ieee64"; Capability = Capability.Emulated; Family = RepresentationFamily.Ieee; Bits = 64; MinMagnitude = "2.2250738585072014e-308"; MaxMagnitude = "1.7976931348623157e+308"; Boundary = Boundary.Saturate }
+
+    let core: TargetCore = {
+        Os = "none"
+        Arch = "xtensa_esp32s3"
+        WordSizeBits = 32
+        Endianness = "little"
+        Runtime = "bare"
+        // esp-clang's spelling. Upstream LLVM uses xtensa-none-elf and has no
+        // esp32s3 CPU; this triple/CPU pair is only emittable by Espressif's
+        // fork.
+        Triple = "xtensa-esp-elf"
+        CpuModel = "esp32s3"
+        Widths = [| pointerWidth; { Name = "Register"; Bits = 32 } |]
+        Representations = [| repInt8; repInt16; repInt32; repInt64
+                             repUInt8; repUInt16; repUInt32; repUInt64
+                             repIeee32; repIeee64 |]
+    }
+
+    // -----------------------------------------------------------------------
+    // Execution requirements this environment does NOT satisfy, and which an
+    // image selecting it must own. These are recorded because each one is a
+    // way a first image fails silently.
+    // -----------------------------------------------------------------------
+
+    /// Register windows. 64 physical address registers, rotated in windows of
+    /// 16. A call that exhausts the window raises an overflow exception whose
+    /// handler spills to the caller's stack frame. The window vectors are not
+    /// optional: without them, ordinary nested calls fault at the depth a
+    /// widget tree reaches.
+    let requiresWindowVectors = true
+    let physicalAddressRegisters = 64
+
+    /// There is no level-1 interrupt vector. Level-1 interrupts arrive through
+    /// the user (or kernel) exception vector and must be distinguished from
+    /// real exceptions by reading EXCCAUSE and the INTERRUPT register.
+    let level1InterruptsShareExceptionVector = true
+
+    /// No NVIC. A peripheral source must be routed onto one of the core's 32
+    /// interrupt numbers through the interrupt matrix before it can be taken.
+    let requiresInterruptMatrixRouting = true
+    let cpuInterrupts = Core.cpuInterrupts
+
+    /// The FPU coprocessor is disabled at reset; CPENABLE gates it.
+    let requiresCpEnableForFloat = true
+
+    /// Three watchdogs are armed before an image runs: the RTC watchdog, the
+    /// super watchdog, and the timer-group MWDTs. An image that neither feeds
+    /// nor disarms them is reset mid-bring-up.
+    let requiresWatchdogDisarm = true
+
+    /// Peripherals are clock-gated at reset and must be ungated through
+    /// SYSTEM.PERIP_CLK_EN0/1 before their registers respond.
+    let requiresPeripheralClockUngate = true
+
+    /// VECBASE ignores its low 10 bits, so a relocated vector block must be
+    /// 1024-byte aligned.
+    let vectorAlignment = Core.vectorAlignment
+
+    /// An image placed wholly in SRAM needs no flash cache or MMU setup. One
+    /// that runs from the flash windows must configure EXTMEM first, which is
+    /// outside this environment.
+    let flashWindowsRequireCacheSetup = true

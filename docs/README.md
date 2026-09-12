@@ -14,9 +14,11 @@ boundaries. The historical filename is retained for source references.
 | [BAREWire integration](BAREWire_Rebase_Plan.md) | What migrated and the remaining pin/schema work | Migration status and acceptance criteria |
 | [MMIO contracts and predicates](MMIO_CONTRACTS.md) | Region inventory, mappings, workload grants, CCS evidence and executable limits | Implemented static MMIO slice |
 | [Admission and accelerator handoffs](ADMISSION_AND_SIDECARS.md) | BPF host distinctions, verifier/resource budgets, Strix Halo/Arty and Metal UMA boundaries | Executable reference checks and source packages; compiler/gate integration pending |
+| [ESP32-S3 bring-up](ESP32S3_BRINGUP.md) | Xtensa toolchain gap, ROM-loaded SRAM image format, LX7 vector obligations, Composer backend deltas and the LVGL/Farscape boundary | Planning only; no image built and no declaration CCS-checked |
 
 Hardware sources and board acceptance belong with the corresponding product;
-see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md)
+see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md),
+the [CCC 2026 badge hardware reference](../Hardware/Products/CircuitBoardMedics/CCC2026Badge/docs/BADGE_HARDWARE.md)
 and [Arty binding](../Hardware/Products/Digilent/ArtyA7_100T/README.md).
 
 The maintained Composer F# runners for this structure are

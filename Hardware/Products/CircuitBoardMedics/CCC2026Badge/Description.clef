@@ -1,0 +1,205 @@
+namespace Fidelity.Platform.Hardware.Products.CircuitBoardMedics.CCC2026Badge
+
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.Espressif.ESP32S3.ESP32_S3_WROOM_1_N8.Description
+
+/// Carolina Code Conference 2026 badge, designed by Circuit Board Medics.
+/// Signal assignments only: see docs/BADGE_HARDWARE.md for the evidence and its
+/// limits. No schematic or netlist is published for this board, so unlike the
+/// EK-RA6M5 package there is no BoardNets copper-net declaration here and no
+/// literal terminal membership can be claimed.
+///
+/// These names describe wiring. An application assigns roles: which button
+/// means "next", what the LEDs signify, whether the backlight is PWM or
+/// on/off. Available wiring does not grant an application access to a pin.
+module Description =
+    let product = "CCC2026Badge"
+    let displayName = "Carolina Code Conference 2026 Badge"
+    let manufacturer = "Circuit Board Medics"
+    let siliconPart = Part.partNumber
+    let source = "docs/BADGE_HARDWARE.md; badge repository README.md and AGENTS.md; shipped CircuitPython samples; PCB silkscreen"
+
+    // -----------------------------------------------------------------------
+    // Display: HS180S10B panel, ST7735S controller, 160x128, 1.77 in.
+    // LCSC C5329585.
+    //
+    // The three bus pins are SPI2's OWN IO MUX pins on this package
+    // (GPIO10 = FSPICS0, GPIO11 = FSPID, GPIO12 = FSPICLK), so the panel is
+    // reachable without a GPIO matrix route. The remaining lines are plain
+    // GPIO driven by the application.
+    // -----------------------------------------------------------------------
+    let displayController = "ST7735S"
+    let displayPartNumber = "HS180S10B"
+    let displayWidth = 160
+    let displayHeight = 128
+    let displayBitsPerPixel = 16
+
+    let displaySckPin = 12
+    let displayMosiPin = 11
+    let displayChipSelectPin = 10
+    let displayDataCommandPin = 6
+    let displayResetPin = 7
+    let displayBacklightPin = 5
+
+    /// The panel's control lines are active low; DC is a level, not a strobe:
+    /// low selects the command register, high selects display data.
+    let displayChipSelectActiveHigh = false
+    let displayResetActiveHigh = false
+    let displayBacklightActiveHigh = true
+    let displayDataCommandDataIsHigh = true
+
+    /// True when the panel expects BGR rather than RGB component order.
+    let displayBgrOrder = true
+
+    /// SPI2 reaches these pins through the IO MUX rather than the GPIO matrix.
+    let displayUsesNativeIoMuxPins = true
+
+    /// A separate font ROM on the panel module shares the SPI bus. Hold its
+    /// chip select HIGH to keep it off the bus; it is not otherwise used.
+    let fontChipSelectPin = 9
+    let fontChipDataOutPin = 44
+    let fontChipSelectActiveHigh = false
+
+    // -----------------------------------------------------------------------
+    // Addressable LEDs: five WS2812, one chained data line.
+    //
+    // WS2812 needs sub-microsecond pulse widths, so the data stream comes from
+    // the RMT peripheral's symbol RAM. A bit-banged stream is corrupted by any
+    // interrupt taken mid-frame.
+    // -----------------------------------------------------------------------
+    let ledCount = 5
+    let ledDataPin = 4
+    let ledProtocol = "WS2812"
+    let ledBitsPerLed = 24
+    let ledComponentOrder = "GRB"
+
+    // -----------------------------------------------------------------------
+    // Buttons. Wired to ground against the chip's internal weak pull-ups:
+    // high when idle, low when pressed. There is no external pull-up to
+    // assume, so the pad's IO MUX config word must enable the internal one.
+    //
+    // Silkscreen names are used here. Note that the badge README calls these
+    // three "SW 1/2/3" while the silkscreen reserves SW1/SW2/SW3 for the power
+    // slide switch, RESET and BOOT.
+    // -----------------------------------------------------------------------
+    let s1Pin = 1
+    let s2Pin = 2
+    let s3Pin = 43
+    let buttonsActiveHigh = false
+    let buttonsNeedInternalPullUp = true
+    let userButtonCount = 3
+
+    /// BOOT (silkscreen SW3) is a strapping input, not a general-purpose
+    /// button: its level is latched at reset to select the boot mode.
+    let bootStrapPin = 0
+
+    /// RESET (silkscreen SW2) drives EN/CHIP_PU. Not a GPIO and not readable.
+    let resetIsChipEnable = true
+
+    /// The ON/OFF slide switch (silkscreen SW1) switches the battery in and
+    /// out. It has no GPIO and does not control USB power.
+    let powerSwitchIsBatteryOnly = true
+
+    // -----------------------------------------------------------------------
+    // USB and console.
+    //
+    // GPIO19/GPIO20 are wired to the USB-Micro connector and driven by the
+    // chip's own USB Serial/JTAG controller: the board enumerates natively,
+    // with no bridge IC.
+    //
+    // UART0 is NOT available: GPIO43/GPIO44, its default U0TXD/U0RXD pins,
+    // carry S3 and the font-chip data line. UART1's own IO MUX pins are
+    // broken out on pads, so a wired serial console is possible but needs
+    // a header fitted.
+    // -----------------------------------------------------------------------
+    let usbDataPlusPin = 20
+    let usbDataMinusPin = 19
+    let consoleIsUsbSerialJtag = true
+    let uart0Available = false
+    let uart1TxPad = 17
+    let uart1RxPad = 18
+
+    // -----------------------------------------------------------------------
+    // Power. Either the USB-Micro connector or a CR123A cell. Per the badge
+    // README the control circuitry disconnects the battery whenever USB power
+    // is present, regardless of the slide switch, and there is no charger.
+    // That is quoted documentation, not a conclusion from a circuit: no
+    // schematic is published.
+    // -----------------------------------------------------------------------
+    let batteryChemistry = "CR123A"
+    let usbConnector = "USB-Micro"
+    let usbPowerTakesPriority = true
+    let hasOnBoardCharger = false
+    let regulatedRailVolts = 3.3
+
+    // -----------------------------------------------------------------------
+    // Broken-out GPIO. No standard header: 2.54 mm through-hole solder pads,
+    // silkscreen-labelled, in three groups plus a GND / 3V3-Out pair.
+    //
+    // Grouped by what is safe to use, because the distinction matters more
+    // than the physical grouping does.
+    // -----------------------------------------------------------------------
+
+    /// Pads with no reset-time role and no on-board function. Safe to claim.
+    let freePads = [| 8; 13; 14; 15; 16; 17; 18; 21; 38; 47; 48 |]
+
+    /// Free only because this is an -N8 module with no PSRAM. On an octal-PSRAM
+    /// part these same pins carry SPIIO6/SPIIO7/SPIDQS and cannot be used.
+    let padsFreeOnlyWithoutPsram = [| 35; 36; 37 |]
+
+    /// The complete JTAG TAP, on adjacent pads: MTCK, MTDO, MTDI, MTMS.
+    /// With no eFuse burned the default JTAG source is the USB Serial/JTAG
+    /// controller, so these pads are needed only for an external probe.
+    let jtagPads = [| 39; 40; 41; 42 |]
+    let jtagTckPin = 39
+    let jtagTdoPin = 40
+    let jtagTdiPin = 41
+    let jtagTmsPin = 42
+    let jtagDefaultSourceIsUsb = true
+
+    /// Strapping pins that reach a pad. Their level is latched at every reset,
+    /// so anything attached to them is a boot-time input whether or not the
+    /// application treats it as one.
+    let strappingPads = [| 3; 45; 46 |]
+
+    /// GPIO45 selects the VDD_SPI rail voltage at reset, and VDD_SPI powers
+    /// the module's flash die. Its internal weak pull-down is what selects
+    /// 3.3 V. Pulled high at reset, the module runs 3.3 V flash from a 1.8 V
+    /// rail and does not boot. Never fit a pull-up to this pad.
+    let vddSpiVoltageStrapPin = 45
+
+    /// GPIO46 contributes to boot-mode selection with GPIO0 and gates ROM
+    /// message printing. Weak pull-down at reset.
+    let bootModeStrapPin = 46
+
+    /// GPIO3 selects the JTAG signal source once EFUSE_STRAP_JTAG_SEL is
+    /// burned. It floats at reset with no internal pull, so a long wire on
+    /// this pad is an undriven input picking up noise.
+    let jtagSelectStrapPin = 3
+
+    let groundPad = "GND"
+    let railPad = "3V3 Out"
+
+    // -----------------------------------------------------------------------
+    // Pins that glitch at power-up (datasheet Table 2-2): a low-level glitch
+    // of typically 60 us. This covers nearly every on-board signal, including
+    // the backlight and all four display control lines.
+    //
+    // Two consequences an image must handle rather than discover: the panel
+    // flashes white unless the backlight is driven low early, and a glitch on
+    // the LED data line can emit a spurious WS2812 symbol, so the LEDs need an
+    // explicit clear rather than an assumption that they start dark.
+    // -----------------------------------------------------------------------
+    let powerUpGlitchPins = [| 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 17; 18; 19 |]
+    let powerUpGlitchMicroseconds = 60
+
+    /// Drive the backlight low before anything else, then raise it once the
+    /// panel has been initialized and the first frame is ready.
+    let backlightRequiresEarlyLow = true
+
+    // -----------------------------------------------------------------------
+    // As shipped. Reflashing replaces this; read the flash out first.
+    // -----------------------------------------------------------------------
+    let stockFirmware = "CircuitPython 10.2.1"
+    let stockBoardId = "espressif_esp32s3_devkitc_1_n8"
+    let stockUsbVendorId = 0x303A
+    let stockUsbProductId = 0x7003

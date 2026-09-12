@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Platform.Environments.Freestanding.Xtensa_ESP32S3"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Freestanding Xtensa LX7 (ESP32-S3) execution contract: ABI widths, numeric representations and the bring-up obligations an image must own."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+silicon = { path = "../../../Hardware/Silicon/MCU/Espressif/ESP32S3/ESP32_S3_WROOM_1_N8/Fidelity.Platform.fidproj" }
