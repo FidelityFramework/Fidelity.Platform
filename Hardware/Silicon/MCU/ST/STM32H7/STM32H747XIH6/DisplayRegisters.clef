@@ -126,5 +126,8 @@ let layer1Bfcr: DeviceRegister = { Name = "layer1Bfcr"; Region = ltdcRegion; Off
 let layer1Cfbar: DeviceRegister = { Name = "layer1Cfbar"; Region = ltdcRegion; Offset = 172; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
 let layer1Cfblr: DeviceRegister = { Name = "layer1Cfblr"; Region = ltdcRegion; Offset = 176; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
 let layer1Cfblnr: DeviceRegister = { Name = "layer1Cfblnr"; Region = ltdcRegion; Offset = 180; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+// Write-only palette entry port, not shadowed: update only while the layer is
+// disabled or during blanking. Offset comes from offsetof, not the header's
+// misleading 0x144 member comment. See docs/display/CLUT_SUPPLEMENT.md.
+let layer1Clutwr: DeviceRegister = { Name = "layer1Clutwr"; Region = ltdcRegion; Offset = 196; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
 let layer2Cr: DeviceRegister = { Name = "layer2Cr"; Region = ltdcRegion; Offset = 260; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
-

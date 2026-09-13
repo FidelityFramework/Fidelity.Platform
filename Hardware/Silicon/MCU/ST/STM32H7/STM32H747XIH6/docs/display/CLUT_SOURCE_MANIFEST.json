@@ -1,0 +1,177 @@
+{
+  "recordedDate": "2026-09-13",
+  "scope": "One additional layer1Clutwr declaration and host-only offset evidence, plus a separately identified bounded interactive hardware checkpoint. Original 80-register checkpoint files remain frozen. The C oracle is not linked into firmware.",
+  "upstreamFiles": [
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/cmsis-device-h7/Include/stm32h747xx.h",
+      "bytes": 2390718,
+      "sha256": "78d84d7042b66f7ee07dc86a6e794b2a0774e464ae945961bed19573dd46ea07",
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-h7",
+      "commit": "81db1ec63cdc191fae1565b772da3ea5aa29a683",
+      "path": "Include/stm32h747xx.h",
+      "url": "https://github.com/STMicroelectronics/cmsis-device-h7/blob/81db1ec63cdc191fae1565b772da3ea5aa29a683/Include/stm32h747xx.h"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Src/stm32h7xx_hal_ltdc.c",
+      "bytes": 71918,
+      "sha256": "6b0df6e21aa61b3ca19a77f0362dd44eb077aded7c43615af026029060870ba8",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Src/stm32h7xx_hal_ltdc.c",
+      "url": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver/blob/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Src/stm32h7xx_hal_ltdc.c"
+    }
+  ],
+  "localCheckpointFiles": [
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/DisplayRegisters.clef",
+      "bytes": 16754,
+      "sha256": "ae5f2f4482da04d0ed1b0b7c0464a85c42a36f430776fc8db3981202feedd30d"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/clut-offset-oracle.c",
+      "bytes": 3109,
+      "sha256": "7c1b9d01229d46114a79ad31323f0e3f68a83a5bdfc690fd0d15f8c8ed9bf7a9"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/clut-offsets.txt",
+      "bytes": 21,
+      "sha256": "cd98a2fa900ac3d591011730071b75de06ac2266438e25fec8687c42498c791d"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/LICENSE.CMSIS.md",
+      "bytes": 11347,
+      "sha256": "053a83960032ab6bbd2231a3b6300bde3b4e526dcf11a61394907c0bdaacd713"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/CLUT_SUPPLEMENT.md",
+      "bytes": 10281,
+      "sha256": "b1d2166dc78e4e518211042da9fc686af541c4215e07e41e895088f78b5b0e4a"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/docs/ES0445_SOURCE_STATUS.md",
+      "bytes": 1217,
+      "sha256": "a61d3f3ccbfcc8e64f0c1d0a8358a506ce0eeec00758dcb71cca1e472f3ce773"
+    }
+  ],
+  "preservedPriorEvidence": [
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/SOURCE_MANIFEST.json",
+      "bytes": 13223,
+      "sha256": "8e679197edd9959311a7c494a431f2be71b3cd90b82d8ce4847ccf176da65716"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/offset-oracle.c",
+      "bytes": 27951,
+      "sha256": "919d8c94184132e976b731a481cf2a10b80a43751f019c71782a1a834b8664e7"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/offsets.txt",
+      "bytes": 1320,
+      "sha256": "8728c618fad09716924049ccf91a973d388fc8d877af260ea716858b5c45eb35"
+    }
+  ],
+  "offsetOracle": {
+    "checkedRegisterCount": 1,
+    "mismatchCount": 0,
+    "binding": "layer1Clutwr",
+    "layerRelativeMemberOffset": 64,
+    "layer1Offset": 132,
+    "declaredRegionOffset": 196,
+    "physicalAddress": "0x500010C4",
+    "access": "w",
+    "transactionBits": 32,
+    "compiler": "cc (GCC) 16.2.1 20260810",
+    "limitations": "Compiled offset only; no device access, cache/timing proof, or runtime protocol acceptance."
+  },
+  "remoteDocumentationObservations": [
+    {
+      "document": "AN4861",
+      "revision": "7, February 2026",
+      "url": "https://www.st.com/resource/en/application_note/an4861-introduction-to-lcdtft-display-controller-ltdc-on-stm32-mcus-stmicroelectronics.pdf",
+      "anchors": [
+        "Section 5.7.3, page 46",
+        "Section 4.3"
+      ],
+      "access": "Remote PDF text inspected; H747 explicitly within scope. Not a locally hashed PDF checkpoint."
+    },
+    {
+      "document": "RM0433",
+      "revision": "8",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0433-stm32h742-stm32h743-753-and-stm32h750-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "anchors": [
+        "Section 32.7.6, page 1216",
+        "Section 32.7.25, page 1227",
+        "Tables270-271, page1203: GCR/CLUTWR pixel-clock domain and APB access stalls"
+      ],
+      "access": "Official indexed passage inspected; related H742/H743/H750/H753 LTDC corroboration, not exact H747 authority. Not a locally hashed PDF checkpoint."
+    },
+    {
+      "document": "RM0399",
+      "revision": "4 in indexed table of contents",
+      "url": "https://www.st.com/resource/en/reference_manual/rm0399-stm32h745755-and-stm32h747757-advanced-armbased-32bit-mcus-stmicroelectronics.pdf",
+      "anchors": [
+        "Section 33.7.6, page 1249",
+        "Section 33.7.25, page 1260"
+      ],
+      "access": "Table of contents only; body retrieval failed. Exact-part semantic acceptance and ES0445 errata review remain pending."
+    },
+    {
+      "document": "stm32h7xx_hal_ltdc.h",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Inc/stm32h7xx_hal_ltdc.h",
+      "bytes": 33297,
+      "sha256": "6c1a411e473f0be96e13dba7452b00b58216a677396c2f8479ea5008540d88a6",
+      "anchors": [
+        "LTDC_PIXEL_FORMAT_L8=0x00000005U"
+      ],
+      "access": "Pinned upstream header retrieved and hashed in memory; not retained as a local source file. Exact URL is immutable by commit."
+    },
+    {
+      "document": "ES0445",
+      "revision": "6, September 2025",
+      "url": "https://www.st.com/resource/en/errata_sheet/es0445-stm32h745xig-stm32h755xi-stm32h747xig-stm32h757xi-device-errata-stmicroelectronics.pdf",
+      "pageCount": 57,
+      "anchors": [
+        "Page1: H747XI, silicon revisions U/V, REV_ID0x2003",
+        "Section2.13.1, page26: enable PLL3R before LTDC APB register interface"
+      ],
+      "access": "Complete PDF readable remotely. Targeted startup erratum reviewed; whole errata review remains open. Direct and alternative official URL/domain downloads timed out; no local PDF or PDF hash claimed."
+    }
+  ],
+  "startupCorrectionCheckpointFiles": [
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/static-display/src/DisplayHost.clef",
+      "bytes": 14819,
+      "sha256": "a49069a22de7e2a3b98adf118966e76a2753af87b53408508540b380a833d3f0"
+    }
+  ],
+  "finalInteractiveCheckpointFiles": [
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/HelloDISCO.Interactive.bin",
+      "bytes": 250190,
+      "sha256": "c3e81169a5f16a63bf10c4a15ef707d035f748aa72c33ecf5a04f5760e4d6030"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/HelloDISCO.Interactive.elf",
+      "bytes": 335564,
+      "sha256": "1a1f452b134cea1b816f79f877a439af9d1a45bef7c83959321ef5d18a536960"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/readback-checks.json",
+      "bytes": 997,
+      "sha256": "897f49a27aa1dd3dd5fdb9f3d2cce070445a33397a537a5ce12f951eaae2ff27"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/frame-readback.bin",
+      "bytes": 230400,
+      "sha256": "3fee300e91ac130cc555a97b43f5ff32f6ae2d9cd77861e1f7639c080c896dba"
+    }
+  ],
+  "finalInteractiveAcceptance": {
+    "date": "2026-09-13",
+    "archive": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette",
+    "machineEvidence": "Both ELF load segments and complete230400-byte index frame match readback. Eight unallocated binary gap bytes differ as documented. CLUTWR is write-only.",
+    "userObservation": "Confirmed debugger disconnected and CN2 unplug/reconnect: banner immediately correct without stripes before joystick input; Left/Right/Center LED controls confirmed. Up/Down palette operation also observed.",
+    "limits": "Bounded HelloDISCO checkpoint only; intermediate33-update timing/frame evidence remains historical. No whole-errata, general-renderer, WCET or M4 startup acceptance."
+  }
+}

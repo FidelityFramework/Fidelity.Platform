@@ -1,13 +1,14 @@
 # A coherent UI and display model across Fidelity targets
 
-Exploration dated 2026-09-12, grounded in the current HelloESP, HelloDISCO,
+Exploration dated 2026-09-12, with HelloDISCO observations updated 2026-09-13,
+grounded in the current HelloESP, HelloDISCO,
 HelloWayland and WrenHello sources. This is a direction for incremental work,
 not a new framework implementation or a claim of proved rendering.
 
 The long-term objective is a coherent declarative UI model with efficient,
 target-appropriate implementations whose storage and effects can be checked
-through BAREWire, Fidelity.Platform, CCS and Composer. HelloDISCO should test
-that direction with a logo and physical input before undertaking a full UI.
+through BAREWire, Fidelity.Platform, CCS and Composer. HelloDISCO now exercises
+that direction with a logo, physical input and an explicit palette consumer.
 Native Clef is the default path; LVGL/Skia bindings remain possible alternatives.
 
 ## The programming model and the display are separate contracts
@@ -20,9 +21,9 @@ one authoritative state transition and selective notification of changed model
 fields. These are compatible layers: a CE describes composition; it need not
 dictate rebuilding a complete tree whenever state changes.
 
-For HelloDISCO, pressing Up changes the logo palette. An LED timer tick changes
-LED phase without changing the logo. A future UI consumer can compare the logo
-palette projection and schedule display work only when that projection changes.
+For HelloDISCO, pressing Up/Down changes the logo palette. An LED timer tick
+changes LED phase without changing the logo. Its foreground palette consumer
+compares the requested and applied palette and schedules work when they differ.
 This small, explicit dependency is a useful first instance of the intended
 reactivity, without importing an unaccepted signal runtime into the image.
 
@@ -148,15 +149,18 @@ on a complete native reactive library:
 
 HelloDISCO already supplies the pure transition in `Behavior.step`; its packed
 integer is an initial representation, not a proposed public Elmish API. A tiny
-expression illustrates the future display subscription:
+expression illustrates the shared projection idea:
 
 ```clef
 let next = Behavior.step pressed current
 let logoChanged = Behavior.logoPalette current <> Behavior.logoPalette next
 ```
 
-This expression is a design example using existing functions. The current
-firmware does not yet install a display subscriber. General messages, typed
+This expression is a design example using existing functions. The
+[interactive image](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
+implements a fixed foreground palette consumer rather than a general subscriber
+runtime: one batch keeps a stable selected palette, and later input can choose
+the next batch. General messages, typed
 models and CE composition can grow above the same semantics when their native
 lowerings are accepted. For the first fixed graph, explicit projections provide
 the desired change-notification behavior without claiming the compiler has
@@ -165,16 +169,17 @@ inferred a Signal dependency graph.
 The useful acceptance cases are repeated/no-op updates, one notification after
 a coherent multi-field change, an LED-only tick causing no logo notification,
 palette wrap, stable rendering snapshots, and identical action traces through
-native and hosted consumers. This is the next **bounded design experiment**;
-rewriting WrenHello's bridge or building a general signal engine is outside this
-HelloDISCO increment.
+native and hosted consumers. These remain acceptance questions for a reusable
+reactivity layer. The current fixed consumer does not establish that broader
+layer; rewriting WrenHello's bridge or building a general signal engine remains
+outside HelloDISCO.
 
 ## What the four examples actually demonstrate
 
 | Example | Current implemented boundary | Contribution to the common model |
 | --- | --- | --- |
 | [HelloESP](../../MCU/Espressif/CCC2026Badge/HelloESP/HelloESP.fidproj) | Native Clef framebuffer drawing, SPI panel transfer, buttons and RMT LEDs on LX7 | End-to-end small-device path; explicit conversion from logical pixels to wire bytes |
-| [HelloDISCO](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/README.md) | Native LED/joystick image plus user-confirmed native landscape glyph on LTDC/DSI | Bounded input/state independent of rendering; one packed AXI buffer published once for scanout |
+| [HelloDISCO interactive](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md) | Native M7 joystick/LED/palette image accepted, including debugger-disconnected cold start and controls | One foreground state/effect owner; immutable AXI index frame and palette changes while the LTDC layer is hidden |
 | [HelloWayland](../../HelloWayland/HelloWayland.fidproj) | Native CPU rendering into scoped typed GBM views, joined worker regions, compositor-owned presentation | Actual stride/capacity checks, borrowed storage, dirty regions and distinct release events |
 | [WrenHello](../../WrenHello/WrenHello.fidproj) | Native counter state, Partas.Solid frontend, shared protocol types, separate bridge codecs | Shared state/event vocabulary with a hosted renderer that owns the DOM |
 
@@ -208,6 +213,8 @@ install handlers.Tick
 
 See [HelloESP Main](../../MCU/Espressif/CCC2026Badge/HelloESP/src/Main.clef) and
 [HelloDISCO Main](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/src/Main.clef).
+The latter is the original GPIO-only selection; the newer interactive image
+uses an assembly tick counter and keeps Clef state/effects in the foreground.
 Both use a declared `FnPtr<int -> unit>` at the assembly boundary. The selected
 adapter owns Xtensa interrupt entry or Cortex-M SysTick entry, register
 preservation and idle behavior. This callback is a foreign/assembly boundary;
@@ -273,6 +280,33 @@ returns after reconnecting CN2 without a debugger. This variant makes one
 startup copy from flash into the final buffer; scanout requires no per-frame
 CPU copy. It does not establish a general zero-copy graphics or signal runtime.
 
+The [interactive variant](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
+represents the accepted banner losslessly with 174 indexed colors: its L8
+frame is 230400 bytes. Runtime palette changes leave that memory unchanged.
+The foreground disables the layer at vertical blank, waits for completion,
+writes 32 CLUT entries per observed tick for eight ticks, then re-enables the
+layer at vertical blank. A background-only interval is intentional. The
+non-shadowed palette port and startup pixel-clock prerequisite are documented
+in the [CLUT supplement](../Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/CLUT_SUPPLEMENT.md).
+
+An intermediate image preserved the complete index frame across 33 palette
+updates with zero observed DSI/LTDC error status and a largest foreground tick
+gap of 1 ms. Those measurements do not establish worst-case execution time.
+Cold start exposed corrupted initial colors despite correct geometry; Up/Down
+restored the intended palette. The final image starts the configured L8
+controller with its layer hidden and uses the same incremental palette state
+machine before first visibility. The user confirmed a correct banner without
+stripes immediately after CN2 unplug/reconnect, before joystick input, with
+the debugger disconnected. Left/Right/Center LED controls are confirmed and
+Up/Down palette operation was also observed.
+
+The final 250190-byte image's ELF load segments and complete index frame match
+readback; its [acceptance archive](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/readback-checks.json)
+preserves those checks. The sequencing correction has passed this bounded
+acceptance; it does not establish the hardware cause of the earlier corruption.
+M7 audio/compute with M4 UI is a future split;
+M4 boot and shared-memory/ownership contracts are not ready.
+
 ## Trust and proof boundaries
 
 Native Clef is selected to make algorithms, writes and dependencies accessible
@@ -295,9 +329,11 @@ path can proceed now without requiring or forbidding either binding.
 
 ## Bounded next exploration
 
-1. Keep HelloDISCO's state/scene boundary and first accept its native LCD path.
-   Maintain a foreground display snapshot and avoid raster work inside the
-   1 kHz input/LED interrupt.
+1. Preserve the accepted combined image, including debugger-disconnected cold
+   start and controls. Keep its explicit foreground palette consumer, immutable
+   frame and assembly-only tick counter as this checkpoint's bounded policy.
+   Return to Clef language/compiler work for DSP and cryptography. The following
+   UI items are later candidates.
 2. Reference one small scene/asset implementation from both MCU workloads and
    retain paired target artifacts. Show genuinely identical source beside its
    different machine-code and storage realizations.
@@ -310,6 +346,6 @@ path can proceed now without requiring or forbidding either binding.
    layout, dynamic lists, text shaping, signal scheduling and foreign renderer
    comparisons remain separate work.
 
-This exploration deliberately leaves the full UI framework and general proof
-system open. The immediate deliverable is a small working consumer and evidence
-that can guide the shared model, without making binding the prerequisite.
+This exploration leaves the full UI framework and general proof system open.
+The working bounded consumer and its retained evidence can guide the shared
+model after the language-readiness checkpoint.

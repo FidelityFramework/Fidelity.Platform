@@ -1,0 +1,42 @@
+namespace Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO_Interactive
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Core = Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7.Description
+module Family = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.Family
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Description
+module Display = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.DisplayRegisters
+module Execution = Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M7.Description
+
+module Description =
+    let image: CortexMImageDescriptor = {
+        FlashSpace = "flash-bank1"; RamSpace = "axi-sram"
+        VectorLayout = "ArmV7MVectors"; VectorAlignment = Part.vectorAlignment
+        StackBytes = 8192; EntrySymbol = "Reset_Handler"
+        DebugDevice = "STM32H747XIH6"; PartNumber = Part.partNumber
+        PartNumberAddress = Family.dbgmcuIdcodeAddress
+        PreservedOptionAddress = 0x5200201C; PreservedOptionBytes = 48
+    }
+    let descriptor: PlatformDescription = {
+        Id = "stm32h747i-disco-hellodisco-interactive"
+        DisplayName = "STM32H747I-DISCO HelloDISCO interactive banner"
+        Substrate = "mcu"; Core = Some Execution.core
+        Spaces = [| Part.flashBank1; Part.axiSram; Part.rcc; Part.gpioi; Part.gpiok
+                    Display.gpiog; Display.gpioj; Display.dsi; Display.ltdc; Core.ppb |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = {
+            Clocks = [| { Name = "reset-HSI"; FrequencyHz = Part.resetSysclkHz } |]
+            Resets = [| { Name = "NRST"; External = true; ActiveHigh = false } |]
+            Entry = "Reset_Handler"; Teardown = "Fault_Handler"
+            Persistence = Persistence.Volatile
+        }
+        Notes = [|
+            "One immutable L8 banner in AXI SRAM; LTDC CLUT updates occur only while the layer is disabled, with vertical-blank reloads."
+            "Requires hardware reset, M7 boot ownership, HSI64 and disabled caches. Display PLLs do not change the CPU clock or core power supply."
+            "Foreground owns joystick, LED model and palette transactions; SysTick only increments an assembly-owned 16-bit nominal millisecond counter."
+            "Fixed assembly adapters bound ROM reads and framebuffer stores. Evidence covers the selected image; general DMA/cache and whole-program proofs remain separate."
+            "No touch, audio, SDRAM or general reactive runtime. Future driver APIs remain documentary until Clef language readiness."
+        |]
+        Limits = [| { Name = "external-vectors"; Value = Part.externalVectors } |]
+    }

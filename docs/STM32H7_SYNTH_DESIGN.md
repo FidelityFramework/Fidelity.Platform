@@ -1,8 +1,9 @@
 # STM32H747I-DISCO native Clef synthesizer
 
-Execution boundary, 2026-09-13: finish the bounded HelloDISCO proof, frame the
-future driver work in the [documentation scaffold](../Profiles/STM32H747I_DISCO_Synth_Reference/scaffold/README.md),
-then focus on Clef language/compiler readiness for DSP and cryptography. This
+Execution boundary, 2026-09-13: the bounded interactive HelloDISCO checkpoint is
+accepted, including debugger-disconnected cold start and controls. Keep future
+driver work in the [documentation scaffold](../Profiles/STM32H747I_DISCO_Synth_Reference/scaffold/README.md)
+and now focus on Clef language/compiler readiness for DSP and cryptography. This
 design records future requirements and alternatives; driver descriptors should
 not expand around the unfinished language surface.
 
@@ -19,19 +20,30 @@ handoffs to the verification tools. LVGL/Skia bindings remain optional research
 paths. Static linking does not establish their memory safety or remove them
 from the trusted computing base; native source also needs proof or isolation
 before its correctness can be excluded from that trust assumption.
-One Cortex-M7 image owns the first instrument. Using the M4 is a later workload
-selection that requires its own image and inter-core contract.
+Current HelloDISCO runs its application on Cortex-M7 only. M7 audio/compute
+with M4 UI is a preferred future experiment, requiring a separate M4 image,
+boot/park/reset acceptance, shared-memory publication and peripheral ownership.
+The second core does not yet have an accepted autonomous boot policy.
 
 ## What is actually present
 
 The initial audit found an incomplete source closure. This increment supplied
 the minimum STM32H7 family, STM32H747XIH6 part, product and M7 environment
 sources and corrected the core representations. The active application is now
-[HelloDISCO](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/README.md), with a
-verified native LED/joystick image and a native LCD experiment. The user has
-confirmed the landscape Clef banner and its return after reconnecting CN2 with
-the debugger disconnected. Halted OpenOCD reads confirmed all 460800 framebuffer
-bytes match the prepared asset. The generated orange glyph remains a fallback.
+[interactive HelloDISCO](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md),
+combining native joystick/LED behavior with landscape palette changes. The user
+confirmed the final image cold-starts correctly after CN2 unplug/reconnect with
+the debugger disconnected: no stripes before touching the joystick, and
+Left/Right/Center operate the LEDs. Up/Down palette operation was also observed.
+All final ELF load segments and the full 230400-byte immutable L8 frame match
+readback. An intermediate image preserved that frame through 33 palette updates
+with zero DSI/LTDC error status and a largest foreground tick gap of 1 ms,
+but initially corrupted the palette on cold start. The final startup uses the
+same hidden-layer palette path before first visibility. These observations
+accept the bounded demo; they do not establish worst-case timing.
+The earlier 460800-byte RGB565 banner separately passed exact framebuffer
+comparison and a user-confirmed CN2 power cycle. It and the orange glyph remain
+fallbacks.
 Broader peripheral inventory is not an
 accepted full-device MMIO/protocol implementation.
 
@@ -89,7 +101,8 @@ flowchart LR
 ```
 
 The diagram describes intended instrument behavior. HelloDISCO now exercises
-native LTDC/DSI scanout from internal AXI SRAM. Audio drivers, general DMA
+native LTDC/DSI scanout from internal AXI SRAM and palette changes while its
+layer is hidden, with joystick/LED work in the same foreground. Audio drivers, general DMA
 handoff, SDRAM and touch are still future work.
 
 ## Board capability map
@@ -104,7 +117,7 @@ BSP refine the following routes; see the audit for exact source anchors.
 | Audio output | DMA2 → SAI1 A → WM8994, with RCC/PLL clocks and I2C4 codec control | First continuous sound and instrument output |
 | Codec input | WM8994 → SAI1 B → DMA2 | Later input/feedback experiment; separate buffer ownership |
 | Digital microphone | PDM microphone → SAI4 A → BDMA → D3 SRAM4 → decimation | Later; it has a different DMA path from codec audio |
-| Display | Selected AXI SRAM or FMC SDRAM → LTDC → DSI host → mounted panel; DMA2D optional | HelloDISCO logo first; larger instrument surface later |
+| Display | Selected AXI SRAM or FMC SDRAM → LTDC → DSI host → mounted panel; DMA2D optional | Interactive HelloDISCO banner implemented; larger instrument surface later |
 | Touch | FT6x06-family controller → shared I2C4 and interrupt → coordinate transform → bounded events | Knobs, switches and gestures |
 | Assets/presets | Dual QSPI flash; microSD through SDMMC | Later persistence; neither is required for first sound |
 | Expansion | USB, Ethernet, camera, Arduino, STMod+/Pmod, buttons/joystick, LEDs and VCP | Catalog all; grant only selected devices |
@@ -292,10 +305,10 @@ from arithmetic conclusions, keyed to the final artifact and configuration.
 
 | Stage | Deliverable | Gate before advancement |
 | --- | --- | --- |
-| 0. Source and board identity | Hashed documents, part/package and assembly applicability, probe/boot-state record | Resolve missing RM0399/ES0445 and revision-specific errata; identify core and panel facts without assuming them |
+| 0. Source and board identity | Hashed documents, part/package and assembly applicability, probe/boot-state record | Resolve RM0399 and remaining errata authority gaps; ES0445 Rev 6 §2.13.1 already supplies the corrected LTDC startup order |
 | 1. Minimum package closure | HelloDISCO family/part/product/environment closure and core corrections now checked | Header/SVD checks cover the initial GPIO slice; missing manual/errata authorities remain open |
 | 2. Cortex-M7 image path | M7 target, startup, vectors, linker and inspection support in Composer/CCS | Build/inspect before deployment; wrong ABI, vectors, memory collision and unavailable register cases must reject |
-| 3. HelloDISCO hardware acceptance | Joystick-driven LED animation, timebase, fault reporting and a recorded M4 strategy; then landscape logo transport | Observable autonomous reset behavior; accepted panel, framebuffer and LTDC/DSI handoff |
+| 3. HelloDISCO hardware acceptance | Final combined joystick/LED/palette image accepted, including correct initial colors, debugger-disconnected cold start and controls | Preserve accepted artifact/readback/observation evidence; M4 boot remains a separate future gate |
 | 4. Memory, clocks and audio transport | Selected power/clock policy, MPU/cache policy, DMA/SAI/codec; silence then a fixed tone | Clock/PCM-format agreement, no transfer faults, buffer ownership and captured output |
 | 5. Native instrument | Oscillators, filter, envelopes, bounded controls and DSP harness | Numeric acceptance and sustained audio deadline evidence |
 | 6. SDRAM, display and touch | Validated FMC bank, panel variant, graphics transport and touch events | Memory patterns, display handoff and correct coordinates; audio survives display stress |
@@ -345,7 +358,7 @@ The initial catalog check resolved 73 of 76 manifests and exposed three missing
 H7 closures. After supplying the minimum packages and HelloDISCO, the maintained
 Composer PlatformCatalog check resolves **80 catalogue/consumer manifests**,
 with **1,305 source references** retaining unique identities within each closure.
-HelloDISCO compiles to a **2,772-byte binary with 166 vectors**, hard-float ABI
+The initial GPIO-only HelloDISCO image compiled to a **2,772-byte binary with 166 vectors**, hard-float ABI
 and no unresolved symbols. Its ledger records 40 static MMIO sites. Native
 behavior/debounce/scene host checks pass, including 100,000 mixed input ticks.
 Composer regression checks pass 19 Cortex-M target, 14 existing MCU and 8 MMIO
@@ -389,9 +402,24 @@ The banner variant subsequently passed programming, ELF segment readback and
 exact framebuffer comparison. The user confirmed the full banner, including
 the tagline, and its return after a CN2 disconnect/reconnect with the debugger
 closed. Its 475936-byte image and evidence are retained under
-`recovery/2026-09-12-banner-display-eerblu_w/` in the board workspace. The static
-display is the accepted stopping point before combining joystick/LED behavior
-or expanding the language/UI work.
+`recovery/2026-09-12-banner-display-eerblu_w/` in the board workspace.
+The subsequent [interactive selection](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
+now combines joystick/LED behavior and palette changes using a lossless L8
+frame. The accepted 250190-byte image initializes the running, configured L8
+controller through the existing hidden-layer palette path before first
+visibility. The debugger-disconnected cold-start and control checks passed.
+The [final readback record](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/readback-checks.json)
+identifies ELF SHA256 `1a1f452b134cea1b816f79f877a439af9d1a45bef7c83959321ef5d18a536960`
+and BIN SHA256 `c3e81169a5f16a63bf10c4a15ef707d035f748aa72c33ecf5a04f5760e4d6030`.
+All ELF load segments match flash; the eight unallocated BIN padding bytes
+retain the documented ELF-versus-objcopy difference. The sequencing change is
+accepted for this workload, without claiming the hardware cause of the earlier
+color corruption has been established.
+The earlier register-access stall was separately
+corrected using [ES0445 §2.13.1](../Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/CLUT_SUPPLEMENT.md):
+PLL3R runs before enabling the LTDC register interface or reading its guard
+registers. Completion of this bounded proof returns the work to Clef language
+support for DSP and cryptography, with future drivers kept as documentation.
 The instrument requirements remain reference data until their hardware, image
 and runtime consumers exist.
 

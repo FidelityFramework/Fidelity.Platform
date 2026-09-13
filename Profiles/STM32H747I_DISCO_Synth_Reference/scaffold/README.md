@@ -5,9 +5,21 @@ language/compiler support is ready. It contains documentation, not selectable
 drivers, descriptor APIs or proof declarations. The accepted HelloDISCO images
 remain the concrete reference implementation for their limited workloads.
 
-The sequence is: **finish the HelloDISCO proof → frame the hardware scaffold →
+The sequence is: **accepted HelloDISCO checkpoint → documented hardware scaffold →
 focus on Clef for DSP and cryptography → resume instrument implementation**.
-Finishing HelloDISCO does not start an audio-driver or full-device mapping phase.
+HelloDISCO completion does not start an audio-driver or full-device mapping phase.
+
+As of 2026-09-13, [interactive HelloDISCO](../../../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
+combines joystick/LED behavior and palette changes on one immutable L8 frame.
+The final 250190-byte image is accepted: the user confirmed a correct banner
+immediately after CN2 unplug/reconnect with the debugger disconnected, before
+joystick input, plus Left/Right/Center LED controls. Up/Down palette operation
+was also observed. Final flash load segments and the 230400-byte index frame
+match readback. An intermediate image preserved that frame across 33 palette
+updates with zero observed DSI/LTDC errors, but exposed initial color corruption
+on cold start. The accepted startup now uses the same hidden-layer palette
+path before first visibility. Retain both that history and the static recovery
+images as distinct checkpoints.
 
 ## What to preserve, and what stays open
 
@@ -29,7 +41,7 @@ modules and speculative register declarations are unnecessary.
 | Board controls | Joystick/LED behavior, debounce, event ownership, optional analog controls/encoders | [Driver inventory](../../../docs/STM32H7_DRIVER_ROADMAP.md) |
 | Shared control bus | I2C4 clients, canonical addresses, register widths/order, serialization, timeout/recovery and shared reset lines | [Driver inventory](../../../docs/STM32H7_DRIVER_ROADMAP.md) |
 | Audio output and capture | Codec routes, SAI framing, clock error, sample/slot distinction, bounded refill, silence/mute, optional microphone/PDM paths | [Synth design](../../../docs/STM32H7_SYNTH_DESIGN.md) |
-| Display and touch | Accepted NT35510 timing, immutable-frame handoff, future repaint ownership, coordinate transforms and shared resources | [Display model](../../../docs/DISPLAY_MODEL.md) |
+| Display and touch | Accepted NT35510 timing, implemented immutable L8 frame/palette handoff, future repaint ownership, coordinate transforms and shared resources | [Display model](../../../docs/DISPLAY_MODEL.md) |
 | Storage | Internal assets, QSPI/SDMMC, SDRAM needs, read integrity, presets and interrupted-write recovery | [Product audit](../../../Hardware/Products/ST/STM32H747I_DISCO/docs/SOURCE_AUDIT.md) |
 | Diagnostics and validation | Fault/reset records, VCP/trace needs, timing measurements, reproducible binaries, numeric/reference and hardware evidence | [Accepted display profile](../../STM32H747I_DISCO_HelloDISCO_Display/README.md) |
 | DSP and cryptography premises | Numeric and bit semantics, bounded storage, lowering fidelity, side-channel obligations and entropy requirements | [Language readiness](LANGUAGE_READINESS.md) |
@@ -42,6 +54,11 @@ requirements and unresolved choices; needed language/compiler capabilities;
 and the observation or check that would accept its first implementation.
 State whether a fact is inventoried, implemented, tested or observed on hardware.
 Name an eventual code owner only as a responsibility, not as a frozen namespace.
+
+The future dual-core direction is M7 audio/compute and M4 UI. Current HelloDISCO
+runs its application on M7 only. M4 boot/park/reset behavior, separate images
+and stacks, shared-memory publication and peripheral ownership remain open;
+record those questions before assigning executable drivers to either core.
 
 Cryptography is a language/software requirement as well as a possible platform
 capability. This STM32H747 has RNG and CRC, not the H757's CRYP/HASH accelerators.

@@ -76,7 +76,7 @@ found; its mechanical, assembly, and fabrication PDFs are different documents.
 | Source | Location searched | Consequence |
 | --- | --- | --- |
 | RM0399 reference manual | `F/Hardware/Silicon/MCU/ST/STM32H7/docs/` | Register semantics, bus-master access matrix, reset/power/clock sequencing and dual-core behavior need this authority before acceptance |
-| ES0445 errata | Same family docs directory | No revision-specific workaround set can yet be accepted |
+| ES0445 errata | Same family docs directory | PDF remains unarchived. Follow-up 2026-09-13 read official Rev 6 remotely and accepted the LTDC startup clause §2.13.1 only; complete errata review remains open. See [source status](../../../../Silicon/MCU/ST/STM32H7/docs/ES0445_SOURCE_STATUS.md). |
 | AN4891, AN4839, AN4938, AN5286, AN5557 | Same family docs directory | Requested local PDFs absent; limited official online DMA/cache evidence was read below |
 | AN4860, AN4861 (optional) | Same family docs directory | Additional display guidance remains unstaged |
 | ST `stm32h7-svd.zip` | Same family docs directory | Current SVDs are interim files, not the requested ST archive |
@@ -380,4 +380,6 @@ create a Generic Payload Read Error; targeted passive snapshots exclude it.
 This milestone identifies the observed controller, not the physical panel
 assembly revision. It does not accept touch, SDRAM, audio, concurrent painting,
 cache-enabled sharing, or the full MCU catalog. RM0399/ES0445 and the remaining
-source/semantic gates above remain open.
+source/semantic gates above remain open. The 2026-09-13 targeted ES0445 review
+accepted the LTDC pixel-clock startup workaround only; that follow-up does
+not change this earlier static-image hardware record or complete the errata review.

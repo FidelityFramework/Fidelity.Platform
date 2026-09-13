@@ -1,0 +1,20 @@
+[package]
+name = "Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO_Interactive"
+version = "0.1.0"
+description = "HelloDISCO interactive proof: immutable indexed banner, palette, joystick and LEDs."
+[compilation]
+target = "mcu"
+[build]
+sources = [
+    "../../Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/DisplayRegisters.clef",
+    "Description.clef"
+]
+output_kind = "library"
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m7"
+description = "Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO_Interactive.Description.descriptor"
+[dependencies]
+product = { path = "../../Hardware/Products/ST/STM32H747I_DISCO/Fidelity.Platform.fidproj" }
+environment = { path = "../../Environments/Freestanding/arm_cortex_m7/Fidelity.Platform.fidproj" }

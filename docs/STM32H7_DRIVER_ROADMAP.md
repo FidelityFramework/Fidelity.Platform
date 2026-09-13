@@ -1,7 +1,8 @@
 # STM32H747I-DISCO driver scope and next boundary
 
-Assessment, 2026-09-13. Finish the bounded HelloDISCO proof and organize the
-future hardware work as a light documentation scaffold. Then focus on Clef's
+Assessment, 2026-09-13. The bounded interactive HelloDISCO checkpoint is
+accepted, including debugger-disconnected cold start and controls. Future
+hardware work remains a light documentation scaffold. Now focus on Clef's
 language/compiler support for DSP and cryptography. The unfinished language
 surface is a reason to defer driver APIs and descriptor expansion: encoding
 today's workarounds throughout the board would create avoidable refactoring.
@@ -29,8 +30,8 @@ fact. There is no single “proven device” status.
 
 | Capability and proposed boundary | Board route or dependency | Current disposition and next acceptance |
 | --- | --- | --- |
-| `BoardControls` → `ControlEvents` | Active-low LEDs PI12–15; joystick PK2 select, PK3 down, PK4 left, PK5 right, PK6 up with pull-ups | GPIO native code and pure state/debounce checks exist. Keep those results distinct from complete combined joystick/display hardware acceptance. |
-| `DisplaySurface` → `DisplayHost` → `Panel` | AXI SRAM → LTDC → DSI → observed NT35510; PG3 reset, panel CABC backlight route | Native banner is visible, frame bytes match the asset, and CN2 power-cycle return is user-confirmed. A concurrent repaint protocol is not implemented by the immutable-frame result. |
+| `BoardControls` → `ControlEvents` | Active-low LEDs PI12–15; joystick PK2 select, PK3 down, PK4 left, PK5 right, PK6 up with pull-ups | Native combined image accepted: the user confirmed cold start and Left/Right/Center LED controls with the debugger disconnected; Up/Down palette changes were also observed. Pure state/debounce checks remain separate evidence. |
+| `DisplaySurface` → `DisplayHost` → `Panel` | AXI SRAM → LTDC → DSI → observed NT35510; PG3 reset, panel CABC backlight route | Final 250190-byte image cold-starts with correct colors before input; ELF load segments and the 230400-byte frame match readback. An intermediate image retained the complete frame across 33 palette updates with zero DSI/LTDC error status. General concurrent repaint remains unimplemented. |
 | `I2c4Bus` → `Wm8994Control` | PD12 SCL / PD13 SDA, AF4; codec canonical address `0x1A`, 16-bit register addressing | Pinned BSP and WM8994 datasheet are local. Native I2C/codec control is unimplemented. First gate: bounded transactions, codec identity, reset/mute/routing readback. |
 | `AudioClockPlan` → `Sai1Playback` → `PcmOutput` | SAI1 A AF6: PG7 MCLK, PE5 SCK, PE4 FS, PE6 data → WM8994 → CN11 headphones | Source-described only. BSP chooses PLL2 and DMA2 Stream1 with SAI1_A request; the stream is a workload allocation, not fixed wiring. First gate: agreed clocks/framing, silence, fixed tone and captured output. |
 | `TouchInput` → `ControlEvents` | Shared I2C4; candidate addresses `0x2A`/`0x38`; PK7 interrupt, EXTI7; PG3 reset shared with panel | FT6x06 BSP supports up to two contacts, but the physical touch device/address and transforms are unobserved. Implement after the audio transport unless HelloDISCO explicitly expands to touch. Contact weight is not accepted pressure/aftertouch. |
@@ -42,6 +43,18 @@ Clock, pin, IRQ, DMA-request and memory ownership belong to the selected
 application/profile. Silicon packages own register requirements; the product
 owns routes; drivers own protocol transitions. Reuse original `MemorySpace`
 instances. A memory envelope neither initializes a device nor grants access.
+
+The [interactive HelloDISCO record](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
+owns the image and acceptance details. The intermediate run's largest foreground
+tick gap was 1 ms; this is a measurement of that run, not a worst-case timing
+proof. The earlier RGB565 banner's power-cycle acceptance remains a separate
+checkpoint. The initial interactive cold-start test exposed corrupted colors;
+startup now uses the configured, running controller and the same hidden-layer
+palette state machine before first visibility. The user confirmed that a CN2
+unplug/reconnect with the debugger disconnected immediately produces the correct
+banner, without stripes or prior joystick input. The correction is accepted
+for this image; the hardware cause of the earlier color corruption is not
+claimed to be established.
 
 ## Questions to preserve in the scaffold
 
@@ -89,10 +102,11 @@ accepted sequence rather than being bundled into codec initialization.
 parameter changes independently of joystick, touch or later MIDI transport.
 Coalesce parameter updates where safe, and specify overflow handling for note
 on/off events. Keep pure state/projections separate from bus and frame writes.
-`DisplaySurface` needs one explicit ownership/presentation transition before
-HelloDISCO repaints; the currently published banner is immutable. Pick a
-bounded pause/repaint/resume or completed-buffer handoff appropriate to the
-small demo, and test its visible result before introducing a general renderer.
+HelloDISCO now uses one immutable L8 frame and a bounded palette transition:
+disable the layer at vertical blank, wait, update its CLUT in eight foreground
+batches, then re-enable at vertical blank. The stream continues with the
+background while the layer is hidden. General repaint or buffer reuse still
+needs a separate ownership/presentation contract when a future UI requires it.
 
 These are documentation outlines. Until the language-readiness gate is met,
 extend the executable slice only where the bounded HelloDISCO proof needs it.
@@ -102,11 +116,18 @@ tags would overstate readiness and freeze premature choices.
 
 ## Cutline after HelloDISCO
 
-HelloDISCO is complete when one autonomous image combines the accepted
-landscape display with the agreed joystick-driven state and LED animation,
-and records its render handoff, input behavior and independent reset result.
+HelloDISCO has reached its bounded completion point: one autonomous image
+combines the landscape display, agreed joystick-driven state and LED animation,
+with recorded frame/palette handoff, input behavior and independent cold start.
 Touch and synthesizer audio remain outside that demo boundary. Preserve both
 static display images as recovery/reference selections.
+
+The final image and readbacks are retained in the
+[interactive acceptance archive](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/evidence/hardware/2026-09-13-interactive-initial-palette/readback-checks.json).
+The proposed later split is M7 audio/compute with M4 UI.
+It requires separate M4 startup/park/reset acceptance, images/stacks, shared
+memory publication and peripheral ownership; this image does not establish a
+ready second-core boot policy.
 
 After language support is ready and synthesizer implementation resumes, the
 first hardware candidate is **codec control plus PCM silence/tone**, with
@@ -124,9 +145,12 @@ the intervening language/compiler work. A successful display proof establishes
 neither of those broader language capabilities.
 
 Before claiming general register-protocol or memory proofs, close RM0399 and
-ES0445 authority/errata gaps, preserve the SVD's interim provenance, reconcile
+the remaining ES0445 authority/errata gaps, preserve the SVD's interim provenance, reconcile
 the physical assembly and selected pin routes, and establish DMA reachability,
 ownership, cache visibility and final-image bounds. The WM8994 datasheet and
 BSP are useful starting authorities; the native numerical and real-time synth
 claims require the separate model, error and deadline evidence already set out
 in the design.
+The targeted ES0445 Rev 6 §2.13.1 review already corrected LTDC startup:
+PLL3R must run before the LTDC register interface is enabled, including before
+guard reads. See the [CLUT protocol record](../Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/CLUT_SUPPLEMENT.md).
