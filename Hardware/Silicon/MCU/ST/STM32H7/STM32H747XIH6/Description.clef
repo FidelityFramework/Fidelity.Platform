@@ -1,0 +1,160 @@
+namespace Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+/// Identified part address envelopes, not a full peripheral implementation.
+/// Sources and limitations: docs/INITIAL_GPIO_SOURCES.md.
+module Description =
+    let itcm: MemorySpace = {
+        Name = "itcm"; Kind = MemoryKind.Sram; Base = Some 0; Capacity = 65536
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "64 KiB ITCM; execution placement and TCM enablement are image obligations; M7/MDMA access only."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let dtcm: MemorySpace = {
+        Name = "dtcm"; Kind = MemoryKind.Sram; Base = Some 536870912; Capacity = 131072
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "128 KiB DTCM; DMA1/DMA2 cannot access this memory."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let flashBank1: MemorySpace = {
+        Name = "flash-bank1"; Kind = MemoryKind.Flash; Base = Some 134217728; Capacity = 1048576
+        Alignment = 1024; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
+        Notes = "Physical AXI flash bank 1; boot aliases, option-byte bank swapping, protection and actual capacity require target checks."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let flashBank2: MemorySpace = {
+        Name = "flash-bank2"; Kind = MemoryKind.Flash; Base = Some 135266304; Capacity = 1048576
+        Alignment = 1024; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
+        Notes = "Physical AXI flash bank 2; inventory does not assign this bank to either CPU or authorize erase."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let axiSram: MemorySpace = {
+        Name = "axi-sram"; Kind = MemoryKind.Sram; Base = Some 603979776; Capacity = 524288
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "D1 AXI SRAM; cache and DMA ownership are workload obligations."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let sram1: MemorySpace = {
+        Name = "sram1"; Kind = MemoryKind.Sram; Base = Some 805306368; Capacity = 131072
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "D2 SRAM1; clock availability and DMA ownership must be established."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let sram2: MemorySpace = {
+        Name = "sram2"; Kind = MemoryKind.Sram; Base = Some 805437440; Capacity = 131072
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "D2 SRAM2; clock availability and DMA ownership must be established."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let sram3: MemorySpace = {
+        Name = "sram3"; Kind = MemoryKind.Sram; Base = Some 805568512; Capacity = 32768
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "D2 SRAM3; clock availability and DMA ownership must be established."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let sram4: MemorySpace = {
+        Name = "sram4"; Kind = MemoryKind.Sram; Base = Some 939524096; Capacity = 65536
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "D3 SRAM4; candidate for BDMA buffers, not an automatic coherent mapping."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let backupSram: MemorySpace = {
+        Name = "backup-sram"; Kind = MemoryKind.Sram; Base = Some 947912704; Capacity = 4096
+        Alignment = 8; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Backup-domain SRAM; access enable and retention are not established by this envelope."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let systemMemory: MemorySpace = {
+        Name = "system-memory"; Kind = MemoryKind.Flash; Base = Some 535822336; Capacity = 131072
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadExecute
+        Notes = "System/test ROM AXI envelope from D1_AXIICP_BASE; not image-owned flash and not writable."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let rcc: MemorySpace = {
+        Name = "rcc"; Kind = MemoryKind.Peripheral; Base = Some 1476543488; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "RCC address envelope. Only individually declared and granted registers authorize transactions."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let pwr: MemorySpace = {
+        Name = "pwr"; Kind = MemoryKind.Peripheral; Base = Some 1476544512; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "PWR address envelope; board Direct SMPS topology must match any supply programming."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let flash: MemorySpace = {
+        Name = "flash-control"; Kind = MemoryKind.Peripheral; Base = Some 1375739904; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "Flash control envelope; no erase/program/option-byte transaction is granted here."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let syscfg: MemorySpace = {
+        Name = "syscfg"; Kind = MemoryKind.Peripheral; Base = Some 1476396032; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "SYSCFG envelope; no SYSCFG register transactions in the initial GPIO slice."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let exti: MemorySpace = {
+        Name = "exti"; Kind = MemoryKind.Peripheral; Base = Some 1476395008; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "EXTI envelope includes per-core routing; initial joystick slice polls GPIOK."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let gpioa: MemorySpace = {
+        Name = "gpioa"; Kind = MemoryKind.Peripheral; Base = Some 1476526080; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIOA envelope retained for diagnostic profile inventory; no GPIOA registers in this subset."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let gpioc: MemorySpace = {
+        Name = "gpioc"; Kind = MemoryKind.Peripheral; Base = Some 1476528128; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIOC envelope retained for wakeup inventory; no GPIOC registers in this subset."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let gpioi: MemorySpace = {
+        Name = "gpioi"; Kind = MemoryKind.Peripheral; Base = Some 1476534272; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIOI register envelope; GPIOI clock must be enabled before use."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let gpiok: MemorySpace = {
+        Name = "gpiok"; Kind = MemoryKind.Peripheral; Base = Some 1476536320; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "GPIOK register envelope; GPIOK clock must be enabled before use."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let usart1: MemorySpace = {
+        Name = "usart1"; Kind = MemoryKind.Peripheral; Base = Some 1073811456; Capacity = 1024
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "USART1 envelope retained for VCP inventory; no USART1 registers in this subset."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let dbgmcu: MemorySpace = {
+        Name = "dbgmcu"; Kind = MemoryKind.Peripheral; Base = Some 1543507968; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "DBGMCU envelope; only read-only IDCODE transaction declared."; MapKind = ""; Since = ""; Until = ""
+    }
+
+    let partNumber = "STM32H747XIH6"
+    let cpuCores = 2
+    let externalVectors = 150
+    let vectorAlignment = 1024
+    /// Nominal HSI frequency, not proof of the live SYSCLK or divider state.
+    let resetSysclkHz = 64000000
+    let mpuRegions = 16
+    let rccGpioIEnableMask = 256
+    let rccGpioKEnableMask = 1024
+
+    let vectorLayout: StructDescriptor = {
+        Name = "ArmV7MVectors"
+        Layout = { Size = 664; Alignment = 4; Fields = [|
+            { Name = "entries"; Offset = 0; Repr = Repr.U32; Count = 166
+              Access = AccessKind.ReadOnly; BitFields = [||]
+              Documentation = Some "16 core + 150 external slots; reserved IRQ holes must remain non-dispatched." }
+        |] }
+        Documentation = Some "HDR-H7 WAKEUP_PIN_IRQn=149; PM0253 Table14; VTOR placement alignment 1024."
+    }
+

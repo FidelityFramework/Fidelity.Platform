@@ -1,0 +1,130 @@
+module Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.DisplayRegisters
+
+open BAREWire.Platform
+open BAREWire.Hardware
+open Fidelity.Platform.Contracts
+
+// Bounded static-display slice; not full peripheral coverage.
+// Offsets/bit fields: ST cmsis-device-h7 81db1ec63cdc191fae1565b772da3ea5aa29a683,
+// Include/stm32h747xx.h (DSI_TypeDef, LTDC_TypeDef, RCC_TypeDef).
+// Transaction roles narrowed to this workload. RM0399/ES0445 local acceptance
+// remains pending; header qualifiers alone do not establish side-effect semantics.
+// Native sequences reference ST stm32h7xx-hal-driver
+// e3c518ebda3e00c8e52b1625ca44fba65da3b63e and pinned discovery BSP c61d8f0.
+// DSI GPDR is a FIFO port; GHCR submits a command; ISR reads may consume status.
+
+let gpiog: MemorySpace = {
+    Name = "gpiog"; Kind = MemoryKind.Peripheral; Base = Some 1476532224; Capacity = 1024
+    Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+    Notes = "STM32H747 gpiog envelope; static-display grant and physical-state prerequisites required."
+    MapKind = ""; Since = ""; Until = ""
+}
+let gpiogRegion: DeviceRegion = { Space = gpiog; AddressSpace = "cpu-physical"; Source = "HDR-H7; DisplayRegisters.clef source pins" }
+
+let gpioj: MemorySpace = {
+    Name = "gpioj"; Kind = MemoryKind.Peripheral; Base = Some 1476535296; Capacity = 1024
+    Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+    Notes = "STM32H747 gpioj envelope; static-display grant and physical-state prerequisites required."
+    MapKind = ""; Since = ""; Until = ""
+}
+let gpiojRegion: DeviceRegion = { Space = gpioj; AddressSpace = "cpu-physical"; Source = "HDR-H7; DisplayRegisters.clef source pins" }
+
+let dsi: MemorySpace = {
+    Name = "dsi"; Kind = MemoryKind.Peripheral; Base = Some 1342177280; Capacity = 4096
+    Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+    Notes = "STM32H747 dsi envelope; static-display grant and physical-state prerequisites required."
+    MapKind = ""; Since = ""; Until = ""
+}
+let dsiRegion: DeviceRegion = { Space = dsi; AddressSpace = "cpu-physical"; Source = "HDR-H7; DisplayRegisters.clef source pins" }
+
+let ltdc: MemorySpace = {
+    Name = "ltdc"; Kind = MemoryKind.Peripheral; Base = Some 1342181376; Capacity = 1024
+    Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+    Notes = "STM32H747 ltdc envelope; static-display grant and physical-state prerequisites required."
+    MapKind = ""; Since = ""; Until = ""
+}
+let ltdcRegion: DeviceRegion = { Space = ltdc; AddressSpace = "cpu-physical"; Source = "HDR-H7; DisplayRegisters.clef source pins" }
+
+let rccRegion = Registers.rccRegion
+
+let rccCr: DeviceRegister = { Name = "rccCr"; Region = rccRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccCfgr: DeviceRegister = { Name = "rccCfgr"; Region = rccRegion; Offset = 16; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let rccD1cfgr: DeviceRegister = { Name = "rccD1cfgr"; Region = rccRegion; Offset = 24; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let rccPllckselr: DeviceRegister = { Name = "rccPllckselr"; Region = rccRegion; Offset = 40; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccPllcfgr: DeviceRegister = { Name = "rccPllcfgr"; Region = rccRegion; Offset = 44; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccPll3divr: DeviceRegister = { Name = "rccPll3divr"; Region = rccRegion; Offset = 64; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccPll3fracr: DeviceRegister = { Name = "rccPll3fracr"; Region = rccRegion; Offset = 68; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccD1ccipr: DeviceRegister = { Name = "rccD1ccipr"; Region = rccRegion; Offset = 76; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccApb3rstr: DeviceRegister = { Name = "rccApb3rstr"; Region = rccRegion; Offset = 140; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccAhb4enr: DeviceRegister = { Name = "rccAhb4enr"; Region = rccRegion; Offset = 224; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccApb3enr: DeviceRegister = { Name = "rccApb3enr"; Region = rccRegion; Offset = 228; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let resetModer: DeviceRegister = { Name = "resetModer"; Region = gpiogRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let resetOtyper: DeviceRegister = { Name = "resetOtyper"; Region = gpiogRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let resetOspeedr: DeviceRegister = { Name = "resetOspeedr"; Region = gpiogRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let resetPupdr: DeviceRegister = { Name = "resetPupdr"; Region = gpiogRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let resetBsrr: DeviceRegister = { Name = "resetBsrr"; Region = gpiogRegion; Offset = 24; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let backlightModer: DeviceRegister = { Name = "backlightModer"; Region = gpiojRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let backlightOtyper: DeviceRegister = { Name = "backlightOtyper"; Region = gpiojRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let backlightOspeedr: DeviceRegister = { Name = "backlightOspeedr"; Region = gpiojRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let backlightPupdr: DeviceRegister = { Name = "backlightPupdr"; Region = gpiojRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let backlightBsrr: DeviceRegister = { Name = "backlightBsrr"; Region = gpiojRegion; Offset = 24; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiCr: DeviceRegister = { Name = "dsiCr"; Region = dsiRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiCcr: DeviceRegister = { Name = "dsiCcr"; Region = dsiRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiLvcidr: DeviceRegister = { Name = "dsiLvcidr"; Region = dsiRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiLcolcr: DeviceRegister = { Name = "dsiLcolcr"; Region = dsiRegion; Offset = 16; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiLpcr: DeviceRegister = { Name = "dsiLpcr"; Region = dsiRegion; Offset = 20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiLpmcr: DeviceRegister = { Name = "dsiLpmcr"; Region = dsiRegion; Offset = 24; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiPcr: DeviceRegister = { Name = "dsiPcr"; Region = dsiRegion; Offset = 44; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiGvcidr: DeviceRegister = { Name = "dsiGvcidr"; Region = dsiRegion; Offset = 48; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiMcr: DeviceRegister = { Name = "dsiMcr"; Region = dsiRegion; Offset = 52; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVmcr: DeviceRegister = { Name = "dsiVmcr"; Region = dsiRegion; Offset = 56; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVpcr: DeviceRegister = { Name = "dsiVpcr"; Region = dsiRegion; Offset = 60; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVccr: DeviceRegister = { Name = "dsiVccr"; Region = dsiRegion; Offset = 64; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVnpcr: DeviceRegister = { Name = "dsiVnpcr"; Region = dsiRegion; Offset = 68; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVhsacr: DeviceRegister = { Name = "dsiVhsacr"; Region = dsiRegion; Offset = 72; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVhbpcr: DeviceRegister = { Name = "dsiVhbpcr"; Region = dsiRegion; Offset = 76; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVlcr: DeviceRegister = { Name = "dsiVlcr"; Region = dsiRegion; Offset = 80; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVvsacr: DeviceRegister = { Name = "dsiVvsacr"; Region = dsiRegion; Offset = 84; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVvbpcr: DeviceRegister = { Name = "dsiVvbpcr"; Region = dsiRegion; Offset = 88; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVvfpcr: DeviceRegister = { Name = "dsiVvfpcr"; Region = dsiRegion; Offset = 92; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiVvacr: DeviceRegister = { Name = "dsiVvacr"; Region = dsiRegion; Offset = 96; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiCmcr: DeviceRegister = { Name = "dsiCmcr"; Region = dsiRegion; Offset = 104; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiGhcr: DeviceRegister = { Name = "dsiGhcr"; Region = dsiRegion; Offset = 108; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiGpdr: DeviceRegister = { Name = "dsiGpdr"; Region = dsiRegion; Offset = 112; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiGpsr: DeviceRegister = { Name = "dsiGpsr"; Region = dsiRegion; Offset = 116; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiClcr: DeviceRegister = { Name = "dsiClcr"; Region = dsiRegion; Offset = 148; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiPctler: DeviceRegister = { Name = "dsiPctler"; Region = dsiRegion; Offset = 160; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiPconfr: DeviceRegister = { Name = "dsiPconfr"; Region = dsiRegion; Offset = 164; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiPsr: DeviceRegister = { Name = "dsiPsr"; Region = dsiRegion; Offset = 176; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiIsr0: DeviceRegister = { Name = "dsiIsr0"; Region = dsiRegion; Offset = 188; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiIsr1: DeviceRegister = { Name = "dsiIsr1"; Region = dsiRegion; Offset = 192; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiIer0: DeviceRegister = { Name = "dsiIer0"; Region = dsiRegion; Offset = 196; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiIer1: DeviceRegister = { Name = "dsiIer1"; Region = dsiRegion; Offset = 200; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWcfgr: DeviceRegister = { Name = "dsiWcfgr"; Region = dsiRegion; Offset = 1024; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWcr: DeviceRegister = { Name = "dsiWcr"; Region = dsiRegion; Offset = 1028; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWier: DeviceRegister = { Name = "dsiWier"; Region = dsiRegion; Offset = 1032; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWisr: DeviceRegister = { Name = "dsiWisr"; Region = dsiRegion; Offset = 1036; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWpcr0: DeviceRegister = { Name = "dsiWpcr0"; Region = dsiRegion; Offset = 1048; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let dsiWrpcr: DeviceRegister = { Name = "dsiWrpcr"; Region = dsiRegion; Offset = 1072; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcSscr: DeviceRegister = { Name = "ltdcSscr"; Region = ltdcRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcBpcr: DeviceRegister = { Name = "ltdcBpcr"; Region = ltdcRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcAwcr: DeviceRegister = { Name = "ltdcAwcr"; Region = ltdcRegion; Offset = 16; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcTwcr: DeviceRegister = { Name = "ltdcTwcr"; Region = ltdcRegion; Offset = 20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcGcr: DeviceRegister = { Name = "ltdcGcr"; Region = ltdcRegion; Offset = 24; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcSrcr: DeviceRegister = { Name = "ltdcSrcr"; Region = ltdcRegion; Offset = 36; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcBccr: DeviceRegister = { Name = "ltdcBccr"; Region = ltdcRegion; Offset = 44; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcIer: DeviceRegister = { Name = "ltdcIer"; Region = ltdcRegion; Offset = 52; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcIsr: DeviceRegister = { Name = "ltdcIsr"; Region = ltdcRegion; Offset = 56; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let ltdcIcr: DeviceRegister = { Name = "ltdcIcr"; Region = ltdcRegion; Offset = 60; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Cr: DeviceRegister = { Name = "layer1Cr"; Region = ltdcRegion; Offset = 132; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Whpcr: DeviceRegister = { Name = "layer1Whpcr"; Region = ltdcRegion; Offset = 136; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Wvpcr: DeviceRegister = { Name = "layer1Wvpcr"; Region = ltdcRegion; Offset = 140; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Pfcr: DeviceRegister = { Name = "layer1Pfcr"; Region = ltdcRegion; Offset = 148; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Cacr: DeviceRegister = { Name = "layer1Cacr"; Region = ltdcRegion; Offset = 152; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Dccr: DeviceRegister = { Name = "layer1Dccr"; Region = ltdcRegion; Offset = 156; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Bfcr: DeviceRegister = { Name = "layer1Bfcr"; Region = ltdcRegion; Offset = 160; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Cfbar: DeviceRegister = { Name = "layer1Cfbar"; Region = ltdcRegion; Offset = 172; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Cfblr: DeviceRegister = { Name = "layer1Cfblr"; Region = ltdcRegion; Offset = 176; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer1Cfblnr: DeviceRegister = { Name = "layer1Cfblnr"; Region = ltdcRegion; Offset = 180; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let layer2Cr: DeviceRegister = { Name = "layer2Cr"; Region = ltdcRegion; Offset = 260; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+

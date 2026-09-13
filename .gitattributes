@@ -1,1 +1,3 @@
 *.clef linguist-language=F# linguist-detectable=false
+# Preserve the exact imported authority bytes, including their CRLF endings.
+Hardware/Silicon/MCU/ST/STM32H7/docs/svd/*.svd -text whitespace=cr-at-eol

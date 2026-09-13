@@ -15,6 +15,9 @@ boundaries. The historical filename is retained for source references.
 | [MMIO contracts and predicates](MMIO_CONTRACTS.md) | Region inventory, mappings, workload grants, CCS evidence and executable limits | Implemented static MMIO slice |
 | [Admission and accelerator handoffs](ADMISSION_AND_SIDECARS.md) | BPF host distinctions, verifier/resource budgets, Strix Halo/Arty and Metal UMA boundaries | Executable reference checks and source packages; compiler/gate integration pending |
 | [ESP32-S3 bring-up](ESP32S3_BRINGUP.md) | Xtensa toolchain gap, ROM-loaded SRAM image format, LX7 vector obligations, Composer backend deltas and the LVGL/Farscape boundary | Planning only; no image built and no declaration CCS-checked |
+| [STM32H7 synthesizer design](STM32H7_SYNTH_DESIGN.md) | Source/package audit, native DSP and touch UI, BAREWire memory/ownership extensions, evidence boundaries and acceptance ladder | Static banner accepted on hardware and after CN2 reconnect; GPIO/display integration and synth implementation pending |
+| [STM32H7 driver roadmap](STM32H7_DRIVER_ROADMAP.md) | Board routes, proposed driver boundaries, shared ownership and the post-HelloDISCO audio cutline | Scope/contract outlines; audio, touch, storage and SDRAM drivers remain unimplemented |
+| [UI and display model across targets](DISPLAY_MODEL.md) | Fabulous/Partas-inspired composition, state and rendering boundaries; comparisons of HelloESP, HelloDISCO, HelloWayland and WrenHello | Grounded design exploration; native display first, optional binding paths retained |
 
 Hardware sources and board acceptance belong with the corresponding product;
 see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md),

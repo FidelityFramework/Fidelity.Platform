@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "STM32H7 identity and explicitly H747-applicable diagnostic scalar; not a family-wide register map."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = ["Family.clef"]
+output_kind = "library"
+
+[dependencies]
+

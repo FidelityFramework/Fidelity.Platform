@@ -1,0 +1,105 @@
+namespace Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloH7
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Core = Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7.Description
+module Family = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.Family
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Description
+module Board = Fidelity.Platform.Hardware.Products.ST.STM32H747I_DISCO.Description
+module Execution = Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M7.Description
+
+/// Historical HelloH7 selection: source-valid library, no companion application
+/// or hardware acceptance. HelloDISCO is the active Cortex-M7 bring-up path.
+/// Shared regions stay direct references to the silicon, core and product
+/// declarations rather than copies, so the profile selects rather than restates.
+module Description =
+
+    /// Main stack allocation at the top of DTCM. Armv7-M has no MSPLIM;
+    /// a linker reservation neither detects overflow nor programs an MPU guard.
+    let stackBytes = 8192
+
+    /// Composer now supports the M7 hard-float image path and flash at
+    /// 0x08000000. This historical library has no corresponding executable.
+    /// CortexMImageDescriptor selects one flash and one RAM region; general
+    /// multi-region DMA/cache ownership remains outside its current contract.
+    /// Flash banks are storage, with core ownership selected by boot addresses
+    /// and software policy rather than intrinsic assignment to M7 or M4.
+    let image: CortexMImageDescriptor = {
+        FlashSpace = "flash-bank1"
+        // DTCM is uncached and outside DMA1/DMA2 reach. MDMA can reach TCM;
+        // this declaration does not establish ownership against every master.
+        RamSpace = "dtcm"
+        VectorLayout = "ArmV7MVectors"
+        VectorAlignment = Part.vectorAlignment
+        StackBytes = stackBytes
+        EntrySymbol = "Reset_Handler"
+        DebugDevice = "STM32H747XIH6"
+        PartNumber = Part.partNumber
+        // DBGMCU_IDC at 0x5C001000 (HDR-H7 DBGMCU_BASE; SVD-CM7-INTERIM):
+        // DEV_ID 0x450 in bits 11:0, REV_ID in bits 31:16.
+        PartNumberAddress = Family.dbgmcuIdcodeAddress
+        // FLASH_OPTSR_CUR: FLASH_R_BASE 0x52002000 + 0x1C (HDR-H7 FLASH_TypeDef).
+        // Historical inspection envelope, 0x1C..0x4B; reconcile semantics
+        // against RM0399. No write or BCM4 modification is authorized or
+        // performed by declaring this preserved range.
+        PreservedOptionAddress = 0x5200201C
+        PreservedOptionBytes = 48
+    }
+
+    let lifecycle: LifecycleFacts = {
+        Clocks = [|
+            // Nominal reset-HSI premise; an application must check actual
+            // clock state before deriving a timebase or peripheral divisor.
+            { Name = "reset-HSI"; FrequencyHz = Part.resetSysclkHz }
+            // X2, 25 MHz, feeds HSE and the Ethernet PHY (UM-7 §6.3). Not
+            // enabled by this historical library; available for later selection.
+            { Name = "HSE"; FrequencyHz = 25000000 }
+        |]
+        // NRST on CN13/CN16 and the B1 RESET button; active low (UM-7 §6.11).
+        Resets = [| { Name = "NRST"; External = true; ActiveHigh = false } |]
+        Entry = "Reset_Handler"
+        Teardown = "Fault_Handler"
+        Persistence = Persistence.Volatile
+    }
+
+    let descriptor: PlatformDescription = {
+        Id = "mcu-st-stm32h747-stm32h747i-disco"
+        DisplayName = "STMicroelectronics STM32H747I-DISCO — historical HelloH7 selection"
+        Substrate = "mcu"
+        Core = Some Execution.core
+        Spaces = [|
+            // Memory. Every RAM region is listed so the inventory tells the
+            // truth about the part; the image itself lives in flash-bank1 and
+            // DTCM only. Bank2 is inventory, not an assigned CM4 image.
+            // The initial physical capture found both internal banks erased.
+            Part.itcm; Part.dtcm
+            Part.flashBank1; Part.flashBank2
+            Part.axiSram; Part.sram1; Part.sram2; Part.sram3; Part.sram4
+            Part.backupSram; Part.systemMemory
+            // Product-owned external memories, referenced as original
+            // declarations. Neither is configured by this image.
+            Board.sdram; Board.qspiStore
+            // Peripherals this workload's registers live in. Inventory
+            // here; the grants are HelloH7's own.
+            Part.rcc; Part.pwr; Part.flash; Part.syscfg; Part.exti
+            Part.gpioa; Part.gpioc; Part.gpioi
+            Part.usart1; Part.dbgmcu
+            Core.ppb
+        |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = lifecycle
+        Notes = [|
+            "Historical workload proposal: LED, SysTick, B2 wake-up button through EXTI15_10 and USART1 VCP. No companion HelloH7 application implements these operations. HelloDISCO is the active GPIO/display bring-up path."
+            "Silicon owns register requirements; the DISCO product owns wiring; HelloH7 owns mappings, grants and timing."
+            "Cortex-M7 is selected. Actual M4 boot options and ownership remain application premises. No BCM4 or other option-byte mutation is part of this historical selection; active HelloDISCO preserves the recorded options."
+            "Selected RAM is uncached DTCM; DMA1/2 cannot reach it, but MDMA can. AXI SRAM and D2/D3 SRAM declarations are inventory, not placement or grants. General ownership and visibility are separate obligations."
+            "Reset HSI64 is a proposed clock premise for this selection, not a measured peripheral clock or implemented USART driver. The application must validate divisors before deriving BRR."
+            "This descriptor performs no PWR access or supply-mode change. Any later clock/power driver must reconcile the physical board supply wiring and retained state with its own source and hardware acceptance."
+            "Vectors: 16 core + 150 external = 166 words (664 bytes) at flash-bank1 base, VTOR alignment 1024 [verify: RM0399 Table 143 and the SVD interrupt elements agree by script]."
+        |]
+        Limits = [|
+            { Name = "external-vectors"; Value = Part.externalVectors }
+            { Name = "cpu-cores"; Value = Part.cpuCores }
+        |]
+    }

@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M7"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "Freestanding STM32H74x/75x Cortex-M7 Thumb hard-float (FPv5-D16) ABI; startup remains image-owned."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+core = { path = "../../../Hardware/Silicon/CPU/Arm/CortexM7/Fidelity.Platform.fidproj" }

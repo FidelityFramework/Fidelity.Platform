@@ -1,0 +1,33 @@
+module Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Registers
+
+open Fidelity.Platform.Contracts
+
+// The region retains the exact original MemorySpace declaration.
+// GPIO access semantics cross-checked with the local SVD; header offsets
+// are the primary transcription source. RM0399/ES0445 acceptance is pending.
+let rccRegion: DeviceRegion = { Space = Description.rcc; AddressSpace = "cpu-physical"; Source = "STM32H747XIH6/docs/INITIAL_GPIO_SOURCES.md; HDR-H7" }
+let gpioiRegion: DeviceRegion = { Space = Description.gpioi; AddressSpace = "cpu-physical"; Source = "STM32H747XIH6/docs/INITIAL_GPIO_SOURCES.md; HDR-H7" }
+let gpiokRegion: DeviceRegion = { Space = Description.gpiok; AddressSpace = "cpu-physical"; Source = "STM32H747XIH6/docs/INITIAL_GPIO_SOURCES.md; HDR-H7" }
+let dbgmcuRegion: DeviceRegion = { Space = Description.dbgmcu; AddressSpace = "cpu-physical"; Source = "STM32H747XIH6/docs/INITIAL_GPIO_SOURCES.md; HDR-H7" }
+let pwrRegion: DeviceRegion = { Space = Description.pwr; AddressSpace = "cpu-physical"; Source = "STM32H747XIH6/docs/INITIAL_GPIO_SOURCES.md; HDR-H7" }
+let rccAhb4enr: DeviceRegister = { Name = "rccAhb4enr"; Region = rccRegion; Offset = 224; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let rccCr: DeviceRegister = { Name = "rccCr"; Region = rccRegion; Offset = 0; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let rccCfgr: DeviceRegister = { Name = "rccCfgr"; Region = rccRegion; Offset = 16; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let rccD1cfgr: DeviceRegister = { Name = "rccD1cfgr"; Region = rccRegion; Offset = 24; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let dbgmcuIdcode: DeviceRegister = { Name = "dbgmcuIdcode"; Region = dbgmcuRegion; Offset = 0; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let pwrCr3: DeviceRegister = { Name = "pwrCr3"; Region = pwrRegion; Offset = 12; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiModer: DeviceRegister = { Name = "gpioiModer"; Region = gpioiRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiOtyper: DeviceRegister = { Name = "gpioiOtyper"; Region = gpioiRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiOspeedr: DeviceRegister = { Name = "gpioiOspeedr"; Region = gpioiRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiPupdr: DeviceRegister = { Name = "gpioiPupdr"; Region = gpioiRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiIdr: DeviceRegister = { Name = "gpioiIdr"; Region = gpioiRegion; Offset = 16; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiOdr: DeviceRegister = { Name = "gpioiOdr"; Region = gpioiRegion; Offset = 20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpioiBsrr: DeviceRegister = { Name = "gpioiBsrr"; Region = gpioiRegion; Offset = 24; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokModer: DeviceRegister = { Name = "gpiokModer"; Region = gpiokRegion; Offset = 0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokOtyper: DeviceRegister = { Name = "gpiokOtyper"; Region = gpiokRegion; Offset = 4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokOspeedr: DeviceRegister = { Name = "gpiokOspeedr"; Region = gpiokRegion; Offset = 8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokPupdr: DeviceRegister = { Name = "gpiokPupdr"; Region = gpiokRegion; Offset = 12; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokIdr: DeviceRegister = { Name = "gpiokIdr"; Region = gpiokRegion; Offset = 16; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokOdr: DeviceRegister = { Name = "gpiokOdr"; Region = gpiokRegion; Offset = 20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let gpiokBsrr: DeviceRegister = { Name = "gpiokBsrr"; Region = gpiokRegion; Offset = 24; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+

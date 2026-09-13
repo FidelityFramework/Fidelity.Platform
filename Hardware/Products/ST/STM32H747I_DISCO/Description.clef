@@ -1,0 +1,50 @@
+namespace Fidelity.Platform.Hardware.Products.ST.STM32H747I_DISCO
+
+open BAREWire.Platform
+
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Description
+
+/// GPIO wiring from pinned BSP and UM2411 Rev7 §§6.11-6.12.
+/// docs/SOURCE_AUDIT.md records BOM applicability and remaining board observations.
+module Description =
+    let product = "STM32H747I-DISCO"
+    let siliconPart = Part.partNumber
+    // Four independent single-color LEDs; these are not an RGB LED.
+    let ledPort = 8
+    let greenLedPin = 12
+    let orangeLedPin = 13
+    let redLedPin = 14
+    let blueLedPin = 15
+    let ledsActiveHigh = false
+    let ledMask = 61440
+
+    // BSP JOY1 maps select/down/left/right/up to PK2/3/4/5/6.
+    // BSP_JOY_Init requests pull-ups; BSP_JOY_GetState treats zero as pressed.
+    let joystickPort = 10
+    let joystickSelectPin = 2
+    let joystickDownPin = 3
+    let joystickLeftPin = 4
+    let joystickRightPin = 5
+    let joystickUpPin = 6
+    let joystickActiveHigh = false
+    let joystickPullUp = true
+    let joystickMask = 124
+
+    let wakeupPort = 2
+    let wakeupPin = 13
+    let hseFrequencyHz = 25000000
+
+    // Inventory only: neither external memory is enabled by this declaration.
+    let sdram: MemorySpace = {
+        Name = "sdram"; Kind = MemoryKind.Sram; Base = Some 3489660928; Capacity = 33554432
+        Alignment = 32; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "BSP candidate FMC bank2 at 0xD0000000; UM2411 Bank1 text conflict remains. Requires FMC setup, timing, refresh and physical memory test."
+        MapKind = ""; Since = ""; Until = ""
+    }
+    let qspiStore: MemorySpace = {
+        Name = "qspi-store"; Kind = MemoryKind.PersistentStore; Base = Some 2415919104; Capacity = 134217728
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadOnly
+        Notes = "Two 512-Mbit devices; CPU window only after validated QSPI memory-mapped configuration. Not initialized by GPIO slice."
+        MapKind = ""; Since = ""; Until = ""
+    }
+

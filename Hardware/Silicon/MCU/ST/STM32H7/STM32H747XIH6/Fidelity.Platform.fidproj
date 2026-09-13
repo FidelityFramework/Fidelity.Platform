@@ -1,0 +1,17 @@
+[package]
+name = "Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "STM32H747XIH6 memory envelopes, M7 vectors, GPIOI/GPIOK and diagnostic MMIO subset."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = ["Description.clef", "Registers.clef"]
+output_kind = "library"
+
+[dependencies]
+contracts = { path = "../../../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+family = { path = "../Fidelity.Platform.fidproj" }
+core = { path = "../../../../CPU/Arm/CortexM7/Fidelity.Platform.fidproj" }

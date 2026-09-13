@@ -1,0 +1,17 @@
+[package]
+name = "Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO"
+version = "0.1.0"
+description = "HelloDISCO Cortex-M7 internal-flash/DTCM bring-up selection."
+[compilation]
+target = "mcu"
+[build]
+sources = ["Description.clef"]
+output_kind = "library"
+[platform]
+runtime_model = "bare"
+os = "none"
+arch = "arm_cortex_m7"
+description = "Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO.Description.descriptor"
+[dependencies]
+product = { path = "../../Hardware/Products/ST/STM32H747I_DISCO/Fidelity.Platform.fidproj" }
+environment = { path = "../../Environments/Freestanding/arm_cortex_m7/Fidelity.Platform.fidproj" }

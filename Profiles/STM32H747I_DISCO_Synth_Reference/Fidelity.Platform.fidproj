@@ -1,0 +1,11 @@
+[package]
+name = "Fidelity.Platform.Profiles.STM32H747I_DISCO_Synth_Reference"
+version = "0.1.0"
+description = "Synthesizer workload requirements for STM32H747I-DISCO; reference only, no executable platform selection."
+
+[compilation]
+target = "library"
+
+[build]
+sources = ["Requirements.clef"]
+output_kind = "library"

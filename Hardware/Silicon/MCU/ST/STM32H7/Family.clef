@@ -1,0 +1,10 @@
+namespace Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7
+
+/// Common family identity; the address below is scoped to the H747 slice.
+/// Source: pinned cmsis-device-h7 stm32h747xx.h, DBGMCU_BASE.
+module Family =
+    let vendor = "STMicroelectronics"
+    let family = "STM32H7"
+    let applicability = "STM32H747xx; other H7 subfamilies are not inferred"
+    let dbgmcuIdcodeAddress = 1543507968
+

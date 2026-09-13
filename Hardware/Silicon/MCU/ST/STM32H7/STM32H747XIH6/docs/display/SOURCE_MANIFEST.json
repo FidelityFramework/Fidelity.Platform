@@ -1,0 +1,229 @@
+{
+  "recordedDate": "2026-09-12",
+  "scope": "DisplayRegisters source provenance and host-only offset evidence for the accepted 416x416 glyph experiment. Source hashes identify this checkpoint, not future application edits.",
+  "upstreamFiles": [
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/cmsis-device-h7/Include/stm32h747xx.h",
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-h7",
+      "commit": "81db1ec63cdc191fae1565b772da3ea5aa29a683",
+      "path": "Include/stm32h747xx.h",
+      "url": "https://github.com/STMicroelectronics/cmsis-device-h7/blob/81db1ec63cdc191fae1565b772da3ea5aa29a683/Include/stm32h747xx.h",
+      "bytes": 2390718,
+      "sha256": "78d84d7042b66f7ee07dc86a6e794b2a0774e464ae945961bed19573dd46ea07"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/cmsis-device-h7/LICENSE.md",
+      "repository": "https://github.com/STMicroelectronics/cmsis-device-h7",
+      "commit": "81db1ec63cdc191fae1565b772da3ea5aa29a683",
+      "path": "LICENSE.md",
+      "url": "https://github.com/STMicroelectronics/cmsis-device-h7/blob/81db1ec63cdc191fae1565b772da3ea5aa29a683/LICENSE.md",
+      "bytes": 11347,
+      "sha256": "053a83960032ab6bbd2231a3b6300bde3b4e526dcf11a61394907c0bdaacd713"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32h747i-disco-bsp/stm32h747i_discovery_lcd.c",
+      "repository": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp",
+      "commit": "c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4",
+      "path": "stm32h747i_discovery_lcd.c",
+      "url": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp/blob/c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4/stm32h747i_discovery_lcd.c",
+      "bytes": 66853,
+      "sha256": "e9db4bdbbdc61278402a8345979165ef438e57fa60e957d30bd6c9749d79dfa7"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32h747i-disco-bsp/stm32h747i_discovery_lcd.h",
+      "repository": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp",
+      "commit": "c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4",
+      "path": "stm32h747i_discovery_lcd.h",
+      "url": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp/blob/c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4/stm32h747i_discovery_lcd.h",
+      "bytes": 13167,
+      "sha256": "8b5498c2df57ae11ddbbb84476022eebfeb93fd6123dbb1bd550b5194c1cd087"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32h747i-disco-bsp/LICENSE.md",
+      "repository": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp",
+      "commit": "c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4",
+      "path": "LICENSE.md",
+      "url": "https://github.com/STMicroelectronics/stm32h747i-disco-bsp/blob/c61d8f01d3fa9a03b81c21ce83c0d334150ea3d4/LICENSE.md",
+      "bytes": 1485,
+      "sha256": "9a1bc1f0583aa5979a4cae0944cdcf6dd924eef09caa0558326888428ccf8b62"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-nt35510/nt35510.c",
+      "repository": "https://github.com/STMicroelectronics/stm32-nt35510",
+      "commit": "0d3008be195d1b0750a6d33cc7e944eea61e2074",
+      "path": "nt35510.c",
+      "url": "https://github.com/STMicroelectronics/stm32-nt35510/blob/0d3008be195d1b0750a6d33cc7e944eea61e2074/nt35510.c",
+      "bytes": 21345,
+      "sha256": "bce77d4e927cca13ce6c53f9318a4797126627085cc74fdbc2eff6ab29ec5bc2"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-nt35510/nt35510.h",
+      "repository": "https://github.com/STMicroelectronics/stm32-nt35510",
+      "commit": "0d3008be195d1b0750a6d33cc7e944eea61e2074",
+      "path": "nt35510.h",
+      "url": "https://github.com/STMicroelectronics/stm32-nt35510/blob/0d3008be195d1b0750a6d33cc7e944eea61e2074/nt35510.h",
+      "bytes": 8371,
+      "sha256": "dd4fd14412c979c387430b9fab6328526cf49d02f5b7cc88c7ddc051b6d8aff8"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-nt35510/nt35510_reg.h",
+      "repository": "https://github.com/STMicroelectronics/stm32-nt35510",
+      "commit": "0d3008be195d1b0750a6d33cc7e944eea61e2074",
+      "path": "nt35510_reg.h",
+      "url": "https://github.com/STMicroelectronics/stm32-nt35510/blob/0d3008be195d1b0750a6d33cc7e944eea61e2074/nt35510_reg.h",
+      "bytes": 9102,
+      "sha256": "d0a1c1fd342e7f8a8b1fa9fbf5a356839359322c3d25ec4511622068e0b88362"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-nt35510/LICENSE.md",
+      "repository": "https://github.com/STMicroelectronics/stm32-nt35510",
+      "commit": "0d3008be195d1b0750a6d33cc7e944eea61e2074",
+      "path": "LICENSE.md",
+      "url": "https://github.com/STMicroelectronics/stm32-nt35510/blob/0d3008be195d1b0750a6d33cc7e944eea61e2074/LICENSE.md",
+      "bytes": 1485,
+      "sha256": "9a1bc1f0583aa5979a4cae0944cdcf6dd924eef09caa0558326888428ccf8b62"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-otm8009a/otm8009a.c",
+      "repository": "https://github.com/STMicroelectronics/stm32-otm8009a",
+      "commit": "c0229f087eb3b87a99b392a08b74d2a8933f4aa4",
+      "path": "otm8009a.c",
+      "url": "https://github.com/STMicroelectronics/stm32-otm8009a/blob/c0229f087eb3b87a99b392a08b74d2a8933f4aa4/otm8009a.c",
+      "bytes": 29902,
+      "sha256": "a8252cdf8c880b2abe5b9038929e66d315e4b5f66b6536160ada654baad3f459"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-otm8009a/otm8009a.h",
+      "repository": "https://github.com/STMicroelectronics/stm32-otm8009a",
+      "commit": "c0229f087eb3b87a99b392a08b74d2a8933f4aa4",
+      "path": "otm8009a.h",
+      "url": "https://github.com/STMicroelectronics/stm32-otm8009a/blob/c0229f087eb3b87a99b392a08b74d2a8933f4aa4/otm8009a.h",
+      "bytes": 8482,
+      "sha256": "e6b20e8cbd70624331facbb62f6612517e2cd1ce99f6abf4787be739cf422730"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/stm32-otm8009a/LICENSE.md",
+      "repository": "https://github.com/STMicroelectronics/stm32-otm8009a",
+      "commit": "c0229f087eb3b87a99b392a08b74d2a8933f4aa4",
+      "path": "LICENSE.md",
+      "url": "https://github.com/STMicroelectronics/stm32-otm8009a/blob/c0229f087eb3b87a99b392a08b74d2a8933f4aa4/LICENSE.md",
+      "bytes": 1485,
+      "sha256": "9a1bc1f0583aa5979a4cae0944cdcf6dd924eef09caa0558326888428ccf8b62"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Src/stm32h7xx_hal_dsi.c",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Src/stm32h7xx_hal_dsi.c",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Src/stm32h7xx_hal_dsi.c",
+      "bytes": 98662,
+      "sha256": "db0b7c48e9de6e3f45a6d245a6c6fdb8a3f900fc022b7308172bf1357f811adf"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Inc/stm32h7xx_hal_dsi.h",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Inc/stm32h7xx_hal_dsi.h",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Inc/stm32h7xx_hal_dsi.h",
+      "bytes": 57664,
+      "sha256": "94f3c09a08d57d8253b0b681f1d47c4b2b403b4b744e453c1e0d1c72361a866f"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Src/stm32h7xx_hal_ltdc.c",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Src/stm32h7xx_hal_ltdc.c",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Src/stm32h7xx_hal_ltdc.c",
+      "bytes": 71918,
+      "sha256": "6b0df6e21aa61b3ca19a77f0362dd44eb077aded7c43615af026029060870ba8"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Inc/stm32h7xx_hal_rcc_ex.h",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Inc/stm32h7xx_hal_rcc_ex.h",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Inc/stm32h7xx_hal_rcc_ex.h",
+      "bytes": 211252,
+      "sha256": "cbebc9c87db8acada7da2fd06994a998528d447960ec62737fd65cace4fd34bf"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Inc/stm32h7xx_hal_rcc.h",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Inc/stm32h7xx_hal_rcc.h",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Inc/stm32h7xx_hal_rcc.h",
+      "bytes": 504477,
+      "sha256": "b97d21c439fb53c8cc83a555074b9cbd1fba107d95ff239ba317ffc28799ff16"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/Src/stm32h7xx_hal_rcc_ex.c",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "Src/stm32h7xx_hal_rcc_ex.c",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/Src/stm32h7xx_hal_rcc_ex.c",
+      "bytes": 128552,
+      "sha256": "ba3ffa42989a60a93e8de7f148cde4fa22c6853223d00d5d9954ad370c6012fe"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/reference/stm32cubeh7/hal-display-e3c518e/LICENSE.md",
+      "repository": "https://github.com/STMicroelectronics/stm32h7xx-hal-driver",
+      "commit": "e3c518ebda3e00c8e52b1625ca44fba65da3b63e",
+      "path": "LICENSE.md",
+      "url": "https://raw.githubusercontent.com/STMicroelectronics/stm32h7xx-hal-driver/e3c518ebda3e00c8e52b1625ca44fba65da3b63e/LICENSE.md",
+      "bytes": 1484,
+      "sha256": "1a0c3a2cf55d2d808048d452c6598d441f89890d62d0890147459ec6db61037a"
+    }
+  ],
+  "localCheckpointFiles": [
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/DisplayRegisters.clef",
+      "bytes": 16349,
+      "sha256": "5485a036449a043f62564401b373a331f4b82d3423c1f76c0f97ccb95979e0b7"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/static-display/src/DisplayAccess.clef",
+      "bytes": 10353,
+      "sha256": "1d170c747df8027179058c8cbacf5ddeefcd75f75d08f14f848dfb45a410cea8"
+    },
+    {
+      "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/static-display/src/DisplayHost.clef",
+      "bytes": 14552,
+      "sha256": "1fd3a9df694f66f58c35b7c69bbd3abe0ce17e321099ccf03bddc6f85c84ce6a"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/offset-oracle.c",
+      "bytes": 27951,
+      "sha256": "919d8c94184132e976b731a481cf2a10b80a43751f019c71782a1a834b8664e7"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/offsets.txt",
+      "bytes": 1320,
+      "sha256": "8728c618fad09716924049ccf91a973d388fc8d877af260ea716858b5c45eb35"
+    },
+    {
+      "localPath": "/home/hhh/repos/Fidelity.Platform/Hardware/Silicon/MCU/ST/STM32H7/STM32H747XIH6/docs/display/LICENSE.CMSIS.md",
+      "bytes": 11347,
+      "sha256": "053a83960032ab6bbd2231a3b6300bde3b4e526dcf11a61394907c0bdaacd713"
+    }
+  ],
+  "offsetOracle": {
+    "checkedRegisterCount": 80,
+    "mismatchCount": 0,
+    "columns": [
+      "Clef binding",
+      "compiled C offset in bytes including layer base",
+      "declared Clef offset in bytes"
+    ],
+    "compiler": "cc (GCC) 16.2.1 20260810",
+    "limitations": "Offsets only; no device reads/writes, hardware acceptance, register side-effect model, cache proof, timing proof, or firmware linkage."
+  },
+  "ccsDeviceAccessCheckpoint": {
+    "localPath": "/home/hhh/repos/MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/static-display/targets/intermediates/device-access.json",
+    "bytes": 503072,
+    "sha256": "6b3d8944de226b464ddf9229052ed2c613da7568f51040c1266061657f9230bd",
+    "siteCount": 225,
+    "uniqueAddressCount": 83,
+    "scope": "Static declaration checks; external mapping/hardware premises are not proved. No runtime or solver certificate.",
+    "retention": "Generated application artifact; counts/hash recorded here, not copied into this source-only offset evidence."
+  }
+}

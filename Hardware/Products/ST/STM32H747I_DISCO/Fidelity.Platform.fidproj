@@ -1,0 +1,19 @@
+[package]
+name = "Fidelity.Platform.Hardware.Products.ST.STM32H747I_DISCO"
+version = "0.1.0"
+authors = ["SpeakEZ Technologies"]
+description = "STM32H747I-DISCO four LED and joystick wiring, with uninitialized external-memory inventory; display/audio remain separate work."
+
+[compilation]
+target = "mcu"
+
+[build]
+sources = [
+    "Description.clef"
+]
+output_kind = "library"
+
+[dependencies]
+
+contracts = { path = "../../../../Contracts/Fidelity.Platform.Contracts.fidproj" }
+silicon = { path = "../../../Silicon/MCU/ST/STM32H7/STM32H747XIH6/Fidelity.Platform.fidproj" }

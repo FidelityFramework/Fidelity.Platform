@@ -1,0 +1,89 @@
+namespace Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7
+
+open BAREWire.Platform
+
+/// STM32H74x/75x Cortex-M7 specialization, using architecture-defined SCS layout.
+/// Optional FPU/MPU/cache configuration is scoped to PM0253 Rev6 Table14;
+/// these values are not inferred for every Cortex-M7 or STM32F7.
+/// ABI, image layout, grants and startup belong to the environment/image.
+module Description =
+    let registerWidth: WidthDeclaration = { Name = "Register"; Bits = 32 }
+
+    // The integer representations the core offers natively: two's-complement
+    // and unsigned at 8, 16, 32 and 64 bits, wrapping at their boundaries
+    // (64-bit arithmetic is register pairs on ARMv7-M, still native and
+    // wrapping). Ranges as exact decimal text.
+    let repInt8: Representation = { Name = "int8"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 8; MinMagnitude = "-128"; MaxMagnitude = "127"; Boundary = Boundary.Wrap }
+    let repInt16: Representation = { Name = "int16"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 16; MinMagnitude = "-32768"; MaxMagnitude = "32767"; Boundary = Boundary.Wrap }
+    let repInt32: Representation = { Name = "int32"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 32; MinMagnitude = "-2147483648"; MaxMagnitude = "2147483647"; Boundary = Boundary.Wrap }
+    let repInt64: Representation = { Name = "int64"; Capability = Capability.Native; Family = RepresentationFamily.Int; Bits = 64; MinMagnitude = "-9223372036854775808"; MaxMagnitude = "9223372036854775807"; Boundary = Boundary.Wrap }
+    let repUInt8: Representation = { Name = "uint8"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 8; MinMagnitude = "0"; MaxMagnitude = "255"; Boundary = Boundary.Wrap }
+    let repUInt16: Representation = { Name = "uint16"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 16; MinMagnitude = "0"; MaxMagnitude = "65535"; Boundary = Boundary.Wrap }
+    let repUInt32: Representation = { Name = "uint32"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 32; MinMagnitude = "0"; MaxMagnitude = "4294967295"; Boundary = Boundary.Wrap }
+    let repUInt64: Representation = { Name = "uint64"; Capability = Capability.Native; Family = RepresentationFamily.UInt; Bits = 64; MinMagnitude = "0"; MaxMagnitude = "18446744073709551615"; Boundary = Boundary.Wrap }
+
+    /// IEEE Exact is the platform boundary tag, not exact real arithmetic.
+    /// Finite signed endpoints are exact decimal integers. NaN, infinities,
+    /// rounding, FPSCR flush-to-zero/default-NaN and exception flags require
+    /// separate numerical contracts. CPACR enablement and barriers belong to startup.
+    /// PM0253 Rev6 Table14: this STM32H74x/75x implementation has SP and DP FPU.
+    let repIeee32: Representation = { Name = "float32"; Capability = Capability.Native; Family = RepresentationFamily.Ieee; Bits = 32; MinMagnitude = "-340282346638528859811704183484516925440"; MaxMagnitude = "340282346638528859811704183484516925440"; Boundary = Boundary.Exact }
+    let repIeee64: Representation = { Name = "float64"; Capability = Capability.Native; Family = RepresentationFamily.Ieee; Bits = 64; MinMagnitude = "-179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"; MaxMagnitude = "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368"; Boundary = Boundary.Exact }
+    let implementationApplicability = "STM32H74x/75x Cortex-M7; PM0253 Rev6 Table14"
+
+    let architecture = "arm_cortex_m7"
+    let cpuModel = "cortex-m7"
+    let wordSizeBits = 32
+    let endianness = "little"
+
+    // -----------------------------------------------------------------------
+    // Private Peripheral Bus: the System Control Space (SCS).
+    //
+    // Arm defines this layout, not the silicon vendor, so it is declared here
+    // and shared by every Cortex-M7 part. Unlike the Cortex-M33 there is no
+    // secure/non-secure alias: one 4 KB window at 0xE000_E000 holds SysTick,
+    // the NVIC, the SCB, the MPU, the cache-maintenance operations and the
+    // Cortex-M7 implementation registers. Registers.clef declares the
+    // inventory over this space. The debug blocks below and above it (ITM,
+    // DWT, FPB, ETM, ROM table) are not declared.
+    // -----------------------------------------------------------------------
+
+    /// 0xE000_E000..0xE000_EFFF. Base is 3758153728, written as decimal
+    /// because it does not fit a signed 32-bit hex literal.
+    let ppb: MemorySpace = {
+        Name = "ppb"; Kind = MemoryKind.Peripheral; Base = Some 3758153728; Capacity = 4096
+        Alignment = 4; Granularity = 1; Growth = Growth.Fixed; Access = Access.ReadWrite
+        Notes = "System Control Space: SysTick, NVIC, SCB, MPU, cache maintenance; Arm-defined layout (ARM-DDI0403E B3), identical on Cortex-M7 F7/H7 parts. Privileged access only; word transactions, with SHPRn/NVIC_IPRn also byte-accessible."
+        MapKind = ""; Since = ""; Until = ""
+    }
+
+    // -----------------------------------------------------------------------
+    // Core facts a layout or startup must know and cannot read before it
+    // runs.
+    // -----------------------------------------------------------------------
+
+    /// L1 instruction and data cache line size. Fixed at 32 bytes (8 words)
+    /// on Cortex-M7 (CMSIS core_cm7.h __SCB_DCACHE_LINE_SIZE; CCSIDR reads
+    /// LineSize = 2). Buffers maintained by cache line must own their entire boundary lines;
+    /// arbitrary CPU data need not be cache-line aligned. [verify: DDI0489]
+    let cacheLineBytes = 32
+
+    /// STM32H74x/75x M7 configuration, PM0253 Rev6 Table14. Read MPU_TYPE
+    /// when admitting a target; generic Cortex-M7 implementations may differ.
+    let mpuRegions = 16
+
+    /// ARMv7-M has no MSPLIM/PSPLIM stack-limit registers (they are ARMv8-M).
+    /// A stack overflow is caught only by placing the stack at the bottom of
+    /// a memory whose lower neighbour faults, or by an MPU guard region.
+    let hasMsplim = false
+
+    /// Vector table entries 0..15 belong to the core: initial SP, Reset, NMI,
+    /// HardFault, MemManage, BusFault, UsageFault, 7..10 reserved, SVCall,
+    /// DebugMonitor, 13 reserved, PendSV, SysTick (ARM-DDI0403E B1.5.2).
+    /// External interrupts begin at entry 16. The part declares how many.
+    let coreVectors = 16
+
+    /// Entries the architecture reserves in the first 16. An image verifier
+    /// requires these to be zero. ARMv8-M's list differs (its entry 7 is
+    /// SecureFault), which is one reason a v7-M image is a sibling path.
+    let reservedVectorSlots = [| 7; 8; 9; 10; 13 |]

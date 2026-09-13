@@ -1,0 +1,180 @@
+module Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7.Registers
+
+open Fidelity.Platform.Contracts
+
+// Hand-written: Arm ships no SVD for the core, so the System Control Space
+// is transcribed from the Armv7-M Architecture Reference Manual (ARM DDI
+// 0403E.e) register-summary tables. Offsets are relative to Description.ppb
+// (0xE000_E000). Every register here is a 32-bit word transaction; SHPRn and
+// NVIC_IPRn are additionally byte-accessible on the hardware (B3.2.9, B3.4.3)
+// but are declared as words so a workload writes a full priority group at
+// once. Inventory permits a transaction; a workload's DeviceAccessPlan grants
+// it. Access is the ARM ARM's "Type" column (RO -> "r", RW -> "rw", WO -> "w").
+//
+// The six Cortex-M7 implementation registers at 0xF90..0xFA8 lie in the
+// IMPLEMENTATION DEFINED window 0xE000EF90-0xE000EFCC (Table B3-6); their
+// names and offsets are cross-checked against CMSIS core_cm7.h only, because
+// the Cortex-M7 TRM (DDI0489) is not on disk. [verify: DDI0489]
+
+let source = "ARM-DDI0403E B3.2 Tables B3-4/B3-6, B3.3 Table B3-7, B3.4 Table B3-8, B3.5 Table B3-11, B2.2 Table B2-1; Cortex-M7 implementation registers per CMSIS core_cm7.h [verify: DDI0489]"
+
+let coreRegion: DeviceRegion = { Space = Description.ppb; AddressSpace = "cpu-physical"; Source = source }
+
+// --- SysTick, 0xE000E010 (Table B3-7) ------------------------------
+let systCsr: DeviceRegister = { Name = "systCsr"; Region = coreRegion; Offset = 0x10; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systRvr: DeviceRegister = { Name = "systRvr"; Region = coreRegion; Offset = 0x14; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systCvr: DeviceRegister = { Name = "systCvr"; Region = coreRegion; Offset = 0x18; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let systCalib: DeviceRegister = { Name = "systCalib"; Region = coreRegion; Offset = 0x1C; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- NVIC, 0xE000E100 (Table B3-8). Five 32-bit words cover 160 lines; the
+// STM32H747 CM7 uses IRQ 0..149 (HDR-H7 IRQn_Type, WAKEUP_PIN_IRQn = 149), so
+// ICTR.INTLINESNUM = 4 and registers 0..4 are the implemented set. [verify: RM0399]
+let nvicIser0: DeviceRegister = { Name = "nvicIser0"; Region = coreRegion; Offset = 0x100; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIser1: DeviceRegister = { Name = "nvicIser1"; Region = coreRegion; Offset = 0x104; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIser2: DeviceRegister = { Name = "nvicIser2"; Region = coreRegion; Offset = 0x108; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIser3: DeviceRegister = { Name = "nvicIser3"; Region = coreRegion; Offset = 0x10C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIser4: DeviceRegister = { Name = "nvicIser4"; Region = coreRegion; Offset = 0x110; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer0: DeviceRegister = { Name = "nvicIcer0"; Region = coreRegion; Offset = 0x180; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer1: DeviceRegister = { Name = "nvicIcer1"; Region = coreRegion; Offset = 0x184; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer2: DeviceRegister = { Name = "nvicIcer2"; Region = coreRegion; Offset = 0x188; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer3: DeviceRegister = { Name = "nvicIcer3"; Region = coreRegion; Offset = 0x18C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcer4: DeviceRegister = { Name = "nvicIcer4"; Region = coreRegion; Offset = 0x190; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIspr0: DeviceRegister = { Name = "nvicIspr0"; Region = coreRegion; Offset = 0x200; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIspr1: DeviceRegister = { Name = "nvicIspr1"; Region = coreRegion; Offset = 0x204; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIspr2: DeviceRegister = { Name = "nvicIspr2"; Region = coreRegion; Offset = 0x208; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIspr3: DeviceRegister = { Name = "nvicIspr3"; Region = coreRegion; Offset = 0x20C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIspr4: DeviceRegister = { Name = "nvicIspr4"; Region = coreRegion; Offset = 0x210; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr0: DeviceRegister = { Name = "nvicIcpr0"; Region = coreRegion; Offset = 0x280; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr1: DeviceRegister = { Name = "nvicIcpr1"; Region = coreRegion; Offset = 0x284; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr2: DeviceRegister = { Name = "nvicIcpr2"; Region = coreRegion; Offset = 0x288; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr3: DeviceRegister = { Name = "nvicIcpr3"; Region = coreRegion; Offset = 0x28C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIcpr4: DeviceRegister = { Name = "nvicIcpr4"; Region = coreRegion; Offset = 0x290; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIabr0: DeviceRegister = { Name = "nvicIabr0"; Region = coreRegion; Offset = 0x300; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIabr1: DeviceRegister = { Name = "nvicIabr1"; Region = coreRegion; Offset = 0x304; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIabr2: DeviceRegister = { Name = "nvicIabr2"; Region = coreRegion; Offset = 0x308; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIabr3: DeviceRegister = { Name = "nvicIabr3"; Region = coreRegion; Offset = 0x30C; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIabr4: DeviceRegister = { Name = "nvicIabr4"; Region = coreRegion; Offset = 0x310; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+// NVIC_IPRn: four 8-bit priority fields per word; word n holds IRQ 4n..4n+3.
+// The H7 implements the upper 4 bits of each field (HDR-H7 __NVIC_PRIO_BITS = 4).
+let nvicIpr0: DeviceRegister = { Name = "nvicIpr0"; Region = coreRegion; Offset = 0x400; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr1: DeviceRegister = { Name = "nvicIpr1"; Region = coreRegion; Offset = 0x404; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr2: DeviceRegister = { Name = "nvicIpr2"; Region = coreRegion; Offset = 0x408; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr3: DeviceRegister = { Name = "nvicIpr3"; Region = coreRegion; Offset = 0x40C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr4: DeviceRegister = { Name = "nvicIpr4"; Region = coreRegion; Offset = 0x410; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr5: DeviceRegister = { Name = "nvicIpr5"; Region = coreRegion; Offset = 0x414; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr6: DeviceRegister = { Name = "nvicIpr6"; Region = coreRegion; Offset = 0x418; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr7: DeviceRegister = { Name = "nvicIpr7"; Region = coreRegion; Offset = 0x41C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr8: DeviceRegister = { Name = "nvicIpr8"; Region = coreRegion; Offset = 0x420; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr9: DeviceRegister = { Name = "nvicIpr9"; Region = coreRegion; Offset = 0x424; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr10: DeviceRegister = { Name = "nvicIpr10"; Region = coreRegion; Offset = 0x428; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr11: DeviceRegister = { Name = "nvicIpr11"; Region = coreRegion; Offset = 0x42C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr12: DeviceRegister = { Name = "nvicIpr12"; Region = coreRegion; Offset = 0x430; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr13: DeviceRegister = { Name = "nvicIpr13"; Region = coreRegion; Offset = 0x434; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr14: DeviceRegister = { Name = "nvicIpr14"; Region = coreRegion; Offset = 0x438; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr15: DeviceRegister = { Name = "nvicIpr15"; Region = coreRegion; Offset = 0x43C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr16: DeviceRegister = { Name = "nvicIpr16"; Region = coreRegion; Offset = 0x440; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr17: DeviceRegister = { Name = "nvicIpr17"; Region = coreRegion; Offset = 0x444; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr18: DeviceRegister = { Name = "nvicIpr18"; Region = coreRegion; Offset = 0x448; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr19: DeviceRegister = { Name = "nvicIpr19"; Region = coreRegion; Offset = 0x44C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr20: DeviceRegister = { Name = "nvicIpr20"; Region = coreRegion; Offset = 0x450; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr21: DeviceRegister = { Name = "nvicIpr21"; Region = coreRegion; Offset = 0x454; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr22: DeviceRegister = { Name = "nvicIpr22"; Region = coreRegion; Offset = 0x458; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr23: DeviceRegister = { Name = "nvicIpr23"; Region = coreRegion; Offset = 0x45C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr24: DeviceRegister = { Name = "nvicIpr24"; Region = coreRegion; Offset = 0x460; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr25: DeviceRegister = { Name = "nvicIpr25"; Region = coreRegion; Offset = 0x464; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr26: DeviceRegister = { Name = "nvicIpr26"; Region = coreRegion; Offset = 0x468; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr27: DeviceRegister = { Name = "nvicIpr27"; Region = coreRegion; Offset = 0x46C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr28: DeviceRegister = { Name = "nvicIpr28"; Region = coreRegion; Offset = 0x470; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr29: DeviceRegister = { Name = "nvicIpr29"; Region = coreRegion; Offset = 0x474; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr30: DeviceRegister = { Name = "nvicIpr30"; Region = coreRegion; Offset = 0x478; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr31: DeviceRegister = { Name = "nvicIpr31"; Region = coreRegion; Offset = 0x47C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr32: DeviceRegister = { Name = "nvicIpr32"; Region = coreRegion; Offset = 0x480; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr33: DeviceRegister = { Name = "nvicIpr33"; Region = coreRegion; Offset = 0x484; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr34: DeviceRegister = { Name = "nvicIpr34"; Region = coreRegion; Offset = 0x488; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr35: DeviceRegister = { Name = "nvicIpr35"; Region = coreRegion; Offset = 0x48C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr36: DeviceRegister = { Name = "nvicIpr36"; Region = coreRegion; Offset = 0x490; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr37: DeviceRegister = { Name = "nvicIpr37"; Region = coreRegion; Offset = 0x494; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr38: DeviceRegister = { Name = "nvicIpr38"; Region = coreRegion; Offset = 0x498; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let nvicIpr39: DeviceRegister = { Name = "nvicIpr39"; Region = coreRegion; Offset = 0x49C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- System Control Block, 0xE000ED00 (Table B3-4) ----------------------
+let scbCpuid: DeviceRegister = { Name = "scbCpuid"; Region = coreRegion; Offset = 0xD00; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let scbIcsr: DeviceRegister = { Name = "scbIcsr"; Region = coreRegion; Offset = 0xD04; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Bits[6:0] are reserved (B3.2.5): a table of 166 entries rounds its alignment up to 1024.
+let scbVtor: DeviceRegister = { Name = "scbVtor"; Region = coreRegion; Offset = 0xD08; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Writes require VECTKEY = 0x05FA in bits[31:16].
+let scbAircr: DeviceRegister = { Name = "scbAircr"; Region = coreRegion; Offset = 0xD0C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbScr: DeviceRegister = { Name = "scbScr"; Region = coreRegion; Offset = 0xD10; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbCcr: DeviceRegister = { Name = "scbCcr"; Region = coreRegion; Offset = 0xD14; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Priorities of system handlers 4..7 (MemManage, BusFault, UsageFault, reserved).
+let scbShpr1: DeviceRegister = { Name = "scbShpr1"; Region = coreRegion; Offset = 0xD18; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Priorities of system handlers 8..11 (reserved x3, SVCall).
+let scbShpr2: DeviceRegister = { Name = "scbShpr2"; Region = coreRegion; Offset = 0xD1C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Priorities of system handlers 12..15 (DebugMonitor, reserved, PendSV, SysTick).
+let scbShpr3: DeviceRegister = { Name = "scbShpr3"; Region = coreRegion; Offset = 0xD20; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbShcsr: DeviceRegister = { Name = "scbShcsr"; Region = coreRegion; Offset = 0xD24; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// MMFSR | BFSR<<8 | UFSR<<16; write-one-to-clear.
+let scbCfsr: DeviceRegister = { Name = "scbCfsr"; Region = coreRegion; Offset = 0xD28; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbHfsr: DeviceRegister = { Name = "scbHfsr"; Region = coreRegion; Offset = 0xD2C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDfsr: DeviceRegister = { Name = "scbDfsr"; Region = coreRegion; Offset = 0xD30; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbMmfar: DeviceRegister = { Name = "scbMmfar"; Region = coreRegion; Offset = 0xD34; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let scbBfar: DeviceRegister = { Name = "scbBfar"; Region = coreRegion; Offset = 0xD38; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// IMPLEMENTATION DEFINED contents; on Cortex-M7 see also ABFSR below.
+let scbAfsr: DeviceRegister = { Name = "scbAfsr"; Region = coreRegion; Offset = 0xD3C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- Cache identification, 0xE000ED78 (Table B4-1) ----------------------
+let scbClidr: DeviceRegister = { Name = "scbClidr"; Region = coreRegion; Offset = 0xD78; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let scbCtr: DeviceRegister = { Name = "scbCtr"; Region = coreRegion; Offset = 0xD7C; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+/// Reports the cache selected by CSSELR; the M7 line size reads back as 32 bytes (Description.cacheLineBytes).
+let scbCcsidr: DeviceRegister = { Name = "scbCcsidr"; Region = coreRegion; Offset = 0xD80; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let scbCsselr: DeviceRegister = { Name = "scbCsselr"; Region = coreRegion; Offset = 0xD84; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- Coprocessor access, 0xE000ED88 (Table B3-4) -----------------------
+/// CP10/CP11 (bits[23:20]) gate the FPU; reset value is UNKNOWN per the ARM ARM and 0 on this part. Set to 0b1111, then ISB, before the first VFP instruction.
+let scbCpacr: DeviceRegister = { Name = "scbCpacr"; Region = coreRegion; Offset = 0xD88; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- MPU (PMSAv7), 0xE000ED90 (Table B3-11) -----------------------------
+/// DREGION (bits[15:8]) reports the implemented region count; Description.mpuRegions is the declared expectation.
+let mpuType: DeviceRegister = { Name = "mpuType"; Region = coreRegion; Offset = 0xD90; TransactionBits = 32; Access = "r"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuCtrl: DeviceRegister = { Name = "mpuCtrl"; Region = coreRegion; Offset = 0xD94; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRnr: DeviceRegister = { Name = "mpuRnr"; Region = coreRegion; Offset = 0xD98; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRbar: DeviceRegister = { Name = "mpuRbar"; Region = coreRegion; Offset = 0xD9C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRasr: DeviceRegister = { Name = "mpuRasr"; Region = coreRegion; Offset = 0xDA0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Alias pairs let one STM store four regions without touching RNR (B3.5.5).
+let mpuRbarA1: DeviceRegister = { Name = "mpuRbarA1"; Region = coreRegion; Offset = 0xDA4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRasrA1: DeviceRegister = { Name = "mpuRasrA1"; Region = coreRegion; Offset = 0xDA8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRbarA2: DeviceRegister = { Name = "mpuRbarA2"; Region = coreRegion; Offset = 0xDAC; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRasrA2: DeviceRegister = { Name = "mpuRasrA2"; Region = coreRegion; Offset = 0xDB0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRbarA3: DeviceRegister = { Name = "mpuRbarA3"; Region = coreRegion; Offset = 0xDB4; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+let mpuRasrA3: DeviceRegister = { Name = "mpuRasrA3"; Region = coreRegion; Offset = 0xDB8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- Cache and branch-predictor maintenance, 0xE000EF50 (Table B2-1) ------
+// Write-only operations executed by storing a word; privileged only. Set/way
+// and MVA operand encodings are in B2.2.7. A read of any of these is undefined.
+let scbIciallu: DeviceRegister = { Name = "scbIciallu"; Region = coreRegion; Offset = 0xF50; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbIcimvau: DeviceRegister = { Name = "scbIcimvau"; Region = coreRegion; Offset = 0xF58; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDcimvac: DeviceRegister = { Name = "scbDcimvac"; Region = coreRegion; Offset = 0xF5C; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDcisw: DeviceRegister = { Name = "scbDcisw"; Region = coreRegion; Offset = 0xF60; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDccmvau: DeviceRegister = { Name = "scbDccmvau"; Region = coreRegion; Offset = 0xF64; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDccmvac: DeviceRegister = { Name = "scbDccmvac"; Region = coreRegion; Offset = 0xF68; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDccsw: DeviceRegister = { Name = "scbDccsw"; Region = coreRegion; Offset = 0xF6C; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDccimvac: DeviceRegister = { Name = "scbDccimvac"; Region = coreRegion; Offset = 0xF70; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbDccisw: DeviceRegister = { Name = "scbDccisw"; Region = coreRegion; Offset = 0xF74; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+let scbBpiall: DeviceRegister = { Name = "scbBpiall"; Region = coreRegion; Offset = 0xF78; TransactionBits = 32; Access = "w"; ByteOrder = "little"; Ordering = "volatile" }
+
+// --- Cortex-M7 implementation registers, 0xE000EF90 [verify: DDI0489] -----
+// IMPLEMENTATION DEFINED window per Table B3-6. Offsets are CMSIS core_cm7.h
+// SCB_Type offsets 0x290..0x2A8 plus the SCB base (0xD00). Access is CMSIS __IOM.
+/// ITCM control: EN, RMW, RETEN, SZ. The H7 ITCM is enabled at reset. [verify: RM0399]
+let scbItcmcr: DeviceRegister = { Name = "scbItcmcr"; Region = coreRegion; Offset = 0xF90; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// DTCM control: EN, RMW, RETEN, SZ. The H7 DTCM is enabled at reset. [verify: RM0399]
+let scbDtcmcr: DeviceRegister = { Name = "scbDtcmcr"; Region = coreRegion; Offset = 0xF94; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// AHBP control: EN, SZ.
+let scbAhbpcr: DeviceRegister = { Name = "scbAhbpcr"; Region = coreRegion; Offset = 0xF98; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// L1 cache control: SIWT (shared write-through), ECCEN, FORCEWT.
+let scbCacr: DeviceRegister = { Name = "scbCacr"; Region = coreRegion; Offset = 0xF9C; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// AHBS control: CTL, TPRI, INITCOUNT.
+let scbAhbscr: DeviceRegister = { Name = "scbAhbscr"; Region = coreRegion; Offset = 0xFA0; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+/// Auxiliary bus fault status: ITCM, DTCM, AHBP, AXIM, EPPB, AXIMTYPE. Latch this with CFSR/BFAR in the fault handler.
+let scbAbfsr: DeviceRegister = { Name = "scbAbfsr"; Region = coreRegion; Offset = 0xFA8; TransactionBits = 32; Access = "rw"; ByteOrder = "little"; Ordering = "volatile" }
+

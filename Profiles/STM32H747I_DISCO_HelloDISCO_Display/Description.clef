@@ -1,0 +1,41 @@
+namespace Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO_Display
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Core = Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7.Description
+module Family = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.Family
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Description
+module Display = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.DisplayRegisters
+module Execution = Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M7.Description
+
+module Description =
+    let image: CortexMImageDescriptor = {
+        FlashSpace = "flash-bank1"; RamSpace = "axi-sram"
+        VectorLayout = "ArmV7MVectors"; VectorAlignment = Part.vectorAlignment
+        StackBytes = 8192; EntrySymbol = "Reset_Handler"
+        DebugDevice = "STM32H747XIH6"; PartNumber = Part.partNumber
+        PartNumberAddress = Family.dbgmcuIdcodeAddress
+        PreservedOptionAddress = 0x5200201C; PreservedOptionBytes = 48
+    }
+    let descriptor: PlatformDescription = {
+        Id = "stm32h747i-disco-hellodisco-static-display"
+        DisplayName = "STM32H747I-DISCO HelloDISCO static logo"
+        Substrate = "mcu"; Core = Some Execution.core
+        Spaces = [| Part.flashBank1; Part.axiSram; Part.rcc
+                    Display.gpiog; Display.gpioj; Display.dsi; Display.ltdc; Core.ppb |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = {
+            Clocks = [| { Name = "reset-HSI"; FrequencyHz = Part.resetSysclkHz } |]
+            Resets = [| { Name = "NRST"; External = true; ActiveHigh = false } |]
+            Entry = "Reset_Handler"; Teardown = "Fault_Handler"
+            Persistence = Persistence.Volatile
+        }
+        Notes = [|
+            "Separate experimental selection: one packed RGB565 layer in AXI SRAM; rendered once before scanout starts, never modified after publication."
+            "Requires hardware reset, M7 boot ownership, HSI64 and disabled caches. Enables HSE, DSI PLL and PLL3 without changing the CPU clock or core power supply."
+            "Assembly storage adapter bounds every halfword store. Image/link checks establish placement; physical LCD operation and general DMA/cache proofs remain separate."
+            "No touch, audio, SDRAM, animation or general reactive runtime. The existing DTCM LED/joystick selection remains independent."
+        |]
+        Limits = [| { Name = "external-vectors"; Value = Part.externalVectors } |]
+    }

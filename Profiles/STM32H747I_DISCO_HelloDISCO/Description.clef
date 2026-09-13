@@ -1,0 +1,40 @@
+namespace Fidelity.Platform.Profiles.STM32H747I_DISCO_HelloDISCO
+
+open BAREWire.Platform
+open BAREWire.Hardware
+
+module Core = Fidelity.Platform.Hardware.Silicon.CPU.Arm.CortexM7.Description
+module Family = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.Family
+module Part = Fidelity.Platform.Hardware.Silicon.MCU.ST.STM32H7.STM32H747XIH6.Description
+module Execution = Fidelity.Platform.Environments.Freestanding.Arm_Cortex_M7.Description
+
+module Description =
+    let image: CortexMImageDescriptor = {
+        FlashSpace = "flash-bank1"; RamSpace = "dtcm"
+        VectorLayout = "ArmV7MVectors"; VectorAlignment = Part.vectorAlignment
+        StackBytes = 8192; EntrySymbol = "Reset_Handler"
+        DebugDevice = "STM32H747XIH6"; PartNumber = Part.partNumber
+        PartNumberAddress = Family.dbgmcuIdcodeAddress
+        PreservedOptionAddress = 0x5200201C; PreservedOptionBytes = 48
+    }
+
+    let descriptor: PlatformDescription = {
+        Id = "stm32h747i-disco-hellodisco-internal"
+        DisplayName = "STM32H747I-DISCO HelloDISCO: LEDs and joystick"
+        Substrate = "mcu"; Core = Some Execution.core
+        Spaces = [| Part.flashBank1; Part.dtcm; Part.rcc; Part.gpioi; Part.gpiok; Core.ppb |]
+        Surfaces = [||]; Buffers = [||]; Transports = [||]
+        Lifecycle = {
+            Clocks = [| { Name = "reset-HSI"; FrequencyHz = Part.resetSysclkHz } |]
+            Resets = [| { Name = "NRST"; External = true; ActiveHigh = false } |]
+            Entry = "Reset_Handler"; Teardown = "Fault_Handler"
+            Persistence = Persistence.Volatile
+        }
+        Notes = [|
+            "First executable selection uses internal flash and DTCM, GPIOI LEDs, GPIOK joystick, and SysTick. Shared storage declarations retain identity."
+            "M7 only. Does not assign, start, or rewrite an M4 image. Boot addresses and second-core state must be recorded before autonomous hardware acceptance."
+            "No PWR, flash-controller, option-byte, PLL, external-memory, LCD, audio or touch writes are granted by this selection."
+            "The future LCD selection needs its own accepted clock, panel, storage and publication contracts; a scene function alone grants no LCD access."
+        |]
+        Limits = [| { Name = "external-vectors"; Value = Part.externalVectors } |]
+    }

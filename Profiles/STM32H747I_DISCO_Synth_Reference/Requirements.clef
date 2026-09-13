@@ -1,0 +1,46 @@
+namespace Fidelity.Platform.Profiles.STM32H747I_DISCO_Synth_Reference
+
+/// Proposed workload policy, not discovered hardware facts or an admission
+/// result. No platform export, MemorySpace, mapping, or grant is declared here.
+/// Bytes describe boundary storage; Clef source numerics remain int/float.
+module Requirements =
+    let sampleRateHz = 48000
+    let framesPerBlock = 64
+    let outputChannels = 2
+    // Proposed 32-bit PCM slots. Actual SAI framing, significant sample bits,
+    // DMA transaction width and WM8994 format must be reconciled together.
+    let sampleSlotBytes = 4
+    let audioBufferCount = 2
+    // Workload alignment request, to be checked against the selected core,
+    // DMA and MPU declarations when those contracts are available.
+    let bufferAlignmentBytes = 32
+    let audioBlockBytes = framesPerBlock * outputChannels * sampleSlotBytes
+    let audioBufferBytes = audioBlockBytes * audioBufferCount
+    let audioPayloadBytesPerSecond = sampleRateHz * outputChannels * sampleSlotBytes
+
+    // Exact rational microseconds; do not round the 64/48000 second deadline
+    // down into a supposedly exact integer time or equate it with latency.
+    let blockPeriodMicrosecondsNumerator = framesPerBlock * 1000000
+    let blockPeriodMicrosecondsDenominator = sampleRateHz
+    let deadlineReservePercent = 25
+    let renderBudgetMicrosecondsNumerator = blockPeriodMicrosecondsNumerator * (100 - deadlineReservePercent)
+    let renderBudgetMicrosecondsDenominator = sampleRateHz * 100
+
+    let voiceCount = 1
+    let oscillatorsPerVoice = 3
+    let maxControlEventsPerBlock = 32
+
+    // Proposed landscape surface. The mounted panel and its accepted timing
+    // select the eventual scan mode; UI update frequency is independent.
+    let displayWidthPixels = 800
+    let displayHeightPixels = 480
+    let framebufferBytesPerPixel = 2
+    let framebufferCount = 2
+    let uiUpdateHz = 30
+    let framebufferStrideBytes = displayWidthPixels * framebufferBytesPerPixel
+    let framebufferBytes = framebufferStrideBytes * displayHeightPixels
+    let framebufferPoolBytes = framebufferBytes * framebufferCount
+
+    // Payload accounting only, excluding render reads, blending, blanking,
+    // SDRAM refresh/arbitration and other bus masters. This is not a bus bound.
+    let fullSurfaceWriteBytesPerSecond = framebufferBytes * uiUpdateHz
