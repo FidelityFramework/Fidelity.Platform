@@ -43,6 +43,7 @@ modules and speculative register declarations are unnecessary.
 | Audio output and capture | Codec routes, SAI framing, clock error, sample/slot distinction, bounded refill, silence/mute, optional microphone/PDM paths | [Synth design](../../../docs/STM32H7_SYNTH_DESIGN.md) |
 | Display and touch | Accepted NT35510 timing, implemented immutable L8 frame/palette handoff, future repaint ownership, coordinate transforms and shared resources | [Display model](../../../docs/DISPLAY_MODEL.md) |
 | Storage | Internal assets, QSPI/SDMMC, SDRAM needs, read integrity, presets and interrupted-write recovery | [Product audit](../../../Hardware/Products/ST/STM32H747I_DISCO/docs/SOURCE_AUDIT.md) |
+| Radio (optional) | DISCO needs an external device; Bluetooth/Wi-Fi/LoRa selection, transport, power/pin conflicts, bounded control messages and backend trust | [Radio model](../../../docs/RADIO_MODEL.md) |
 | Diagnostics and validation | Fault/reset records, VCP/trace needs, timing measurements, reproducible binaries, numeric/reference and hardware evidence | [Accepted display profile](../../STM32H747I_DISCO_HelloDISCO_Display/README.md) |
 | DSP and cryptography premises | Numeric and bit semantics, bounded storage, lowering fidelity, side-channel obligations and entropy requirements | [Language readiness](LANGUAGE_READINESS.md) |
 | Optional expansion | MIDI/USB, network, camera, SPDIF/DFSDM, second-core workloads and their pin/resource conflicts | [Board routes](../../../Hardware/Products/ST/STM32H747I_DISCO/docs/CONNECTOR_MAP.md) |

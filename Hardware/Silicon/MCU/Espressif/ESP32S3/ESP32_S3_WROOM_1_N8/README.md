@@ -11,9 +11,22 @@ inventory, generated from Espressif's SVD by
 
 ## Status
 
-**Declarations only. Nothing here has been checked by CCS or built into an
-image.** 111 registers over 12 peripherals are declared — the subset a display
-and LED bring-up needs, not the part's full 2053-register inventory.
+The selected HelloESP source closure compiled through Composer and CCS and
+ran on the badge on 2026-09-12; see the
+[hardware acceptance record](../../../../../../docs/ESP32S3_BRINGUP.md#10-helloesp-runs-2026-09-12).
+111 registers over 12 peripherals are declared for the display/LED workload,
+not the part's full 2053-register inventory. Unused peripherals remain outside
+that acceptance.
+
+## Integrated radio
+
+This module provides 2.4 GHz Wi-Fi 802.11b/g/n and Bluetooth 5 LE with a PCB
+antenna; it does not provide Bluetooth Classic or LoRa. Wi-Fi and BLE share
+RF resources. These integrated capabilities retain this MCU package as their
+owner; [the Radio inventory](../../../../Radio/README.md) indexes them without
+creating a second device. HelloESP has no Wi-Fi/BLE implementation. See the
+[radio model](../../../../../../docs/RADIO_MODEL.md) for backend boundaries
+and future work.
 
 ## The -N8 suffix is load-bearing
 

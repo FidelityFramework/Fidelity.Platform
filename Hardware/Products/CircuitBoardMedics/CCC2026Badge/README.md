@@ -11,21 +11,34 @@ assignments.
 
 ## Status
 
-**Product scaffold. No accepted MCU bring-up, and no image has been built for
-this board.** What exists is a declaration of wiring and of the part's memory
-and register inventory. What does not exist is a toolchain that can emit code
-for it — see below.
+HelloESP compiled through Composer and CCS and ran on this badge on 2026-09-12,
+including its display, five LEDs, three buttons and 1 kHz interrupt. See the
+[hardware acceptance record](../../../../docs/ESP32S3_BRINGUP.md#10-helloesp-runs-2026-09-12).
+That establishes the selected workload; unused peripheral declarations remain
+outside its acceptance.
 
 | Piece | State |
 | --- | --- |
-| Wiring declarations | Written from documentation, silkscreen and working CircuitPython samples; not checked by CCS |
+| Wiring declarations | Selected HelloESP routes exercised; documentation, silkscreen and CircuitPython sources remain the provenance |
 | [Silicon memory/register declarations](../../../Silicon/MCU/Espressif/ESP32S3/ESP32_S3_WROOM_1_N8) | Written; 111 registers generated from Espressif's SVD |
-| Execution environment | Not written |
-| Profile | Not written |
-| Composer image backend | **Does not exist for Xtensa.** The MCU image path is Cortex-M33 only |
-| Xtensa codegen | **Not available in the LLVM on this machine** |
+| Execution environment and profile | [HelloESP selection](../../../../Profiles/CCC2026Badge_HelloESP/README.md), consumed by the compiled workload |
+| Composer image backend and Xtensa codegen | Executed for HelloESP; see the dated acceptance record for the actual toolchain and image |
 
-## The toolchain gap
+## Radio capability
+
+The ESP32-S3-WROOM-1-N8 contains 2.4 GHz Wi-Fi 802.11b/g/n and Bluetooth 5 LE
+with a PCB antenna. It has no Bluetooth Classic or LoRa transceiver. HelloESP
+does not initialize or exercise Wi-Fi/BLE. The
+[radio inventory](../../../Silicon/Radio/README.md) records primary sources,
+shared RF use and the distinction between available hardware and a Fidelity
+driver. The [radio model](../../../../docs/RADIO_MODEL.md) leaves backend/API
+implementation until its language and resource requirements are ready.
+
+## Initial toolchain investigation (historical)
+
+The following investigation predates the accepted HelloESP workload. Its
+options and machine-tool observations describe that initial state; §10 of the
+linked bring-up record establishes the later execution result.
 
 This part is a dual-core **Xtensa LX7**, and Xtensa is the obstacle.
 
@@ -45,8 +58,8 @@ The likely answer is therefore to build upstream LLVM 22.1.8 with
 `LLVM_EXPERIMENTAL_TARGETS_TO_BUILD=Xtensa` and select the S3 by flags — which
 keeps the lowering path pure LLVM and version-matched to the installed MLIR.
 `esp-clang` still has its role: building LVGL's static archive, which is where
-[toolchain sovereignty](../../../../Farscape/docs/roadmap/05_toolchain-sovereignty-and-native-assets.md)
-confines clang anyway. See [the bring-up plan](../../../docs/ESP32S3_BRINGUP.md) §1.
+[toolchain sovereignty](../../../../../Farscape/docs/roadmap/05_toolchain-sovereignty-and-native-assets.md)
+confines clang anyway. See [the bring-up plan](../../../../docs/ESP32S3_BRINGUP.md) §1.
 
 ## Why the wiring is declared without a netlist
 

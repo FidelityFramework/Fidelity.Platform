@@ -14,10 +14,11 @@ boundaries. The historical filename is retained for source references.
 | [BAREWire integration](BAREWire_Rebase_Plan.md) | What migrated and the remaining pin/schema work | Migration status and acceptance criteria |
 | [MMIO contracts and predicates](MMIO_CONTRACTS.md) | Region inventory, mappings, workload grants, CCS evidence and executable limits | Implemented static MMIO slice |
 | [Admission and accelerator handoffs](ADMISSION_AND_SIDECARS.md) | BPF host distinctions, verifier/resource budgets, Strix Halo/Arty and Metal UMA boundaries | Executable reference checks and source packages; compiler/gate integration pending |
-| [ESP32-S3 bring-up](ESP32S3_BRINGUP.md) | Xtensa toolchain gap, ROM-loaded SRAM image format, LX7 vector obligations, Composer backend deltas and the LVGL/Farscape boundary | Planning only; no image built and no declaration CCS-checked |
-| [STM32H7 synthesizer design](STM32H7_SYNTH_DESIGN.md) | Source/package audit, native DSP and touch UI, BAREWire memory/ownership extensions, evidence boundaries and acceptance ladder | Static banner accepted on hardware and after CN2 reconnect; GPIO/display integration and synth implementation pending |
-| [STM32H7 driver roadmap](STM32H7_DRIVER_ROADMAP.md) | Board routes and a documentation scaffold for resuming after Clef DSP/cryptography readiness | Future APIs and descriptor expansion deferred; finish the bounded HelloDISCO proof first |
+| [ESP32-S3 bring-up](ESP32S3_BRINGUP.md) | Xtensa image, vector and hardware bring-up history | §10 records the compiled HelloESP display/LED/button/interrupt workload running; radio remains outside acceptance |
+| [STM32H7 synthesizer design](STM32H7_SYNTH_DESIGN.md) | Source/package audit, native DSP and touch UI, BAREWire memory/ownership extensions, evidence boundaries and acceptance ladder | Interactive HelloDISCO and independent cold start accepted; audio, touch and the synth remain future work |
+| [STM32H7 driver roadmap](STM32H7_DRIVER_ROADMAP.md) | Board routes and a documentation scaffold for resuming after Clef DSP/cryptography readiness | Bounded HelloDISCO accepted; future APIs and descriptor expansion deferred |
 | [UI and display model across targets](DISPLAY_MODEL.md) | Fabulous/Partas-inspired composition, state and rendering boundaries; comparisons of HelloESP, HelloDISCO, HelloWayland and WrenHello | Grounded design exploration; native display first, optional binding paths retained |
+| [Radio model](RADIO_MODEL.md) | Wi-Fi/Bluetooth/LoRa ownership, reusable BLE commands/events, backend trust boundaries and language-readiness questions | Documentation scaffold; no radio driver or radio hardware acceptance |
 
 Hardware sources and board acceptance belong with the corresponding product;
 see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md),

@@ -1,7 +1,16 @@
 # ESP32-S3 bring-up: what the target needs that Cortex-M did not
 
-Planning document for running a Clef unikernel with statically bound LVGL on the
-Carolina Code Conference 2026 badge (ESP32-S3-WROOM-1-N8). Written 2026-09-11.
+Bring-up history for the Carolina Code Conference 2026 badge
+(ESP32-S3-WROOM-1-N8), begun 2026-09-11. Current status:
+[§10](#10-helloesp-runs-2026-09-12) records the Clef/Composer HelloESP image
+running its display, LEDs, buttons and interrupt on 2026-09-12. The initial
+toolchain/declaration concerns below are historical. The accepted application
+uses its native display path; Wi-Fi/BLE are future work in the
+[Radio scaffold](RADIO_MODEL.md).
+
+## Initial plan (2026-09-11)
+
+The initial plan considered a Clef unikernel with statically bound LVGL.
 
 The accepted MCU path in this repository is
 [EK_RA6M5_HelloBlinky](../Profiles/EK_RA6M5_HelloBlinky): a Cortex-M33 image with
@@ -669,4 +678,3 @@ Later-stage polish from the same audit: `Leds.waitIdle` polls `TX_START`,
 which is write-only (use the `CH0STATUS` state field); `SPI_CMD.UPDATE` could
 be re-issued per transfer; SYSTIMER period-mode write ordering; RMT
 `SYS_CONF` `MEM_FORCE_PU`/`SCLK_DIV_B` as esp-idf sets them.
-

@@ -6,13 +6,10 @@ the ESP32-S3 mask ROM from flash offset 0.
 
 ## Status
 
-**Not accepted, but no longer untried.** No image has been built from *this
-profile* by CCS. An image built through the same Composer backend, from
-hand-written IR, ran on the badge on 2026-09-11 and drove the backlight — see
-[First light](../../docs/ESP32S3_BRINGUP.md#9-first-light). It is composed from
-declarations that have not been checked by CCS, against a Composer backend whose
-subprocess sequence has never run, for an architecture whose toolchain is still
-being stood up. Every piece is authored; none is verified.
+The selected HelloESP application compiled through Composer and CCS and ran
+on the badge on 2026-09-12, including display, LEDs, buttons and a 1 kHz
+interrupt. See [the hardware acceptance record](../../docs/ESP32S3_BRINGUP.md#10-helloesp-runs-2026-09-12).
+This establishes that workload, not every declared peripheral or future driver.
 
 ## What it selects
 
@@ -52,7 +49,13 @@ the [2026-09-11 recovery image](../../../MCU/Espressif/CCC2026Badge/recovery/202
 
 ## Not in this image
 
-No RTOS, no ESP-IDF, no second-stage bootloader, no partition table, no heap, no
+No RTOS, no ESP-IDF, no second-stage bootloader, no partition table, no
 DMA, no WiFi, no BLE, no flash cache or MMU configuration — and **no LVGL**.
 HelloESP draws its own framebuffer so the hardware path can be proven before a
 foreign archive joins the link.
+
+The application does use image-owned allocation for its arrays; the
+[display model](../../docs/DISPLAY_MODEL.md#representation-and-lifetime-determine-the-implementation)
+records actual storage widths and allocation behavior. The
+[Radio scaffold](../../docs/RADIO_MODEL.md) inventories available wireless
+hardware without adding it to this workload.

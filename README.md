@@ -10,10 +10,11 @@ uses their evidence to compile, package and deploy the artifact.
 - `Contracts/`: shared MMIO, admission-evidence and BAREWire-backed handoff contracts.
 - `AbstractMachines/`: cBPF/eBPF instruction descriptions; no executable backend.
 - `Hardware/Silicon/`: architecture, part and package facts.
+- `Hardware/Silicon/Radio/`: radio inventory and future discrete parts; integrated radios retain their MCU owner.
 - `Hardware/Products/`: component selection, wiring and available resources.
 - `Hardware/VirtualMachines/`: guest-machine descriptions; currently synthetic.
 - `Environments/`: execution ABI, host-provided services, native bindings and admission rules.
-- `Protocols/`: reserved protocol implementations, including virtio.
+- `Protocols/`: reserved protocol implementations, including virtio and the Radio design scaffold.
 - `Profiles/`: execution selections, workload budgets and explicitly marked reference catalogues.
 
 [PLATFORM_STRUCTURE.md](PLATFORM_STRUCTURE.md) lists current packages and support

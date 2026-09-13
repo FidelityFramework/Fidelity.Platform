@@ -10,6 +10,23 @@ the NT35510 panel and its return after reconnecting CN2 without a debugger.
 Audio, touch, general DMA ownership and external-memory
 protocols remain outside this accepted display path.
 
+Update, 2026-09-13: the combined joystick/LED and palette-driven banner image
+is accepted, including debugger-disconnected cold start. The
+[scaffold handoff](../../../../Profiles/STM32H747I_DISCO_Synth_Reference/scaffold/README.md)
+records that checkpoint and the return to language/compiler work.
+
+## Radio expansion
+
+There is no onboard Wi-Fi, Bluetooth or LoRa radio. MB1280 is a STMod+ fan-out
+board with expansion connections, including an ESP-01 socket; its BOM does
+not supply a radio module. The [radio inventory](../../../Silicon/Radio/README.md)
+records the sources and the distinction between a connector and an installed
+device. Any later radio needs a selected module, reconciled power/pin routes
+and a separate driver/resource profile. See the
+[radio model](../../../../docs/RADIO_MODEL.md) for shared protocol/API direction.
+
+## Source pack
+
 The [source audit](docs/SOURCE_AUDIT.md) identifies downloaded documents by
 contents, hashes, revisions and board applicability. The
 [synthesizer design](../../../../docs/STM32H7_SYNTH_DESIGN.md) defines the full
