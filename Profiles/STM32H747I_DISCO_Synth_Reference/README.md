@@ -5,6 +5,13 @@ three oscillators, a nonlinear ladder-style filter, envelopes, and a touch UI.
 It has no `[platform]` selection and cannot produce or deploy an MCU image.
 The values are proposed requirements, not hardware capabilities or verified bounds.
 
+The current policy is a **light documentation scaffold until Clef's required
+language support is ready**. Start from the [scaffold handoff](scaffold/README.md).
+Preserve the existing budget arithmetic as an exploratory record; do not grow
+this package into a future driver API or ownership schema around present
+compiler limitations. Completing the bounded HelloDISCO proof precedes a
+focused language/compiler phase for DSP and cryptography.
+
 [Requirements.clef](Requirements.clef) keeps the first budget calculations in
 authored Clef. The [design and acceptance plan](../../docs/STM32H7_SYNTH_DESIGN.md)
 defines ownership, BAREWire extensions, numerical obligations, and bring-up stages.

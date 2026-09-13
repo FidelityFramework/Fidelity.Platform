@@ -1,12 +1,17 @@
 # STM32H747I-DISCO driver scope and next boundary
 
-Assessment, 2026-09-13. Finish HelloDISCO's agreed joystick/LED behavior in one
-display image, then take the requested Clef language/compiler checkpoint.
-Name the synthesizer capabilities and their contracts now; the next hardware
-increment when instrument work resumes is one audio-output chain producing
-silence and a fixed tone. A complete peripheral register catalog, SDRAM,
-touch, a general graphics runtime and USB MIDI are not prerequisites for that
-first audio milestone.
+Assessment, 2026-09-13. Finish the bounded HelloDISCO proof and organize the
+future hardware work as a light documentation scaffold. Then focus on Clef's
+language/compiler support for DSP and cryptography. The unfinished language
+surface is a reason to defer driver APIs and descriptor expansion: encoding
+today's workarounds throughout the board would create avoidable refactoring.
+
+The [scaffold handoff](../Profiles/STM32H747I_DISCO_Synth_Reference/scaffold/README.md)
+is the pickup point after that language work. Capability names below are
+organizational labels. Record hardware facts, dependencies, open decisions and
+future acceptance checks now; settle executable representations when their
+language support is ready. Audio silence/tone is a future resumption candidate,
+not an additional task before the language checkpoint.
 
 The [synth design](STM32H7_SYNTH_DESIGN.md) remains the architecture and numerical
 acceptance plan. This document chooses the next driver boundaries; the names
@@ -38,7 +43,12 @@ application/profile. Silicon packages own register requirements; the product
 owns routes; drivers own protocol transitions. Reuse original `MemorySpace`
 instances. A memory envelope neither initializes a device nor grants access.
 
-## Small outlines worth settling now
+## Questions to preserve in the scaffold
+
+The following sketches preserve design intent; their operation names, data
+shapes and sequencing APIs remain provisional. No new API or descriptor schema
+is selected by this document. Existing HelloDISCO code remains a narrow accepted
+implementation rather than the mandatory template for every future driver.
 
 **Shared control bus.** `I2c4Bus` should have one owner and bounded transfers
 using canonical 7-bit addresses, explicit register-address width and byte
@@ -84,9 +94,11 @@ HelloDISCO repaints; the currently published banner is immutable. Pick a
 bounded pause/repaint/resume or completed-buffer handoff appropriate to the
 small demo, and test its visible result before introducing a general renderer.
 
-These are contract outlines. Add register declarations and Clef APIs only with
-their concrete consumer, bounded protocol and validation. Empty driver modules,
-permissive grants and unsupported proof tags would overstate readiness.
+These are documentation outlines. Until the language-readiness gate is met,
+extend the executable slice only where the bounded HelloDISCO proof needs it.
+Keep future register inventories, driver APIs and ownership representations in
+the scaffold. Empty driver modules, permissive grants and unsupported proof
+tags would overstate readiness and freeze premature choices.
 
 ## Cutline after HelloDISCO
 
@@ -96,8 +108,8 @@ and records its render handoff, input behavior and independent reset result.
 Touch and synthesizer audio remain outside that demo boundary. Preserve both
 static display images as recovery/reference selections.
 
-When synthesizer implementation resumes, the next executable increment is
-**codec control plus PCM silence/tone**, with
+After language support is ready and synthesizer implementation resumes, the
+first hardware candidate is **codec control plus PCM silence/tone**, with
 display load included when testing refill reliability. Then add the native
 monophonic DSP model and its numerical harness. Touch, larger/double surfaces,
 SDRAM and preset storage follow demonstrated instrument needs. Reserve names
@@ -105,7 +117,11 @@ for microphone/input, USB MIDI, Ethernet, camera, M4 and optional foreign
 renderers; no driver implementation for those is justified by the present demo.
 Do not silently extend HelloDISCO into that audio milestone: the user's intended
 boundary after the interactive demo is a return to language/compiler completion.
-The audio contract can be settled now without starting its register implementation.
+The audio requirements and unanswered contract questions can be recorded now;
+its final Clef API, BAREWire representation and descriptor structure stay open.
+DSP numerical semantics and cryptographic bit/constant-time requirements drive
+the intervening language/compiler work. A successful display proof establishes
+neither of those broader language capabilities.
 
 Before claiming general register-protocol or memory proofs, close RM0399 and
 ES0445 authority/errata gaps, preserve the SVD's interim provenance, reconcile

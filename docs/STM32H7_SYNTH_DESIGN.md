@@ -1,5 +1,11 @@
 # STM32H747I-DISCO native Clef synthesizer
 
+Execution boundary, 2026-09-13: finish the bounded HelloDISCO proof, frame the
+future driver work in the [documentation scaffold](../Profiles/STM32H747I_DISCO_Synth_Reference/scaffold/README.md),
+then focus on Clef language/compiler readiness for DSP and cryptography. This
+design records future requirements and alternatives; driver descriptors should
+not expand around the unfinished language surface.
+
 Design baseline: 2026-09-12. This is an analysis and scaffolding increment. The
 goal is a Clef unikernel instrument with Minimoog-like sound characteristics,
 audio output, display and capacitive touch. Hardware inventory should preserve
