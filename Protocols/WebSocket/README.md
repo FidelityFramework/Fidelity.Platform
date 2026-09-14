@@ -1,0 +1,9 @@
+# WebSocket
+
+RFC 6455 as protocol source shared by every native environment: the frame codec (`Frame.clef`: header parsing, masking, frame building, close payloads), the opening handshake (`Handshake.clef`: upgrade request validation, `Sec-WebSocket-Accept` from SHA-1 and Base64, the 101 response), and the protocol types (`Types.clef`: opcodes, close codes, the parsed header, connection state, the decoded inbound message). Namespace `Fidelity.Platform.WebSocket`. These files are pure over bytes and strings and depend on no environment binding.
+
+The medium is the environment's. Each `Environments/<environment>/<architecture>/` that speaks WebSocket supplies its own socket, TLS and run loop and declares the result as a `Transport` in its platform description (`MaxUnit`, `Ordered`, endpoints), so a frame can be checked against the medium the same way a buffer is checked against its capacity. The Linux x86_64 server (`Environments/Linux/x86_64/WebSocket/Server.clef`, with the socket-bound `WebSocketServer` and `SockAddrIn` types beside it) is the first such binding: listen, accept, upgrade, receive and send over the socket syscalls, consuming this protocol tier. It is a draft (single client, no fragmentation, blocking receive) and is in no `.fidproj`.
+
+Written here: the server role of the handshake, unmasked server-to-client frames, unmasking of client frames. Not written: the client role (key generation, masked client-to-server frames, `Sec-WebSocket-Accept` validation), fragmentation, extensions, and any TLS, which is an environment binding by nature. BAREWire's envelope travels inside a binary message; the two framings are separate layers and neither absorbs the other (BAREWire `docs/Readiness Audit.md` §5).
+
+Sibling protocols that will share this pattern of pure sequencing over environment-owned media, WebTransport and Media over QUIC among them, belong beside this directory when they are written.

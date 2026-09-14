@@ -1,9 +1,10 @@
-/// WebSocket Server Implementation
-/// RFC 6455 compliant WebSocket server for WREN Stack
-namespace Fidelity.Platform.WebSocket
+/// WebSocket server over Linux TCP sockets: listen, accept, upgrade, receive, send.
+/// The protocol (frames, masking, handshake) is Protocols/WebSocket; this file binds it to the socket syscalls.
+namespace Fidelity.Platform.Linux_x86_64
 
 open Fidelity.Platform.Bindings
 open Fidelity.Platform.Types
+open Fidelity.Platform.WebSocket
 
 /// WebSocket server operations
 module Server =

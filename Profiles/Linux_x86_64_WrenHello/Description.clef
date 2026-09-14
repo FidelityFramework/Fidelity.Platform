@@ -1,0 +1,73 @@
+/// Linux selection for WrenHello: the default budgets with a constant section
+/// sized for the welded UI bundle.
+module Fidelity.Platform.Profiles.Linux_x86_64_WrenHello.Description
+
+open BAREWire.Platform
+open Fidelity.Platform.Environments.Linux.X86_64
+open Fidelity.Platform.Profiles.Linux_x86_64_Default.CompatibilityBudgets
+
+/// `.rodata` budget: 32 pages. The welded UI bundle (`src/Backend/EmbeddedAssets.fs`,
+/// one literal of about 49 KiB at version 0.3.0) and the backend's other literals
+/// are proved to fit; the budget leaves room for the bundle to double before this
+/// declaration must change.
+let rodataWren: MemorySpace = {
+    Name = "rodata"
+    Kind = MemoryKind.Rodata
+    Capacity = 131072
+    Alignment = 4096
+    Granularity = 4096
+    Growth = Growth.Fixed
+    Access = Access.ReadOnly
+    Base = None
+    Notes = "linker-placed constants; 32-page budget for the embedded UI bundle"
+    MapKind = ""
+    Since = ""
+    Until = ""
+}
+
+/// `Console.readln`'s line buffer, as in the default profile.
+let consoleReadln: BufferSchema = {
+    Name = "consoleReadln"
+    Schema = "str"
+    Capacity = Console.READLINE_CAPACITY
+    Framing = Framing.Delimited
+    Delimiter = 10
+    TrimDelimiter = true
+    Space = "arena"
+    Lifetime = Lifetime.Scope
+    Access = Access.ReadWrite
+    Slot = 0
+}
+
+/// `Console.write`'s source, bounded by this profile's `rodata` budget.
+let consoleWrite: BufferSchema = {
+    Name = "consoleWrite"
+    Schema = "str"
+    Capacity = 131072
+    Framing = Framing.Fixed
+    Delimiter = -1
+    TrimDelimiter = false
+    Space = "rodata"
+    Lifetime = Lifetime.Program
+    Access = Access.ReadOnly
+    Slot = 0
+}
+
+/// The platform: the default Linux selection with `rodata` replaced.
+let description: PlatformDescription = {
+    Id = "cpu-linux-x86_64-wrenhello"
+    DisplayName = "Linux x86-64 (libc), WrenHello budgets"
+    Substrate = "CPU"
+    Core = Some core
+    Spaces = [| text; rodataWren; data; bss; stack; arena; heap |]
+    Surfaces = [| syscalls |]
+    Buffers = [| consoleReadln; consoleWrite |]
+    Transports = [| websocket; wayland |]
+    Lifecycle = lifecycle
+    Notes = [|
+        "budgets: Linux_x86_64_Default/CompatibilityBudgets.clef, except rodata"
+        "rodata: 32 pages for the welded UI bundle in WrenHello/src/Backend/EmbeddedAssets.fs"
+        "consoleReadln capacity: Console.READLINE_CAPACITY in Console.clef"
+    |]
+    Limits = [||]
+}

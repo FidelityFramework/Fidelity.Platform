@@ -1,8 +1,6 @@
-/// WebSocket Frame Implementation
-/// RFC 6455 compliant frame parsing and building
+/// WebSocket frame codec: RFC 6455 §5 header parsing, masking, and frame building.
+/// Pure over bytes; every environment binds the medium underneath (Protocols/WebSocket/README.md).
 namespace Fidelity.Platform.WebSocket
-
-open Fidelity.Platform.Bindings
 
 /// WebSocket frame operations
 module Frame =

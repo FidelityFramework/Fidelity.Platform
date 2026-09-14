@@ -1,8 +1,7 @@
-/// WebSocket Handshake Implementation
-/// RFC 6455 compliant HTTP upgrade handshake with pure F# SHA-1 and Base64
+/// WebSocket opening handshake: RFC 6455 §4 upgrade request and response with SHA-1 (FIPS 180-4)
+/// and Base64. Pure over strings and bytes; the environment supplies the socket
+/// (Protocols/WebSocket/README.md). Server role only; the client role (key generation, masked send) is not written.
 namespace Fidelity.Platform.WebSocket
-
-open Fidelity.Platform.Bindings
 
 /// Pure F# SHA-1 implementation (FIPS 180-4)
 module SHA1 =

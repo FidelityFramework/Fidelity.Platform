@@ -1,6 +1,6 @@
 # Fidelity.Platform structure
 
-Taxonomy updated 2026-09-13 with a documentation-only Radio scaffold.
+Taxonomy updated 2026-09-14: the WebSocket protocol moved under `Protocols/`, leaving its Linux socket server in the environment. 2026-09-13 added a documentation-only Radio scaffold.
 Hardware identity, execution environment,
 communication protocol and workload selection have separate owners. Shared
 silicon declarations can support several products; one product can support
@@ -38,7 +38,8 @@ Fidelity.Platform/
 │   └── iOS/                      # Reserved
 ├── Protocols/
 │   ├── Radio/                    # Design scaffold; no radio drivers
-│   └── Virtio/                   # Reserved; no driver implementation
+│   ├── Virtio/                   # Reserved; no driver implementation
+│   └── WebSocket/                # RFC 6455 frames, handshake, types; environments bind the socket
 └── Profiles/
 ```
 
@@ -70,7 +71,9 @@ general topology composition still need implementation.
 
 [Radio hardware](Hardware/Silicon/Radio/README.md) reserves discrete-radio part
 ownership and indexes integrated MCU radios without duplicating them.
-[Radio protocols](Protocols/Radio/README.md) groups Bluetooth, Wi-Fi and future
+[WebSocket](Protocols/WebSocket/README.md) holds RFC 6455 as protocol source shared
+by every environment; `Environments/Linux/x86_64/WebSocket/` keeps only the socket-bound
+server and its descriptor types. [Radio protocols](Protocols/Radio/README.md) groups Bluetooth, Wi-Fi and future
 LoRa work. The [radio model](docs/RADIO_MODEL.md) keeps board wiring, protocol
 semantics, environment bindings and application messages in their owning layers.
 
@@ -86,6 +89,7 @@ and deployment; OCI would be an orchestration selection, not a hardware branch.
 | [CCC2026Badge_HelloESP](Profiles/CCC2026Badge_HelloESP/README.md) | Compiled display/LED/button/interrupt workload observed on hardware; Wi-Fi/BLE outside acceptance |
 | [STM32H747I_DISCO_HelloDISCO_Interactive](Profiles/STM32H747I_DISCO_HelloDISCO_Interactive) | Interactive banner/joystick/LED workload and independent cold start accepted; audio, touch, storage and optional radio remain scaffold work |
 | [Linux_x86_64_Default](Profiles/Linux_x86_64_Default) | Hosted Linux/libc selection; architecture facts, services/bindings and preserved application budgets have separate owners |
+| [Linux_x86_64_WrenHello](Profiles/Linux_x86_64_WrenHello) | The default Linux selection with a 32-page constant-section budget for WrenHello's embedded UI bundle |
 | [ArtyA7_HelloArty](Profiles/ArtyA7_HelloArty) | Application report/buffer/UART requirements over [Digilent product wiring](Hardware/Products/Digilent/ArtyA7_100T) and [Xilinx part facts](Hardware/Silicon/FPGA/Xilinx/Artix7/XC7A100T_CSG324); Contracts still supplies the operative pin map |
 | [RestrictedGuest64](Profiles/RestrictedGuest64) | Synthetic 64-bit-pointer/32-bit-MMIO compiler fixture using a [synthetic machine](Hardware/VirtualMachines/Synthetic/RestrictedGuest64) and freestanding x86_64 facts; no VM boot or virtio |
 | [MeadowF7](Hardware/Products/WildernessLabs/MeadowF7) | Product scaffold and reference pack; no accepted MCU bring-up |

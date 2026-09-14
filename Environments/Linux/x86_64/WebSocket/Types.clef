@@ -1,0 +1,30 @@
+/// Linux socket-bound WebSocket types: the server's descriptors and the sockaddr_in layout.
+/// The protocol itself lives in Protocols/WebSocket (namespace Fidelity.Platform.WebSocket).
+namespace Fidelity.Platform.Linux_x86_64
+
+open Fidelity.Platform.WebSocket
+
+/// WebSocket server state over Linux TCP sockets
+[<Struct>]
+type WebSocketServer = {
+    ListenFd: int
+    ClientFd: int
+    Port: uint16
+    State: ConnectionState
+}
+
+/// Socket address structure for IPv4 (sockaddr_in)
+/// Layout: family (2) + port (2) + addr (4) + zero (8) = 16 bytes
+module SockAddrIn =
+    [<Literal>]
+    let Size = 16
+
+    [<Literal>]
+    let AF_INET = 2us
+
+    /// Build sockaddr_in in a stack buffer
+    /// port should be in network byte order (use htons)
+    /// addr 0 means INADDR_ANY (bind to all interfaces)
+    let inline offsetFamily = 0
+    let inline offsetPort = 2
+    let inline offsetAddr = 4

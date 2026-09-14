@@ -1,0 +1,16 @@
+[package]
+name = "Fidelity.Platform.Profiles.Linux_x86_64_WrenHello"
+version = "0.1.0"
+description = "Linux x86-64 libc selection with a constant-section budget for WrenHello's embedded UI."
+[compilation]
+target = "cpu"
+[build]
+sources = ["Description.clef"]
+output_kind = "library"
+[platform]
+description = "Fidelity.Platform.Profiles.Linux_x86_64_WrenHello.Description.description"
+runtime_model = "libc"
+os = "linux"
+arch = "x86_64"
+[dependencies]
+default = { path = "../Linux_x86_64_Default/Fidelity.Platform.Description.fidproj" }
