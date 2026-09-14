@@ -7,7 +7,7 @@ open Fidelity.Platform.Environments.Linux.X86_64
 open Fidelity.Platform.Profiles.Linux_x86_64_Default.CompatibilityBudgets
 
 /// `.rodata` budget: 32 pages. The welded UI bundle (`src/Backend/EmbeddedAssets.fs`,
-/// one literal of about 49 KiB at version 0.3.0) and the backend's other literals
+/// one literal of 48,928 bytes at version 0.3.0) and the backend's other literals
 /// are proved to fit; the budget leaves room for the bundle to double before this
 /// declaration must change.
 let rodataWren: MemorySpace = {
