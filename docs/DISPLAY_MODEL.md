@@ -1,6 +1,7 @@
 # A coherent UI and display model across Fidelity targets
 
-Exploration dated 2026-09-12, with HelloDISCO observations updated 2026-09-13,
+Exploration dated 2026-09-12, with HelloDISCO observations updated 2026-09-13
+and UI direction aligned with the 2026-09-18 architectural review,
 grounded in the current HelloESP, HelloDISCO,
 HelloWayland and WrenHello sources. This is a direction for incremental work,
 not a new framework implementation or a claim of proved rendering.
@@ -13,13 +14,15 @@ Native Clef is the default path; LVGL/Skia bindings remain possible alternatives
 
 ## The programming model and the display are separate contracts
 
-The existing [component design](../../Fidelity.UI/docs/02_component_model.md)
-combines Fabulous-style computation expressions and typed modifiers with
-Partas.Solid/SolidJS-style selective updates. Its
-[Elmish–signal hybrid](../../Fidelity.UI/docs/07_elmish_signal_hybrid.md) adds
-one authoritative state transition and selective notification of changed model
-fields. These are compatible layers: a CE describes composition; it need not
-dictate rebuilding a complete tree whenever state changes.
+The current [UI architectural review](../../Fidelity.UI/docs/08_ui_model_reconsideration.md)
+selects cold functional descriptions and owned, demand-driven activation over a
+shared semantic contract. The native direction is a new reactive-area engine;
+WREN realizes the contract through the DOM/WebView. The
+[component design](../../Fidelity.UI/docs/02_component_model.md) keeps computation
+expressions optional over those same operations. An
+[Elmish–signal hybrid](../../Fidelity.UI/docs/07_elmish_signal_hybrid.md) can provide
+authoritative pure state transitions and selective projections where useful.
+Neither CEs nor whole-model reducers are prerequisites for selective updates.
 
 For HelloDISCO, pressing Up/Down changes the logo palette. An LED timer tick
 changes LED phase without changing the logo. Its foreground palette consumer
@@ -27,31 +30,30 @@ compares the requested and applied palette and schedules work when they differ.
 This small, explicit dependency is a useful first instance of the intended
 reactivity, without importing an unaccepted signal runtime into the image.
 
-The source history matters here:
+The [Fidelity UI model](../../clef-lang-site/hugo/content/blog/fidelity-ui-model.md)
+describes declarative controls and owned activation.
+[Native reactivity in Clef](../../clef-lang-site/hugo/content/blog/native-reactivity-in-clef.md)
+places incremental work in the language and framework's reactive foundation.
+[Scaling FidelityUI](../../clef-lang-site/hugo/content/blog/scaling-fidelityui.md)
+extends the design to independently owned views and services. Execution placement
+and resource budgets remain explicit choices for each product.
 
-- [Fabulous for native UI](../../clef-lang-site/hugo/content/blog/leveraging-fabulous-for-native-ui.md)
-  and [the Fidelity UI model](../../clef-lang-site/hugo/content/blog/fidelity-ui-model.md)
-  establish declarative widgets, attributes and native compilation as the
-  objective. Their LVGL/Skia paths and compile-away claims are early proposals.
-- [Fidelity.Rx's UI follow-up](../../clef-lang-site/hugo/content/blog/fidelityrx-native-reactivity.md#integration-with-ui-from-fabulous-to-fidelityui)
-  explicitly moves toward signal-driven UI primitives. The reusable lesson is
-  fine-grained dependency/update semantics, not a requirement to restore the
-  earlier runtime-diffing design.
-- [Scaling FidelityUI](../../clef-lang-site/hugo/content/blog/scaling-fidelityui.md)
-  explores larger actor/lifetime structures. That does not require a tiny MCU
-  logo application to instantiate a desktop actor runtime.
-
-The proposed component setup runs once **per mount**; reactive properties and
-conditional/list regions still perform work as their inputs change. Static
-composition can be specialized, but dynamic child counts, text, subscriptions
-and resource lifetime still require bounded state and an implementation. A CE
-surface alone does not imply zero allocations or prove its update cost.
+The proposed cold description performs no mounting or subscription until an
+explicit owner activates it. Mounted setup is distinct from repeatable pure
+area updates. Invalidated derivations run when demanded; application-owned
+service observation or scoped preparation can retain demand independently of
+visibility. Closing a visual observer need not stop its service. The specified
+`Effect.create` activates a sink, so a cold UI description defers that call until
+owned activation. Static composition can be specialized, but dynamic children,
+text, subscriptions and resource lifetime still require bounded state and an
+implementation. Neither syntax surface implies zero allocations or proves its
+update cost.
 
 ```mermaid
 flowchart TD
     Input[Joystick / touch / hosted events] --> Update[Bounded state transition]
     Update --> Changed[Changed properties and affected regions]
-    CE[Declarative components and typed properties] --> Scene[Scene meaning and layout]
+    View[Declarative components and typed properties] --> Scene[Scene meaning and layout]
     Changed --> Scene
     Scene --> Native[Native pixel or drawing operations]
     Scene --> Web[Hosted DOM component adapter]
@@ -71,7 +73,7 @@ by LLVM from a generic widget name.
 | Contract | Portable meaning | Target-owned obligations |
 | --- | --- | --- |
 | State and events | Actions, pure update, derived properties, bounded event policy | Physical input normalization; event delivery and scheduling |
-| Composition and reactivity | Typed components/properties, layout, stable identity, changed regions | Accepted CE lowering; bounded topology/captures and update execution |
+| Composition and reactivity | Typed components/properties, layout, stable identity, changed regions | Accepted semantic operation lowering; bounded dependencies, ownership, demand and update execution; optional CE elaboration |
 | Drawing | Shape/mask, logical color, clipping and coordinate transforms | Raster algorithm or supported hosted/accelerated realization |
 | Storage | Extents, format, pitch, capacity, access lifetime | Actual representation, address, alignment, master reachability and cache policy |
 | Presentation | Publication, completion, reuse and failure | SPI completion, LTDC reload/scanout, compositor release, or WebView lifecycle |
@@ -82,6 +84,23 @@ access contracts use BAREWire. The application owns its workload policy. CCS
 and Composer must consume each supported contract and retain evidence for the
 selected implementation. Introducing a descriptor without a consumer does not
 establish its guarantee.
+
+## Sweet Potato and the KeyStation panel
+
+The [Sweet Potato port plan](SWEET_POTATO_UI_PORT.md) applies this model to the
+AML-S905X-CC-V2 with the selected Waveshare 7.9inch HDMI LCD, SKU 17916.
+The [panel entry](../Hardware/Products/Waveshare/7_9inch_HDMI_LCD/README.md)
+records its HDMI/USB interfaces, ASIN and UPCs.
+Native Meson display and touch integration precede a restricted Mali-450
+renderer. CPU rendering supplies the reference for damage, clipping and alpha.
+Linux provides a separately selected hosted route and hardware reference.
+
+The [UI design](../../Fidelity.UI/docs/09_sweet_potato_keystation.md) keeps
+component syntax independent of those drivers. Selected fades acquire temporary
+clock demand, while an inactive panel can release visual demand and retain a
+separately owned service projection. Device completion and display release
+govern buffer reuse. The [board entry](../Hardware/Products/LibreComputer/AML_S905X_CC_V2/README.md)
+records hardware identity, source evidence and the remaining acceptance gates.
 
 ## Current API implementation limits
 
@@ -94,19 +113,19 @@ Elmish/store hybrid.
 Current [Fidelity.UI widgets](../../Fidelity.UI/src/Widgets.clef) are small
 descriptor constructors. Its containers retain a child count, not a complete
 child graph, and the [renderer](../../Fidelity.UI/src/Render.clef) is a partial
-hosted implementation. The full CE/component design is not implemented by
-those files. Their historical comments about language support are not a
+hosted implementation. Those files do not implement the shared component and
+reactive-area design. Their historical comments about language support are not a
 substitute for checking today's compiler.
 
-[Fidelity.Signal's status](../../Fidelity.Signal/README.md#implementation-status--read-this)
+[Fidelity.Signal's status](../../Fidelity.Signal/README.md#implementation-status)
 explicitly marks its runtime-table/function-pointer implementation superseded.
 The [reactive specification](../../clef-lang-spec/spec/reactive-signals.md)
-prescribes a thin surface over `Observable`/`Incremental`, while the library
-README still calls that relationship an open architecture question. That
-disagreement needs reconciliation. The native design calls for closure/PSG
-dependencies; it does not establish a working heapless MCU stabilization implementation.
+and library README now agree on a thin surface over `Observable`/`Incremental`.
+The compiler-visible dependency and lifetime design remains an implementation
+obligation; it does not establish a working heapless MCU stabilization
+implementation.
 HelloDISCO should preserve a replaceable state/update boundary without choosing
-that unresolved machinery as a prerequisite for its logo.
+that unimplemented machinery as a prerequisite for its logo.
 
 The current [native checker](../../clef/src/Compiler/NativeTypedTree/NativeService.fs)
 special-cases sequence expressions but handles a generic computation-expression
@@ -160,9 +179,9 @@ This expression is a design example using existing functions. The
 [interactive image](../../MCU/ST/STM32H747I-DISCO/HelloDISCO/experiments/interactive/README.md)
 implements a fixed foreground palette consumer rather than a general subscriber
 runtime: one batch keeps a stable selected palette, and later input can choose
-the next batch. General messages, typed
-models and CE composition can grow above the same semantics when their native
-lowerings are accepted. For the first fixed graph, explicit projections provide
+the next batch. General messages, typed models and functional composition,
+with optional CEs, can grow above the same semantics when their native lowerings
+are accepted. For the first fixed graph, explicit projections provide
 the desired change-notification behavior without claiming the compiler has
 inferred a Signal dependency graph.
 
@@ -321,7 +340,7 @@ path can proceed now without requiring or forbidding either binding.
 
 | Obligation | Evidence to seek | Current limit |
 | --- | --- | --- |
-| UI meaning | Deterministic action traces, changed-property behavior, layout/coordinate checks | No general native CE UI lowering accepted by this work |
+| UI meaning | Deterministic action traces, changed-property behavior, layout/coordinate checks | No general native semantic UI lowering accepted by this work |
 | Numeric rendering | Explicit color/geometry representations, quantization rules, reference comparisons | Bounded integers or IEEE selection do not prove arbitrary rendering accuracy |
 | CPU memory accesses | Capacity/pitch arithmetic, scoped views, actual element width and instructions | Source validity is not a whole-program memory-safety certificate |
 | Device memory accesses | Master reachability, extents, publication/completion/cache obligations | Existing MMIO grants do not check general DMA ownership or program an MPU |

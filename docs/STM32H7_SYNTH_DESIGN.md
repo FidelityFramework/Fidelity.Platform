@@ -15,6 +15,12 @@ small, independently observable stages.
 
 The initial implementation direction is native Clef DSP and a purpose-built
 native UI, with narrow replaceable interfaces for optional foreign components.
+The [current UI review](../../Fidelity.UI/docs/08_ui_model_reconsideration.md)
+places this future instrument within a shared cold semantic UI contract and
+native reactive-area engine. Audio service demand, control updates and visual
+layout/paint have separate ownership and scheduling obligations; closing a
+control panel need not stop an active instrument. This does not change the
+accepted hardware checkpoint or establish an audio implementation.
 The native display path is the default because it exposes bounds, storage and
 handoffs to the verification tools. LVGL/Skia bindings remain optional research
 paths. Static linking does not establish their memory safety or remove them
@@ -232,9 +238,10 @@ panel orientation, contact identity and release; continuous control changes
 can be coalesced, while note-on/off events require a defined overflow policy.
 
 The existing sibling libraries offer useful ideas but do not yet supply this
-runtime: Fidelity.Signal is UI reactivity, with its older runtime marked
-superseded; Fidelity.UI has small pure widget descriptors but its renderer
-depends on Wayland/GBM/resvg/libc; Fidelity.Font is a FreeType binding. A
+runtime: Fidelity.Signal documents the thin `Observable`/`Incremental` surface,
+with its older runtime marked superseded; Fidelity.UI has small pure widget
+descriptors but its renderer depends on Wayland/GBM/resvg/libc; Fidelity.Font is
+a FreeType binding. A
 build-time glyph atlas and a bounded native blitter are a practical initial
 font path. Reuse pure interfaces selectively rather than importing hosted
 dependencies into the audio image.

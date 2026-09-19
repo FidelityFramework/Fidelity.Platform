@@ -17,8 +17,10 @@ boundaries. The historical filename is retained for source references.
 | [ESP32-S3 bring-up](ESP32S3_BRINGUP.md) | Xtensa image, vector and hardware bring-up history | §10 records the compiled HelloESP display/LED/button/interrupt workload running; radio remains outside acceptance |
 | [STM32H7 synthesizer design](STM32H7_SYNTH_DESIGN.md) | Source/package audit, native DSP and touch UI, BAREWire memory/ownership extensions, evidence boundaries and acceptance ladder | Interactive HelloDISCO and independent cold start accepted; audio, touch and the synth remain future work |
 | [STM32H7 driver roadmap](STM32H7_DRIVER_ROADMAP.md) | Board routes and a documentation scaffold for resuming after Clef DSP/cryptography readiness | Bounded HelloDISCO accepted; future APIs and descriptor expansion deferred |
-| [UI and display model across targets](DISPLAY_MODEL.md) | Fabulous/Partas-inspired composition, state and rendering boundaries; comparisons of HelloESP, HelloDISCO, HelloWayland and WrenHello | Grounded design exploration; native display first, optional binding paths retained |
+| [UI and display model across targets](DISPLAY_MODEL.md) | Cold functional components, reactive areas and rendering boundaries across MCU, SBC, desktop and WREN hosts | Grounded design exploration; native display first, optional binding paths retained |
+| [Sweet Potato native UI port](SWEET_POTATO_UI_PORT.md) | KeyStation boot, Meson HDMI, USB touch, restricted Mali rendering and the hosted Linux reference | Documentation scaffold and source inventory; no board or GPU acceptance |
 | [Radio model](RADIO_MODEL.md) | Wi-Fi/Bluetooth/LoRa ownership, reusable BLE commands/events, backend trust boundaries and language-readiness questions | Documentation scaffold; no radio driver or radio hardware acceptance |
+| [Cryptography providers](CRYPTOGRAPHY_PROVIDERS.md) | Fidelity.Cryptography ownership, hardware capabilities, custody and provider admission | Documentation scaffold; no crypto provider implementation or acceptance |
 
 Hardware sources and board acceptance belong with the corresponding product;
 see the [EK-RA6M5 source pack](../Hardware/Products/Renesas/EK_RA6M5/docs/README.md),

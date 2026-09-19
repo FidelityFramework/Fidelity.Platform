@@ -51,7 +51,21 @@ hardware does not grant application access: HelloBlinky owns its mappings, grant
 and timing predicate. A product with several compute blocks does not implicitly
 select several compilation targets.
 
+## Sweet Potato and native graphics
+
+The [AML-S905X-CC-V2 board entry](Hardware/Products/LibreComputer/AML_S905X_CC_V2/README.md)
+and [KeyStation reference selection](Profiles/SweetPotato_KeyStation_Reference/README.md)
+frame a Clef unikernel with Meson HDMI, USB touch and a restricted Mali-450
+renderer. The [port plan](docs/SWEET_POTATO_UI_PORT.md) separates firmware handoff,
+native display and GPU acceptance, with Linux as a reference and hosted route.
+These are documentation scaffolds without a selectable platform export.
+
 ## Admission and accelerator handoff references
+
+[Cryptography providers](docs/CRYPTOGRAPHY_PROVIDERS.md) defines the boundary with
+[Fidelity.Cryptography](../Fidelity.Cryptography/README.md): Platform owns exact
+hardware capabilities and native bindings, while the peer library owns algorithms,
+key-use contracts and provider conformance. This is a documentation scaffold.
 
 [Strix Halo + Arty A7](Profiles/StrixHalo_ArtyLab/README.md) is the physical
 reference for ThreeBody. Its handoff declarations distinguish CPU/GPU shared
