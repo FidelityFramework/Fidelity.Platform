@@ -7,6 +7,27 @@ head-node redesign is not a prerequisite for current platform work.
 
 ## What exists
 
+### Planned operation-specific capabilities — 2026-09-20
+
+[Composer M-01](../../Composer/docs/PRDs/M-01-DialectAdmission.md) coordinates the
+next consumer work under [Numeric Selection §10.4](../../clef-lang-spec/spec/numeric-selection.md#104-target-eligibility-and-realization-cost)
+and the [Scheduler Contract](../../clef-lang-spec/spec/scheduler-contract.md).
+Extend declarations where demanded to state primitive/intermediate precision,
+rounding/subnormal modes, contraction, accumulator capacity, memory/publication
+requirements and permitted software realizations. Keep silicon capability,
+environment enablement and selected profile policy traceable to their sources.
+The RA6M5 profile needs its actual FPU/ABI/runtime facts; an MCU name or generic
+float flag cannot establish eligibility for every numeric operation.
+
+Baker settles these facts with program requirements. Alex uses them for
+target-aware arith/math and control-form selection, and forwards required facts
+to the backend. Scheduler admission, control-plane capacity and timeout recovery
+need the same profile-specific treatment. Add a positive and a rejected-capability
+oracle plus the matching CCS editor diagnostic when a declaration/consumer pair
+lands. The standard explicitly leaves the shared operation-fact schema open;
+this note does not claim that schema or its readers are implemented. Current
+implementation facts follow below.
+
 Platform facts are not located exclusively beside the graph or exclusively in
 one special node. They have an authored representation and derived projections:
 

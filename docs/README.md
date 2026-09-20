@@ -35,6 +35,11 @@ regressions separately from hardware acceptance.
 
 ## Keeping the documents current
 
+The [operation-specific capability plan](D4b_PLATFORM_CARRIER_LOCATION.md#planned-operation-specific-capabilities--2026-09-20)
+tracks Composer M-01, numeric selection, scheduler requirements and target-aware
+witnessing. Its acceptance remains planned; the linked implementation tables
+retain their existing evidence boundaries.
+
 - Separate implemented behavior, dated test evidence, trusted hardware premises
   and proposed work. A declared fact or successful example is not proof of all
   exported APIs or all platform behavior.
