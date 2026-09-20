@@ -24,6 +24,18 @@ string fields. Their consumers have not been replaced by a universal alias layer
 Consumers now depend on the Contracts package instead of copying its source list.
 BAREWire metadata/full-library packages likewise share explicit source owners.
 
+BAREWire `PlatformDescription.ProgramLifetime` explicitly names its immutable
+image space and optional mutable program-lifetime space. Both names resolve to
+the descriptor's existing `Spaces`; `None` supplies no such authority. CCS
+retains the designation and resolved declaration identities, and storage users
+reject missing authority rather than infer it from a name or memory kind. The
+Linux Default and Wren profiles name their existing `rodata` and `data` budgets;
+MCU profiles name their selected image regions where declared. Arty, the ESP
+SRAM-only image and the restricted guest leave this capability unavailable.
+This designation grants neither runtime writes into immutable images nor a new
+target storage realization. Source `let` immutability is not an initialization
+permission. Contracts-only records still declare no memory-space authority.
+
 ## Authoritative export selection
 
 A selected platform manifest can name its root explicitly:

@@ -66,6 +66,7 @@ let description: PlatformDescription = {
     DisplayName = "Digilent Arty A7-100T (Rev D/E)"
     Substrate = "FPGA"
     Core = None
+    ProgramLifetime = None
     Spaces = [| bram; registers; flash |]
     Surfaces = [| pins |]
     Buffers = [| uartTx |]

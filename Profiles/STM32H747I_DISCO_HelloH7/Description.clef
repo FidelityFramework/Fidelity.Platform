@@ -68,6 +68,7 @@ module Description =
         DisplayName = "STMicroelectronics STM32H747I-DISCO — historical HelloH7 selection"
         Substrate = "mcu"
         Core = Some Execution.core
+        ProgramLifetime = Some { Immutable = "flash-bank1"; Mutable = Some "dtcm" }
         Spaces = [|
             // Memory. Every RAM region is listed so the inventory tells the
             // truth about the part; the image itself lives in flash-bank1 and

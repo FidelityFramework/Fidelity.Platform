@@ -59,6 +59,7 @@ let description: PlatformDescription = {
     DisplayName = "Linux x86-64 (libc), WrenHello budgets"
     Substrate = "CPU"
     Core = Some core
+    ProgramLifetime = Some { Immutable = "rodata"; Mutable = Some "data" }
     Spaces = [| text; rodataWren; data; bss; stack; arena; heap |]
     Surfaces = [| syscalls |]
     Buffers = [| consoleReadln; consoleWrite |]

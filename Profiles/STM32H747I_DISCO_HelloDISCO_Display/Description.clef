@@ -22,6 +22,7 @@ module Description =
         Id = "stm32h747i-disco-hellodisco-static-display"
         DisplayName = "STM32H747I-DISCO HelloDISCO static logo"
         Substrate = "mcu"; Core = Some Execution.core
+        ProgramLifetime = Some { Immutable = "flash-bank1"; Mutable = Some "axi-sram" }
         Spaces = [| Part.flashBank1; Part.axiSram; Part.rcc
                     Display.gpiog; Display.gpioj; Display.dsi; Display.ltdc; Core.ppb |]
         Surfaces = [||]; Buffers = [||]; Transports = [||]

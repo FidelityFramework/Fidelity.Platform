@@ -16,6 +16,7 @@ module Description =
     let managementControl = Fidelity.Platform.Hardware.VirtualMachines.Synthetic.RestrictedGuest64.Description.managementControl
     let descriptor: PlatformDescription = {
         Id = "restricted-guest64-design-probe"; DisplayName = "Restricted 64-bit guest (synthetic)"
+        ProgramLifetime = None
         Substrate = "cpu"; Core = Some core; Spaces = [| transport; management |]
         Surfaces = [||]; Buffers = [||]; Transports = [||]
         Lifecycle = { Clocks = [||]; Resets = [||]; Entry = "main"; Teardown = ""; Persistence = "volatile" }

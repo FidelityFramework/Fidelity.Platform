@@ -84,6 +84,7 @@ module Description =
         // image descriptor), and
         // the flash store as a download target. No flash window is selected --
         // this image lives entirely in SRAM and establishes no cache mapping.
+        ProgramLifetime = None
         Spaces = [| Part.sram0; Part.sram1; Part.sram2
                     Part.flashStore
                     // Peripherals this workload's registers live in. Inventory

@@ -24,6 +24,7 @@ module Description =
     let descriptor: PlatformDescription = {
         Id = "mcu-renesas-ra6m5-ek-ra6m5"; DisplayName = "Renesas EK-RA6M5 HelloBlinky"
         Substrate = "mcu"; Core = Some Execution.core
+        ProgramLifetime = Some { Immutable = "flash"; Mutable = Some "sram" }
         Spaces = [| Part.flash; Part.sram; Part.icu; Part.cpscu
                     Part.system; Part.port0; Part.pfs; Part.ppb |]
         Surfaces = [||]; Buffers = [||]; Transports = [||]; Lifecycle = lifecycle
