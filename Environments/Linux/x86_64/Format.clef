@@ -1,14 +1,15 @@
 /// Format operations for Fidelity.Platform
-/// Numeric-to-string conversion using byte arrays and String.fromBytes.
-/// Types are language-level: byte[], int, string. No pointer types.
+/// Numeric-to-string conversion using integer character codes and String.fromBytes.
+/// Character ranges determine storage through the selected platform declaration.
 module Format
 
-/// Convert float to string representation preserving full precision.
+/// Convert a finite float whose integer part fits the platform integer
+/// representation to decimal text with up to 15 fractional digits.
 /// Integer part extracted right-to-left; fractional digits extracted left-to-right.
 /// Trailing fractional zeros are stripped via lastNonZero tracking (no stripping loop).
 /// All mutables at function entry, all while loops at function level — flat structure.
 let float (value: float) : string =
-    let buf = Array.zeroCreate<byte> 64
+    let buf = Array.zeroCreate<int> 64
     let mutable pos = 0
     let mutable v = value
     let isNeg = v < 0.0
@@ -16,26 +17,26 @@ let float (value: float) : string =
         v <- 0.0 - v
 
     // Separate integer and fractional parts
-    let intPart = int v
+    let intPart = truncate v
     let frac = v - (float intPart)
 
     // Sign
     if isNeg then
-        Array.set buf pos 45uy
+        Array.set buf pos 45
         pos <- pos + 1
 
     // Integer part (right-to-left into temp buffer)
-    let intBuf = Array.zeroCreate<byte> 21
+    let intBuf = Array.zeroCreate<int> 21
     let mutable intPos = 20
     let mutable iv = intPart
     let mutable isDone = false
     if iv = 0 then
-        Array.set intBuf intPos 48uy
+        Array.set intBuf intPos 48
         intPos <- intPos - 1
         isDone <- true
     while not isDone do
         let digit = iv % 10
-        Array.set intBuf intPos (byte (digit + 48))
+        Array.set intBuf intPos (digit + 48)
         intPos <- intPos - 1
         iv <- iv / 10
         if iv = 0 then
@@ -49,16 +50,16 @@ let float (value: float) : string =
         ci <- ci + 1
 
     // Fractional part: extract up to 15 digits, track last non-zero position
-    let fracBuf = Array.zeroCreate<byte> 15
+    let fracBuf = Array.zeroCreate<int> 15
     let mutable fracLen = 0
     let mutable lastNonZero = -1
     let mutable f = frac
     let mutable fracDone = frac <= 0.0
     while not fracDone do
         f <- f * 10.0
-        let raw = int f
-        let d = if raw > 9 then 9 else raw
-        Array.set fracBuf fracLen (byte (d + 48))
+        let raw = truncate f
+        let d = if raw < 0 then 0 elif raw > 9 then 9 else raw
+        Array.set fracBuf fracLen (d + 48)
         if d > 0 then
             lastNonZero <- fracLen
         fracLen <- fracLen + 1
@@ -68,7 +69,7 @@ let float (value: float) : string =
 
     // Write decimal point if we have fractional digits
     if lastNonZero >= 0 then
-        Array.set buf pos 46uy
+        Array.set buf pos 46
         pos <- pos + 1
 
     // Copy fractional digits up to last non-zero (loop doesn't execute when lastNonZero = -1)
@@ -81,27 +82,29 @@ let float (value: float) : string =
     String.fromBytes (Array.sub buf 0 pos)
 
 /// Convert integer to string representation
-/// Uses right-to-left digit extraction with byte array buffer.
+/// Uses right-to-left digit extraction with an integer character-code buffer.
 let int (value: int) : string =
-    let buf = Array.zeroCreate<byte> 21
+    let buf = Array.zeroCreate<int> 21
     let mutable pos = 20
-    let mutable v = if value < 0 then 0 - value else value
+    // Keep the accumulator nonpositive: the minimum signed value has no positive
+    // counterpart in the same representation. A remainder's magnitude is at most 9.
+    let mutable v = if value > 0 then 0 - value else value
     let mutable isDone = false
 
     if v = 0 then
-        Array.set buf pos 48uy
+        Array.set buf pos 48
         pos <- pos - 1
         isDone <- true
     while not isDone do
-        let digit = v % 10
-        Array.set buf pos (byte (digit + 48))
+        let digit = 0 - (v % 10)
+        Array.set buf pos (digit + 48)
         pos <- pos - 1
         v <- v / 10
         if v = 0 then
             isDone <- true
 
     if value < 0 then
-        Array.set buf pos 45uy
+        Array.set buf pos 45
         pos <- pos - 1
 
     let startPos = pos + 1
