@@ -1,0 +1,18 @@
+module ParseValues
+
+let private check condition label =
+    if condition then Console.writeln label else Console.writeln "FAIL"
+
+[<EntryPoint>]
+let main _ =
+    check (Parse.int "0" = 0) "integer zero"
+    check (Parse.int "9" = 9) "integer nine"
+    check (Parse.int "0123456789" = 123456789) "all decimal digits"
+    check (Parse.int "-907" = -907) "negative integer"
+    check (Parse.int "0009" = 9) "leading zeroes"
+    check (Parse.float "0.0" = 0.0) "decimal zero"
+    check (Parse.float "9.25" = 9.25) "decimal fraction"
+    check (Parse.float "-0.5" = -0.5) "negative proper fraction"
+    check (Parse.float "-907.25" = -907.25) "negative decimal"
+    check (Parse.float "0123456789.5" = 123456789.5) "decimal digit accumulation"
+    0

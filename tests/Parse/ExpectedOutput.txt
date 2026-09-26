@@ -1,0 +1,10 @@
+integer zero
+integer nine
+all decimal digits
+negative integer
+leading zeroes
+decimal zero
+decimal fraction
+negative proper fraction
+negative decimal
+decimal digit accumulation
