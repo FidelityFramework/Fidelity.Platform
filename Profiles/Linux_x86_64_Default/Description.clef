@@ -60,7 +60,7 @@ let description: PlatformDescription = {
     Transports = [| websocket; wayland |]
     Lifecycle = lifecycle
     Notes = [|
-        "syscall numbers: Syscalls.clef, arch/x86/entry/syscalls/syscall_64.tbl"
+        "syscall numbers: arch/x86/entry/syscalls/syscall_64.tbl"
         "stack: RLIMIT_STACK default soft limit 8 MiB (setrlimit(2)); 16-byte alignment, System V AMD64 ABI 3.2.2"
         "arena: BAREWire docs/Arena_Design.md, the caller-provided 4096-byte scope arena"
         "heap: TASK_SIZE_MAX for 4-level paging, arch/x86/include/asm/page_64_types.h, with RLIMIT_DATA unlimited"
