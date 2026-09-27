@@ -100,6 +100,21 @@ type Representation = {
     Boundary: Boundary
 }
 
+/// Selected spatial topology and the ordered external scalar transport.
+/// Input names identify complete integer decoders in Core.Representations;
+/// Result is a destination constraint on the mathematically computed value.
+[<CLIMutable>]
+type KernelTarget = {
+    Device: string
+    Columns: int
+    ShimRow: int
+    ComputeRow: int
+    FifoDepth: int
+    Iterations: int
+    Inputs: string array
+    Result: string
+}
+
 /// The ISA/ABI facts of a processor core (docs/CANONICAL_PLATFORM_SPEC.md,
 /// "Schema: extend the live descriptor with a TargetCore block"), with the
 /// width dimensions and numeric representations it declares. The twin of

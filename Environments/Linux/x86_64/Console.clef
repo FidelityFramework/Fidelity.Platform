@@ -1,7 +1,6 @@
 /// Console I/O operations for Fidelity.Platform
-/// These use compiler intrinsics (Sys.write, Sys.read) with string types.
-/// String is memref<?xi8> in MLIR — the backend extracts pointer and length
-/// at syscall boundaries via memref.extract_aligned_pointer_as_index and memref.dim.
+/// Writes explicitly borrow immutable string bytes with that string's extent.
+/// CCS/Baker settles storage, bounds and the selected endpoint's ABI.
 ///
 /// NOTE: Top-level module declaration provides "Console.readln" etc. directly matching
 /// the intrinsic names for write/writeln/error/errorln. This allows user code to
@@ -19,30 +18,32 @@ let STDOUT = 1
 let STDERR = 2
 
 /// Read a line from stdin, returning it as a string.
-/// Backend handles buffer allocation, byte-level I/O, and newline trimming.
+/// Requires its own source-owned input buffer contract before native admission.
 let readln () : string =
     Sys.readline STDIN
 
 /// Write a string to stdout.
 let write (s: string) : unit =
-    let _ = Sys.write STDOUT s
+    let _ = Sys.write STDOUT s.Bytes s.Length
     ()
 
 /// Write a string to stdout followed by newline.
 let writeln (s: string) : unit =
     write s
-    let _ = Sys.write STDOUT "\n"
+    let newline = "\n"
+    let _ = Sys.write STDOUT newline.Bytes newline.Length
     ()
 
 /// Write a string to stderr.
 let error (s: string) : unit =
-    let _ = Sys.write STDERR s
+    let _ = Sys.write STDERR s.Bytes s.Length
     ()
 
 /// Write a string to stderr followed by newline.
 let errorln (s: string) : unit =
     error s
-    let _ = Sys.write STDERR "\n"
+    let newline = "\n"
+    let _ = Sys.write STDERR newline.Bytes newline.Length
     ()
 
 /// Capacity in bytes of the line buffer `readln` reads into. Authored here
